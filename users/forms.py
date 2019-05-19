@@ -8,19 +8,23 @@ from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 import random
 
+from.models import GENDERS
+
 
 class MemberCreationForm(UserCreationForm):
     username = forms.CharField()
     password1 = forms.CharField(widget=forms.PasswordInput)
     password2 = forms.CharField(widget=forms.PasswordInput)
     email_validator = EmailValidator(message=_('لطفا ایمیل خود را درست وارد نمایید'))
-    phone_validator = RegexValidator(regex=r'^\d{6,18}$', message=_('لطفا شماره تماس خود را درست وارد نمایید'))
+    # phone_validator = RegexValidator(regex=r'^\d{6,12}$', message=_('لطفا شماره تماس خود را درست وارد نمایید'))
     email = forms.CharField(validators=[email_validator])
-    phone = forms.CharField(required=False, validators=[phone_validator])
+    # phone = forms.CharField(validators=[phone_validator])
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2', 'phone')
+        # model = Member
+        fields = ('username', 'email', 'password1', 'password2')
+        # fields = ('first_name', 'last_name', 'gender', 'username', 'user.email', 'password1', 'password2', 'photo', 'phone')
 
     def notify(self, subject, message):
         print(subject)
@@ -58,3 +62,16 @@ class MemberActivationForm(forms.ModelForm):
             self.user.user.save()
         return self.cleaned_data['code']
 
+
+class EditProfileForm(forms.ModelForm):
+    first_name = forms.CharField(required=False)
+    last_name = forms.CharField(required=False)
+    gender = forms.ChoiceField(required=False, choices=GENDERS)
+    photo = forms.ImageField(required=False)
+
+    phone_validator = RegexValidator(regex=r'^\d{6,12}$', message=_('لطفا شماره تماس خود را درست وارد نمایید'))
+    phone_number = forms.CharField(required=False, validators=[phone_validator])
+
+    class Meta:
+        model = Member
+        fields = ('first_name', 'last_name', 'gender', 'photo', 'phone_number')

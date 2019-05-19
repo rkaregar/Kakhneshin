@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views.generic import FormView, CreateView, UpdateView
 
 from users.models import Member
-from .forms import MemberActivationForm, MemberCreationForm
+from .forms import MemberActivationForm, MemberCreationForm, EditProfileForm
 
 
 class MemberActivationView(FormView):
@@ -30,7 +30,8 @@ class MemberCreationView(CreateView):
 
 class EditProfileView(UpdateView):
     model = Member
-    fields = ['phone_number']
+    form_class = EditProfileForm
+    # fields = ['phone_number']
     template_name = 'edit_profile.html'
     success_url = '/'
 

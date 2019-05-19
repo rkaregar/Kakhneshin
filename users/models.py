@@ -4,25 +4,27 @@ from django.db.models.deletion import CASCADE
 
 # Create your models here.
 
+GENDERS = (('M', 'مرد'),
+           ('F', 'زن'),
+           ('O', 'سایر'),
+           ('N', 'نمی‌خواهم اعلام کنم'))
+
 
 class Member(models.Model):
     user = models.OneToOneField(to=User, on_delete=CASCADE, related_name='member')
-    phone_number = models.CharField(max_length=12, default=0)
+
+    first_name = models.CharField(max_length=20, null=True)
+    last_name = models.CharField(max_length=20, null=True)
+    gender = models.CharField(choices=GENDERS, max_length=1, null=True)
+    photo = models.ImageField(upload_to='gallery', null=True)
+    phone_number = models.CharField(max_length=12, null=True)
 
     def __str__(self):
-        return self.user.username
-
-    @property
-    def first_name(self):
-        return self.user.first_name
-
-    @property
-    def last_name(self):
-        return self.user.last_name
+        return self.first_name + ' ' + self.last_name + ', ' + self.user.username
 
     @property
     def name(self):
-        return self.first_name + ' ' + self.last_name
+        return self.name + ' ' + self.last_name
 
     @property
     def email(self):

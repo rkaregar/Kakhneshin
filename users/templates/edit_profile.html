@@ -47,21 +47,34 @@
       {% endif %}
 
 
-      <form method="post">
+
+      <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-group row" align="right">
           <h3 class="col-sm-6">ویرایش پروفایل</h3>
         </div>
 
+        {#        {{ form }}#}
 
-        <div class="form-group row">
-          <label for="phone_number" class="col-sm-2 col-form-label">شماره تلفن</label>
-          <div class="col-sm-7">
-            <input type="text" class="form-control" id="phone_number" name="phone_number"
-                   value="{{ form.phone_number.value }}" placeholder="" dir="ltr">
+        {% for field in form %}
+          <div class="form-group row">
+            <label for="phone_number" class="col-sm-2 col-form-label">{{field.label_tag}}</label>
+            <div class="col-sm-7">
+              {{ field }}
+{#              <input type="text" class="form-control" id="phone_number" name="phone_number"#}
+{#                     value="{{ form.phone_number.value }}" placeholder="" dir="ltr">#}
+            </div>
           </div>
-        </div>
+        {% endfor %}
 
+        {#                        <div class="form-group row">#}
+        {#                          <label for="phone_number" class="col-sm-2 col-form-label">شماره تلفن</label>#}
+        {#                          <div class="col-sm-7">#}
+        {#                            <input type="text" class="form-control" id="phone_number" name="phone_number"#}
+        {#                                   value="{{ form.phone_number.value }}" placeholder="" dir="ltr">#}
+        {#                          </div>#}
+        {#                        </div>#}
+        {##}
         <div style="padding-left: 150px">
           <button type="submit" class="btn btn-primary" name="submit_button">ثبت</button>
         </div>
