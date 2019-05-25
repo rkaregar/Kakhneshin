@@ -11,7 +11,7 @@ variables:
 test:
   stage: test
   script:
-  - pip install -r ci_requirements.txt
+  - pip install -r requirements.txt
   - python manage.py test --settings=kakhneshin.ci_settings
 
 
