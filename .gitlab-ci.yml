@@ -21,4 +21,4 @@ production:
  - gem install dpl
  - dpl --provider=heroku --app=kakhneshin --api-key=9680d18a-7a90-4d9d-8c88-5e889461c279
  only:
- - master
+ - develop
