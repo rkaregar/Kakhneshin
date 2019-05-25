@@ -1,0 +1,24 @@
+image: python:3.5.2
+
+services:
+  - postgres:latest
+
+variables:
+  POSTGRES_DB: kakhneshin
+  POSTGRES_USER: kakhneshin
+  POSTGRES_PASSWORD: strongpassword
+
+test:
+  script:
+  - pip install -r requirements.txt
+  - python manage.py test --settings=ci_settings
+
+
+#production:
+# script:
+# - apt-get update -qy
+# - apt-get install -y ruby-dev
+# - gem install dpl
+# - dpl --provider=heroku --app=asd-g7 --api-key=$HEROKU_PRODUCTION_API_KEY
+# only:
+# - master
