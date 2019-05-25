@@ -1,0 +1,24 @@
+image: python:3.6.5
+
+services:
+  - postgres:latest
+
+variables:
+  POSTGRES_DB: kakhneshin
+  POSTGRES_USER: kakhneshin
+  POSTGRES_PASSWORD: strongpassword
+
+test:
+  script:
+  - pip install -r requirements/production.txt
+  - python manage.py test --settings=kakhneshin.ci_settings
+
+
+production:
+ script:
+ - apt-get update -qy
+ - apt-get install -y ruby-dev
+ - gem install dpl
+ - dpl --provider=heroku --app=kakhneshin --api-key=9680d18a-7a90-4d9d-8c88-5e889461c279
+ only:
+ - develop
