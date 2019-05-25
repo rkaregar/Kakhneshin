@@ -22,9 +22,7 @@ class MemberCreationForm(UserCreationForm):
 
     class Meta:
         model = User
-        # model = Member
         fields = ('username', 'email', 'password1', 'password2')
-        # fields = ('first_name', 'last_name', 'gender', 'username', 'user.email', 'password1', 'password2', 'photo', 'phone')
 
     def notify(self, subject, message):
         print(subject)

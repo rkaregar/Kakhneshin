@@ -24,7 +24,7 @@ class Member(models.Model):
 
     @property
     def name(self):
-        return self.name + ' ' + self.last_name
+        return self.first_name + ' ' + self.last_name
 
     @property
     def email(self):
