@@ -25,7 +25,7 @@ SECRET_KEY = '5)wy1g23*w88h*!qx8y6^i#=(_icqu5b4yy=5jamo-8ip1jcma'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost','kakhneshin.herokuapp.com']
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'habitats',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -102,13 +103,21 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'asdproject97982@gmail.com'
+EMAIL_HOST_PASSWORD = '_Sz][RM;66QCBY;j'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+# DEFAULT_FROM_EMAIL = 'ASD Project <asd@project.com>'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tehran'
 
 USE_I18N = True
 
@@ -120,4 +129,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+LOGIN_REDIRECT_URL = '/users/edit-profile/'
+LOGOUT_REDIRECT_URL = '/users/login'
+
+TEMPLATES[0]['OPTIONS']['context_processors'].append('users.context_processors.categories_processor')
+
