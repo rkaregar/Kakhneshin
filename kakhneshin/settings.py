@@ -138,3 +138,7 @@ LOGOUT_REDIRECT_URL = '/users/login'
 
 TEMPLATES[0]['OPTIONS']['context_processors'].append('users.context_processors.categories_processor')
 
+# ie if Heroku server
+if 'DATABASE_URL' in os.environ:
+    import dj_database_url
+    DATABASES = {'default': dj_database_url.config()}
