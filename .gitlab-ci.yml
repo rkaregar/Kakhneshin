@@ -15,7 +15,7 @@ test:
   - python manage.py test --settings=kakhneshin.ci_settings
 
 
-production:
+deploy:
   stage: deploy
   script:
   - apt-get update -qy
