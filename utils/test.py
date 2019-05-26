@@ -1,7 +1,8 @@
+from unittest import skip
+
 import random
 from copy import copy
-from django.test import TestCase
-# from selenium.webdriver import Firefox
+# from selenium.webdriver import Chrome
 
 # class SeleniumResponse(object):
 #     def __init__(self, web_driver):
@@ -11,7 +12,7 @@ from django.test import TestCase
 #
 # class SeleniumDjangoTestClient(object):
 #
-#     def __init__(self, web_driver=Firefox(), live_server_url=None):
+#     def __init__(self, web_driver=Chrome(), live_server_url=None):
 #         self.web_driver = web_driver
 #         self.live_server_url = live_server_url
 #
@@ -37,7 +38,7 @@ from django.test import TestCase
 #         return SeleniumResponse(self.web_driver)
 #
 
-class KakhneshinCRUDTestCase(TestCase):
+class KakhneshinCRUDTestCase:
 
     read_url = None
     list_url = None
