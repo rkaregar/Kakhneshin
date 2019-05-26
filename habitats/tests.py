@@ -1,12 +1,12 @@
 from django.test import LiveServerTestCase
 from habitats.models import Habitat
+from selenium import webdriver
 
 # Create your tests here.
 from utils.test import KakhneshinCRUDTestCase, SeleniumDjangoTestClient
 
 
 class HabitatsBackendTest(KakhneshinCRUDTestCase):
-
     read_url = '/habitats'
     list_url = '/habitats'
     create_url = '/habitats/create'
@@ -29,4 +29,8 @@ class HabitatSeleniumTest(LiveServerTestCase):
 
     def __init__(self, methodName='runTest'):
         super().__init__(methodName)
-        self.client = SeleniumDjangoTestClient(live_server_url=self.live_server_url)
+        driver_options = webdriver.ChromeOptions()
+        driver_options.add_argument('headless')
+        driver_options.add_argument('window-size=1980,1080')
+        self.client = SeleniumDjangoTestClient(web_driver=webdriver.Chrome(chrome_options=driver_options),
+                                               live_server_url=self.live_server_url)
