@@ -10,6 +10,8 @@ variables:
 
 test:
   stage: test
+  services:
+  - selenium/standalone-firefox
   script:
   - pip install -r requirements.txt
   - python manage.py test --settings=kakhneshin.ci_settings
