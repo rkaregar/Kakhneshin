@@ -1,4 +1,4 @@
-image: python:3.6.5
+image: joyzoursky/python-chromedriver:3.7-selenium
 
 services:
   - postgres:latest
@@ -10,8 +10,6 @@ variables:
 
 test:
   stage: test
-  services:
-  - selenium/standalone-firefox
   script:
   - pip install -r requirements.txt
   - python manage.py test --settings=kakhneshin.ci_settings
