@@ -1,41 +1,41 @@
 import random
 from copy import copy
 from django.test import TestCase
-from selenium.webdriver import Firefox
+# from selenium.webdriver import Firefox
 
-class SeleniumResponse(object):
-    def __init__(self, web_driver):
-        self.status_code = 404 if '404' in web_driver.page_source else 200
-        self.content = web_driver.page_source
-        self.web_driver = web_driver
-
-class SeleniumDjangoTestClient(object):
-
-    def __init__(self, web_driver=Firefox(), live_server_url=None):
-        self.web_driver = web_driver
-        self.live_server_url = live_server_url
-
-    def get_absolute_url(self, path):
-        return self.live_server_url + path
-
-    def get(self, path):
-        self.web_driver.get(path)
-        return SeleniumResponse(self.web_driver)
-
-
-    def post(self, path, data: dict = None):
-        self.web_driver.get(path)
-        last_element = None
-        for name, value in data.items():
-            element = self.web_driver.find_element_by_name(name)
-            element.send_keys(value)
-            last_element = element
-        last_element.submit()
-
-    def delete(self, path):
-        self.get(path)
-        return SeleniumResponse(self.web_driver)
-
+# class SeleniumResponse(object):
+#     def __init__(self, web_driver):
+#         self.status_code = 404 if '404' in web_driver.page_source else 200
+#         self.content = web_driver.page_source
+#         self.web_driver = web_driver
+#
+# class SeleniumDjangoTestClient(object):
+#
+#     def __init__(self, web_driver=Firefox(), live_server_url=None):
+#         self.web_driver = web_driver
+#         self.live_server_url = live_server_url
+#
+#     def get_absolute_url(self, path):
+#         return self.live_server_url + path
+#
+#     def get(self, path):
+#         self.web_driver.get(path)
+#         return SeleniumResponse(self.web_driver)
+#
+#
+#     def post(self, path, data: dict = None):
+#         self.web_driver.get(path)
+#         last_element = None
+#         for name, value in data.items():
+#             element = self.web_driver.find_element_by_name(name)
+#             element.send_keys(value)
+#             last_element = element
+#         last_element.submit()
+#
+#     def delete(self, path):
+#         self.get(path)
+#         return SeleniumResponse(self.web_driver)
+#
 
 class KakhneshinCRUDTestCase(TestCase):
 
