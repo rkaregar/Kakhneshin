@@ -30,7 +30,8 @@ class HabitatSeleniumTest(LiveServerTestCase):
     def __init__(self, methodName='runTest'):
         super().__init__(methodName)
         driver_options = webdriver.ChromeOptions()
-        driver_options.add_argument('headless')
-        driver_options.add_argument('window-size=1980,1080')
+        driver_options.add_argument('--headless')
+        driver_options.add_argument('--no-sandbox')
+        driver_options.add_argument('--disable-dev-shm-usage')
         self.client = SeleniumDjangoTestClient(web_driver=webdriver.Chrome(chrome_options=driver_options),
                                                live_server_url=self.live_server_url)
