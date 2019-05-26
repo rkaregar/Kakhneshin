@@ -1,7 +1,7 @@
 import random
 from copy import copy
 from django.test import TestCase
-from selenium.webdriver import Firefox
+from selenium.webdriver import Chrome
 
 class SeleniumResponse(object):
     def __init__(self, web_driver):
@@ -11,7 +11,7 @@ class SeleniumResponse(object):
 
 class SeleniumDjangoTestClient(object):
 
-    def __init__(self, web_driver=Firefox(), live_server_url=None):
+    def __init__(self, web_driver=Chrome(), live_server_url=None):
         self.web_driver = web_driver
         self.live_server_url = live_server_url
 
