@@ -6,7 +6,7 @@ from selenium.webdriver import Firefox
 class SeleniumResponse(object):
     def __init__(self, web_driver):
         self.status_code = 404 if '404' in web_driver.page_source else 200
-        self.body = web_driver.page_source
+        self.content = web_driver.page_source
         self.web_driver = web_driver
 
 class SeleniumDjangoTestClient(object):
@@ -49,16 +49,18 @@ class KakhneshinCRUDTestCase(TestCase):
     visible_fields = ()
 
     def populate_with_test_data(self):
+        result = []
         for model_test_data in self.model_test_data:
             instance = self.model(**model_test_data)
             instance.save()
-            yield instance
+            result.append(instance)
+        return result
 
     def assert_object_in_response(self, obj, response):
         self.assert_object_page_ok_response(response)
         for visible_field in self.visible_fields:
             self.assertIn(
-                getattr(obj, visible_field), response.body,
+                str(getattr(obj, visible_field)), response.content.decode('utf8'),
                 '{} read page does not contain visible field {}'.format(
                     self.model.name,
                     visible_field
@@ -79,7 +81,7 @@ class KakhneshinCRUDTestCase(TestCase):
         objs = self.populate_with_test_data()
 
         for obj in objs:
-            response = self.client.get(self.read_url + '/' + obj.id)
+            response = self.client.get(self.read_url.format(obj.id))
             self.assert_object_in_response(obj, response)
 
     def test_list(self):
@@ -112,18 +114,22 @@ class KakhneshinCRUDTestCase(TestCase):
         objs = self.populate_with_test_data()
 
         shuffled_test_data = copy(self.model_test_data)
+        random.shuffle(shuffled_test_data)
 
         for obj_place, obj in enumerate(objs):
             response = self.client.post(
-                path=self.update_url + '/' + obj_place,
-                data=shuffled_test_data[obj_place]
+                path=self.update_url.format(obj.id),
+                data=shuffled_test_data[obj_place],
+                follow=True
             )
             self.assert_object_page_ok_response(response)
             obj.refresh_from_db()
             self.assert_object_attributes(obj, shuffled_test_data[obj_place])
 
     def test_delete(self):
-        objs = list(self.populate_with_test_data())
+        objs = self.populate_with_test_data()
         object_to_delete = random.choice(objs)
-        self.client.delete(path=self.delete_url + '/' + object_to_delete.id)
+        self.client.get(path=self.delete_url.format(object_to_delete.id))
+        self.assertTrue(self.model.objects.filter(id=object_to_delete.id).exists())
+        self.client.post(path=self.delete_url.format(object_to_delete.id))
         self.assertFalse(self.model.objects.filter(id=object_to_delete.id).exists())
