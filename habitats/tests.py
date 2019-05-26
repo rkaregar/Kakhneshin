@@ -14,15 +14,15 @@ class HabitatsBackendTest(KakhneshinCRUDTestCase):
     delete_url = '/habitats/delete'
 
     model = Habitat
-    model_test_data = (
+    model_test_data = [
         {
             'name': 'اقامتگاه اول',
             'address': 'اول آنجایی که می‌دانی',
             'town': 'تهران',
             'cost': 100000,
         }
-    )
-    visible_fields = ('name',)
+    ]
+    visible_fields = ('name', 'address', 'town', 'cost')
 
 
 class HabitatSeleniumTest(LiveServerTestCase):
