@@ -1,3 +1,5 @@
 from django.contrib import admin
 
-# Register your models here.
+from habitats.models import Habitat
+
+admin.site.register(Habitat)

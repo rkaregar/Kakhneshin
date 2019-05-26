@@ -1,0 +1,17 @@
+{% extends "master.html" %}
+
+{% block content %}
+    <div id="page-content-wrapper" align="center">
+    <h1>اقامتگاه‌های سیستم</h1>
+
+    <ul>
+    {% for habitat in object_list %}
+    <li>{{ habitat }}</li>
+    {% empty %}
+    <li>No articles yet.</li>
+    {% endfor %}
+    </ul>
+
+    </div>
+    <script src="/static/Translator.js"></script>
+{% endblock %}
