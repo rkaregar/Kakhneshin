@@ -81,6 +81,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'OPTIONS': {
+            # ...
+            'timeout': 1000,
+            # ...
+        }
     }
 }
 
@@ -139,3 +144,10 @@ LOGIN_REDIRECT_URL = '/users/edit-profile/'
 LOGOUT_REDIRECT_URL = '/users/login'
 
 TEMPLATES[0]['OPTIONS']['context_processors'].append('users.context_processors.categories_processor')
+
+
+TEST_SETTINGS = {
+    'DEBUG': True,
+    'ALLOWED_HOSTS': ['*'],
+
+}
