@@ -1,10 +1,4 @@
-image: joyzoursky/python-chromedriver:3.7-selenium
-
-env:
-  - MOZ_HEADLESS=1
-
-addons:
-  firefox: latest
+image: qxf2rohand/python-selenium-firefox
 
 services:
   - postgres:latest
@@ -18,6 +12,7 @@ test:
   stage: test
   script:
   - pip install -r requirements.txt
+  - export MOZ_HEADLESS=1
   - python manage.py test --settings=kakhneshin.ci_settings
 
 
