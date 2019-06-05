@@ -13,6 +13,13 @@ class HabitatCreateView(CreateView):
     template_name = 'habitats/create_habitat.html'
     success_url = '/habitats/create'
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user.member
+        return super(HabitatCreateView, self).form_valid(form)
+
+
+
+
 
 class HabitatUpdateView(UpdateView):
     form_class = CreateHabitatForm
