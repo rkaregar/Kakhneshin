@@ -1,4 +1,4 @@
-image: qxf2rohand/python-selenium-firefox
+image: juusechec/firefox-headless-selenium-python
 
 services:
   - postgres:latest
