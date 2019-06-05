@@ -11,6 +11,9 @@ variables:
 test:
   stage: test
   script:
+  - apt-get update -yq > /dev/null
+  - apt-get install python3 python3-pip > /dev/null
+  - pip install --upgrade pip
   - pip install -r requirements.txt
   - export MOZ_HEADLESS=1
   - python manage.py test --settings=kakhneshin.ci_settings
