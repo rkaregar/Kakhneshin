@@ -13,3 +13,4 @@ DATABASES = {
 }
 
 HEADLESS_SELENIUM = True
+SELENIUM_SERVER = {'host': 'selenium', 'port': 4444}

@@ -18,10 +18,13 @@ class SeleniumDjangoTestClient(object):
 
     def __init__(self, web_driver=None, live_server_url='http://127.0.0.1:8000'):
         if web_driver is None:
-            firefox_options = Options()
-            if settings.HEADLESS_SELENIUM:
-                firefox_options.add_argument('-headless')
-            self.web_driver = webdriver.Firefox(options=firefox_options)
+            if settings.SELENIUM_SERVER is not None:
+                self.web_driver = webdriver.Remote(command_executor='http://selenium:4444/wd/hub')
+            else:
+                firefox_options = Options()
+                if settings.HEADLESS_SELENIUM:
+                    firefox_options.add_argument('-headless')
+                self.web_driver = webdriver.Firefox(options=firefox_options,)
         else:
             self.web_driver = web_driver
         self.web_driver.implicitly_wait(self.implicit_wait)

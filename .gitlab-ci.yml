@@ -1,7 +1,9 @@
-image: juusechec/firefox-headless-selenium-python
+image: joyzoursky/python-chromedriver:3.7-selenium
 
 services:
   - postgres:latest
+  - name: selenium/standalone-firefox
+    alias: selenium
 
 variables:
   POSTGRES_DB: kakhneshin
