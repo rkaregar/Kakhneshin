@@ -15,6 +15,7 @@ class Habitat(models.Model):
 
 
 class RoomType(models.Model):
+    habitat = models.ForeignKey(Habitat, null=True, on_delete=models.CASCADE)
     type_name = models.CharField(max_length=200, default='عادی')
     capacity_in_person = models.PositiveIntegerField(default=0)
     cost_per_night = models.PositiveIntegerField(default=0)
