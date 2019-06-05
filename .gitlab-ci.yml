@@ -11,6 +11,10 @@ variables:
 test:
   stage: test
   script:
+  - sudo apt-get update -yq > /dev/null
+  - sudo apt-get install -yq virtualenv libpq-dev python3-dev > /dev/null
+  - virtualenv -p /usr/bin/python3 venv > /dev/null
+  - source venv/bin/activate
   - pip install -r requirements.txt
   - python manage.py test --settings=kakhneshin.ci_settings
 
