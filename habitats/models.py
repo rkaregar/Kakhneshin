@@ -41,3 +41,4 @@ class RoomOutOfService(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     inclusive_since = models.DateTimeField()
     inclusive_until = models.DateTimeField()
+    details = models.CharField(max_length=1000, null=True)
