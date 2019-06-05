@@ -1,8 +1,14 @@
-from unittest import skip
+from time import sleep
+
+from django import db
+
+import os
+from subprocess import call, Popen
 
 import random
 from copy import copy
-from selenium.webdriver import Firefox
+from selenium.webdriver.common.keys import Keys
+
 
 class SeleniumResponse(object):
     def __init__(self, web_driver):
@@ -12,8 +18,11 @@ class SeleniumResponse(object):
 
 class SeleniumDjangoTestClient(object):
 
-    def __init__(self, web_driver=Firefox(), live_server_url=None):
+    implicit_wait = 10
+
+    def __init__(self, web_driver, live_server_url=None):
         self.web_driver = web_driver
+        self.web_driver.implicitly_wait(self.implicit_wait)
         self.live_server_url = live_server_url
 
     def get_absolute_url(self, path):
@@ -26,14 +35,17 @@ class SeleniumDjangoTestClient(object):
 
     def post(self, path, data: dict = None):
         self.web_driver.get(self.get_absolute_url(path))
-        last_element = None
-        if not data:
-            return SeleniumResponse(self.web_driver)
-        for name, value in data.items():
-            element = self.web_driver.find_element_by_name(name)
-            element.send_keys(value)
-            last_element = element
-        last_element.submit()
+        if data:
+            last_element = None
+            for name, value in data.items():
+                element = self.web_driver.find_element_by_name(name)
+                element.send_keys(Keys.CONTROL, 'a')
+                element.send_keys(value)
+                last_element = element
+            if last_element is not None:
+                last_element.submit()
+        else:
+            self.web_driver.find_element_by_tag_name('form').submit()
         return SeleniumResponse(self.web_driver)
 
     def delete(self, path):
@@ -85,7 +97,8 @@ class KakhneshinCRUDTestCase:
         objs = self.populate_with_test_data()
 
         for obj in objs:
-            response = self.client.get(self.read_url.format(obj.id))
+            obj_id = obj.id
+            response = self.client.get(self.read_url.format(obj_id))
             self.assert_object_in_response(obj, response)
 
     def test_list(self):

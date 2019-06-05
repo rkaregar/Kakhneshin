@@ -9,8 +9,12 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
+import sys
 
 import os
+
+
+TEST = 'test' in sys.argv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -80,12 +84,7 @@ WSGI_APPLICATION = 'kakhneshin.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        'OPTIONS': {
-            # ...
-            'timeout': 1000,
-            # ...
-        }
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3' if not TEST else 'db.sqlite3.test'),
     }
 }
 
@@ -145,9 +144,7 @@ LOGOUT_REDIRECT_URL = '/users/login'
 
 TEMPLATES[0]['OPTIONS']['context_processors'].append('users.context_processors.categories_processor')
 
-
 TEST_SETTINGS = {
     'DEBUG': True,
     'ALLOWED_HOSTS': ['*'],
-
 }
