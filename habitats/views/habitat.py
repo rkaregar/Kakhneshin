@@ -18,9 +18,6 @@ class HabitatCreateView(CreateView):
         return super(HabitatCreateView, self).form_valid(form)
 
 
-
-
-
 class HabitatUpdateView(UpdateView):
     form_class = CreateHabitatForm
     template_name = 'habitats/update_habitat.html'
