@@ -17,13 +17,13 @@ class CreateRoomTypeForm(forms.ModelForm):
                   'has_bath_tub', 'has_shower', 'has_wc', 'details')
 
 
-class CreateRoom(forms.ModelForm):
+class CreateRoomForm(forms.ModelForm):
     class Meta:
         model = Room
         fields = ('room_type', 'number', 'details')
 
 
-class CreateRoomOutOfService(forms.ModelForm):
+class CreateRoomOutOfServiceForm(forms.ModelForm):
     class Meta:
         model = RoomOutOfService
         fields = ('room', 'inclusive_since', 'inclusive_until', 'details')

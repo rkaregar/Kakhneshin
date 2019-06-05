@@ -3,11 +3,6 @@ from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from habitats.forms import CreateHabitatForm
 from habitats.models import Habitat
 
-
-def all(request):
-    raise NotImplementedError
-
-
 class HabitatCreateView(CreateView):
     form_class = CreateHabitatForm
     template_name = 'habitats/create_habitat.html'
