@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from django.test import TestCase, tag, LiveServerTestCase
 from django.test import override_settings
 from habitats.models import Habitat
-from selenium import webdriver
 from users.models import Member
 from utils.test import KakhneshinCRUDTestCase, SeleniumDjangoTestClient
 
@@ -53,7 +52,6 @@ class HabitatSeleniumTest(HabitatsCRUDTest, LiveServerTestCase):
         def setUpClass(cls):
             super().setUpClass()
             cls.selenium_client = SeleniumDjangoTestClient(
-                web_driver=webdriver.Firefox(),
                 live_server_url=cls.live_server_url
             )
 

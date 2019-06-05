@@ -1,5 +1,11 @@
 image: joyzoursky/python-chromedriver:3.7-selenium
 
+env:
+  - MOZ_HEADLESS=1
+
+addons:
+  firefox: latest
+
 services:
   - postgres:latest
 

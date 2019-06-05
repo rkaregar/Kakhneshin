@@ -11,3 +11,5 @@ DATABASES = {
     'PORT': '5432',
   }
 }
+
+HEADLESS_SELENIUM = True

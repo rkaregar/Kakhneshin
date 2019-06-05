@@ -1,13 +1,9 @@
-from time import sleep
-
-from django import db
-
-import os
-from subprocess import call, Popen
-
 import random
 from copy import copy
+from django.conf import settings
+from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.options import Options
 
 
 class SeleniumResponse(object):
@@ -20,8 +16,14 @@ class SeleniumDjangoTestClient(object):
 
     implicit_wait = 10
 
-    def __init__(self, web_driver, live_server_url=None):
-        self.web_driver = web_driver
+    def __init__(self, web_driver=None, live_server_url='http://127.0.0.1:8000'):
+        if web_driver is None:
+            firefox_options = Options()
+            if settings.HEADLESS_SELENIUM:
+                firefox_options.add_argument('-headless')
+            self.web_driver = webdriver.Firefox(options=firefox_options)
+        else:
+            self.web_driver = web_driver
         self.web_driver.implicitly_wait(self.implicit_wait)
         self.live_server_url = live_server_url
 
@@ -33,7 +35,9 @@ class SeleniumDjangoTestClient(object):
         return SeleniumResponse(self.web_driver)
 
 
-    def post(self, path, data: dict = None):
+    def post(self, path, data: dict = None, follow=True):
+        if not follow:
+            raise Exception('follow=True is not allowed when using selenium client.')
         self.web_driver.get(self.get_absolute_url(path))
         if data:
             last_element = None
@@ -137,6 +141,7 @@ class KakhneshinCRUDTestCase:
             response = self.client.post(
                 path=self.update_url.format(obj.id),
                 data=shuffled_test_data[obj_place],
+                follow=True,
             )
             self.assert_object_page_ok_response(response)
             obj.refresh_from_db()

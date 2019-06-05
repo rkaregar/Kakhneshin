@@ -148,3 +148,5 @@ TEST_SETTINGS = {
     'DEBUG': True,
     'ALLOWED_HOSTS': ['*'],
 }
+
+HEADLESS_SELENIUM = False
