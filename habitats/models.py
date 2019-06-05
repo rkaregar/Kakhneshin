@@ -29,3 +29,15 @@ class RoomType(models.Model):
     has_shower = models.BooleanField(default=False)
     has_wc = models.BooleanField(default=False)
     details = models.CharField(max_length=10000, null=True)
+
+
+class Room(models.Model):
+    room_type = models.ForeignKey(RoomType, null=True, on_delete=models.CASCADE)  # TODO: cascade?
+    number = models.CharField(max_length=10, null=True)
+    details = models.CharField(max_length=10000, null=True)
+
+
+class OutOfService(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    inclusive_since = models.DateTimeField()
+    inclusive_until = models.DateTimeField()
