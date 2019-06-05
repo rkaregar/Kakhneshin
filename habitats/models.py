@@ -37,7 +37,7 @@ class Room(models.Model):
     details = models.CharField(max_length=10000, null=True)
 
 
-class OutOfService(models.Model):
+class RoomOutOfService(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     inclusive_since = models.DateTimeField()
     inclusive_until = models.DateTimeField()
