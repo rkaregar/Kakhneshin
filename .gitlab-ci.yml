@@ -1,9 +1,7 @@
-image: joyzoursky/python-chromedriver:3.7-selenium
+image: selenium/standalone-firefox
 
 services:
   - postgres:latest
-  - name: selenium/standalone-firefox
-    alias: selenium
 
 variables:
   POSTGRES_DB: kakhneshin
@@ -13,8 +11,11 @@ variables:
 test:
   stage: test
   script:
+  - apt-get update -yp > /dev/null
+  - apt-get install virtualenv > /dev/null
+  - virtualenv -p /usr/bin/python3 venv
+  - source venv/bin/activate
   - pip install -r requirements.txt
-  - export MOZ_HEADLESS=1
   - python manage.py test --settings=kakhneshin.ci_settings
 
 
