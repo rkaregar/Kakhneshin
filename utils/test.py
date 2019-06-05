@@ -2,7 +2,6 @@ import random
 from copy import copy
 from django.conf import settings
 from selenium import webdriver
-from selenium.webdriver import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
@@ -19,12 +18,6 @@ class SeleniumDjangoTestClient(object):
 
     def __init__(self, web_driver=None, live_server_url='http://127.0.0.1:8000'):
         if web_driver is None:
-            # if settings.SELENIUM_SERVER is not None:
-            #     self.web_driver = webdriver.Remote(
-            #         command_executor='http://selenium:4444/wd/hub',
-            #         desired_capabilities=DesiredCapabilities.FIREFOX
-            #     )
-            # else:
             firefox_options = Options()
             if settings.HEADLESS_SELENIUM:
                 firefox_options.add_argument('-headless')
