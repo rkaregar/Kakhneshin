@@ -22,8 +22,8 @@ test:
 deploy:
   stage: deploy
   script:
-  - apt-get update -qy
-  - apt-get install -y ruby-dev
+  - sudo apt-get update -qy
+  - sudo apt-get install -y ruby-dev
   - gem install dpl
   - dpl --provider=heroku --app=kakhneshin --api-key=9680d18a-7a90-4d9d-8c88-5e889461c279
   only:
