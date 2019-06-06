@@ -1,10 +1,12 @@
-from accounts.forms import TransactionForm
+from accounts.forms import TransactionForm, WithdrawalForm
 from accounts.models import Transaction
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.decorators import method_decorator
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views.generic import FormView, TemplateView
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import FormView, TemplateView, ListView, UpdateView, CreateView
 
 
 class ChargeView(LoginRequiredMixin, FormView):
@@ -29,3 +31,41 @@ class CallbackView(TemplateView):
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
+
+class WithdrawalsView(LoginRequiredMixin, CreateView):
+    login_url = reverse_lazy('users:login')
+    template_name = 'accounts/withdrawals.html'
+    form_class = WithdrawalForm
+    success_url = reverse_lazy('accounts:withdrawals')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        super_context = super().get_context_data(object_list=object_list, **kwargs)
+        super_context['transactions'] = Transaction.objects.filter(
+            from_user=self.request.user, verified=False, to_user=None
+        )
+        return super_context
+
+    def get_form_class(self):
+        class RequestForm(self.form_class):
+            request = self.request
+        return RequestForm
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class WithdrawalApprovalView(LoginRequiredMixin, ListView):
+    login_url = reverse_lazy('admin:login')
+    model = Transaction
+    template_name = 'accounts/withdrawal_approval.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(verified=False, to_user=None)
+
+
+
+@method_decorator(staff_member_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class UpdateTransaction(UpdateView):
+    success_url = reverse_lazy('accounts:withdrawal_approval')
+    model = Transaction
+    fields = ('verified',)
+    template_name = 'accounts/withdrawal_approval.html'

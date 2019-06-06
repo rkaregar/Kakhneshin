@@ -49,11 +49,18 @@ class SeleniumDjangoTestClient(object):
             last_element = None
             for name, value in data.items():
                 element = self.web_driver.find_element_by_name(name)
+                if element.get_attribute('type') == 'hidden':
+                    if element.get_attribute('value') != value:
+                        raise Exception('hidden field is not correctly valued.')
+                    else:
+                        continue
                 element.send_keys(Keys.CONTROL, 'a')
                 element.send_keys(value)
                 last_element = element
             if last_element is not None:
                 last_element.submit()
+            else:
+                self.web_driver.find_element_by_tag_name('form').submit()
         else:
             self.web_driver.find_element_by_tag_name('form').submit()
         return SeleniumResponse(self.web_driver)
@@ -182,14 +189,19 @@ def create_user(username='test', password='test', **kwargs):
 @tag('abstract')
 class SeleniumTestCase(LiveServerTestCase):
 
-        @classmethod
-        def setUpClass(cls):
-            super().setUpClass()
-            cls.selenium_client = SeleniumDjangoTestClient(
-                live_server_url=cls.live_server_url
-            )
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.selenium_client = SeleniumDjangoTestClient(
+            live_server_url=cls.live_server_url
+        )
 
-        @classmethod
-        def tearDownClass(cls):
-            cls.selenium_client.web_driver.close()
-            super().tearDownClass()
+    @classmethod
+    def tearDownClass(cls):
+        cls.selenium_client.web_driver.close()
+        super().tearDownClass()
+
+
+    def tearDown(self):
+        self.client.logout()
+        super().tearDown()

@@ -42,7 +42,10 @@
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog"
                  style="padding-left: 18px">
               <a class="dropdown-item" href="{% url 'accounts:deposit' %}">شارژ حساب</a>
-              <a class="dropdown-item" href="#">برداشت از حساب</a>
+              <a class="dropdown-item" href="{% url 'accounts:withdrawals' %}">برداشت از حساب</a>
+              {% if user.is_staff %}
+                <a class="dropdown-item" href="{% url 'accounts:withdrawal_approval' %}">تایید برداشت‌ها</a>
+              {% endif %}
             </div>
           </li>
           <li class="nav-item">
