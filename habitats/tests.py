@@ -2,11 +2,11 @@ from time import sleep
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.test import TestCase, tag, LiveServerTestCase
+from django.test import TestCase, tag
 from django.test import override_settings
 from habitats.models import Habitat
 from users.models import Member
-from utils.test import KakhneshinCRUDTestCase, SeleniumDjangoTestClient
+from utils.test import KakhneshinCRUDTestCase, create_user, SeleniumTestCase
 
 
 class HabitatsCRUDTest(KakhneshinCRUDTestCase):
@@ -46,25 +46,15 @@ class HabitatsBackendTest(HabitatsCRUDTest, TestCase):
 
 @tag('ui')
 @override_settings(**settings.TEST_SETTINGS)
-class HabitatSeleniumTest(HabitatsCRUDTest, LiveServerTestCase):
+class HabitatSeleniumTest(HabitatsCRUDTest, SeleniumTestCase):
 
-        @classmethod
-        def setUpClass(cls):
-            super().setUpClass()
-            cls.selenium_client = SeleniumDjangoTestClient(
-                live_server_url=cls.live_server_url
-            )
 
         def setUp(self):
             super().setUp()
             self.client = self.selenium_client
-            Member.objects.create(user=User.objects.create_user('test', 'test@kakhneshin.ir', password='test'))
-            self.client.post('/users/login/', data={'username': 'test', 'password': 'test'})
+            create_user(username='test', password='test')
+            self.client.login(username='test', password='test')
 
-        @classmethod
-        def tearDownClass(cls):
-            cls.selenium_client.web_driver.close()
-            super().tearDownClass()
 
 
 

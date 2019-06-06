@@ -1,9 +1,15 @@
+from unittest import skip
+
 import random
 from copy import copy
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.test import LiveServerTestCase, tag
+from django.test.selenium import SeleniumTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
+from users.models import Member
 
 
 class SeleniumResponse(object):
@@ -55,6 +61,10 @@ class SeleniumDjangoTestClient(object):
     def delete(self, path):
         self.get(self.get_absolute_url(path))
         return SeleniumResponse(self.web_driver)
+
+    def login(self, username, password, login_path='/users/login'):
+        self.post(login_path, data={'username': username, 'password': password})
+
 
 
 class KakhneshinCRUDTestCase:
@@ -154,3 +164,25 @@ class KakhneshinCRUDTestCase:
         self.assertTrue(self.model.objects.filter(id=object_to_delete.id).exists())
         self.client.post(path=self.delete_url.format(object_to_delete.id))
         self.assertFalse(self.model.objects.filter(id=object_to_delete.id).exists())
+
+
+def create_user(username='test', password='test'):
+    user = User.objects.create(username=username, password=password, email='test@kakhneshin.com')
+    Member.objects.create(user=user)
+    return user
+
+
+@tag('abstract')
+class SeleniumTestCase(LiveServerTestCase):
+
+        @classmethod
+        def setUpClass(cls):
+            super().setUpClass()
+            cls.selenium_client = SeleniumDjangoTestClient(
+                live_server_url=cls.live_server_url
+            )
+
+        @classmethod
+        def tearDownClass(cls):
+            cls.selenium_client.web_driver.close()
+            super().tearDownClass()
