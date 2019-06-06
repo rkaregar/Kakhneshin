@@ -1,32 +1,9 @@
-{% extends "master.html" %}
+{% extends "delete_confirm.html" %}
 
-{% block content %}
-
-    <div id="page-content-wrapper" align="center">
-
-        <div class="container p-5" dir="rtl">
-            <div class="row justify-content-center">
-                <div class="col-md-6" align="center">
-
-                    <div class="card" style="background: #E0E0E0">
-                        <div class="card-header text-right">آیا مطمین هستید که می‌خواهید نوع اتاق
-                            {{ object }}
-                            را حذف کنید؟
-                        </div>
-
-                        <div class="card-body" align="center">
-                            <form method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-danger btn-lg btn-block">
-                                    حذف نوع اتاق
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+{% block delete_confirm_text %}
+    آیا مطمین هستید که می‌خواهید نوع اتاق
+    {{ object }}
+    را حذف کنید؟
 {% endblock %}
 
 

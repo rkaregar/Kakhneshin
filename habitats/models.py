@@ -28,7 +28,7 @@ class RoomType(models.Model):
     has_bath_tub = models.BooleanField(default=False, verbose_name='وان حمام')
     has_shower = models.BooleanField(default=False, verbose_name='دوش حمام')
     has_wc = models.BooleanField(default=False, verbose_name='دست‌شویی')
-    details = models.CharField(max_length=10000, null=True, verbose_name='توضیحات')
+    details = models.CharField(max_length=10000, null=True, blank=True, verbose_name='توضیحات')
 
     def __str__(self):
         return self.type_name
@@ -38,11 +38,14 @@ class Room(models.Model):
     room_type = models.ForeignKey(RoomType, null=True, on_delete=models.CASCADE,
                                   verbose_name='نوع اتاق')  # TODO: cascade?
     number = models.CharField(max_length=10, null=True, verbose_name='شماره‌ی اتاق')
-    details = models.CharField(max_length=10000, null=True, verbose_name='توضیحات')
+    details = models.CharField(max_length=10000, null=True, blank=True, verbose_name='توضیحات')
+
+    def __str__(self):
+        return self.number
 
 
 class RoomOutOfService(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, verbose_name='اتاق مورد نظر')
     inclusive_since = models.DateTimeField(verbose_name='تاریخ شروع')
     inclusive_until = models.DateTimeField(verbose_name='تاریخ پایان')
-    details = models.CharField(max_length=1000, null=True, verbose_name='توضیحات')
+    details = models.CharField(max_length=1000, null=True, blank=True, verbose_name='توضیحات')
