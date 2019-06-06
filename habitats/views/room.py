@@ -1,9 +1,11 @@
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 
 from habitats.forms import CreateRoomForm, CreateRoomTypeForm
-from habitats.models import RoomType, Room
+from habitats.models import RoomType, Room, Habitat
+from habitats.views import HabitatCreateView
 
 
 class RoomTypeCreateView(SuccessMessageMixin, CreateView):
@@ -14,6 +16,17 @@ class RoomTypeCreateView(SuccessMessageMixin, CreateView):
 
     def get_success_message(self, cleaned_data):
         return self.success_message % cleaned_data.get('type_name')
+
+    def get_habitat_pk(self):
+        habitat_pk = self.kwargs.get('habitat_pk', None)
+        return habitat_pk
+
+    def get_initial(self):
+        initial = super(RoomTypeCreateView, self).get_initial()
+        habitat_pk = self.get_habitat_pk()
+        habitat = Habitat.objects.get(pk=habitat_pk)  # TODO what if the habitat_pk is wrong
+        initial['habitat'] = habitat
+        return initial
 
 
 class RoomTypeUpdateView(SuccessMessageMixin, UpdateView):

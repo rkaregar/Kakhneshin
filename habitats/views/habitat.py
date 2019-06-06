@@ -16,7 +16,6 @@ class HabitatCreateView(SuccessMessageMixin, CreateView):
         return super(HabitatCreateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):
-        print(cleaned_data.get('name'))
         return self.success_message % cleaned_data.get('name')
 
 
@@ -58,9 +57,6 @@ class HabitatDeleteView(SuccessMessageMixin, DeleteView):
     def get_success_message(self, cleaned_data):
         print(cleaned_data.get('name'))
         return self.success_message % cleaned_data.get('name')
-
-
-
 
 
 class HabitatListView(ListView):

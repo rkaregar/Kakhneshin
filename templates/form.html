@@ -16,22 +16,6 @@
                     {% endfor %}
                 </ul>
             {% endif %}
-            {{ form.non_field_errors }}
-            <ul class="messages" style="list-style-type: none;">
-                {% for field in form %}
-                    {% if field.errors %}
-                        <li>
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                {{ field.label }}: {{ field.errors|striptags }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        </li>
-
-                    {% endif %}
-                {% endfor %}
-            </ul>
         </div>
         <div class="col-6">
             {% block form_content %}{% endblock %}
