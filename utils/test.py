@@ -64,7 +64,12 @@ class SeleniumDjangoTestClient(object):
 
     def login(self, username, password, login_path='/users/login'):
         self.post(login_path, data={'username': username, 'password': password})
-        return
+
+    def force_login(self, user):
+        self.login(user.username, user.raw_password)
+
+    def logout(self, logout_path='/users/logout'):
+        self.get(logout_path)
 
 
 
@@ -167,9 +172,10 @@ class KakhneshinCRUDTestCase:
         self.assertFalse(self.model.objects.filter(id=object_to_delete.id).exists())
 
 
-def create_user(username='test', password='test'):
-    user = User.objects.create_user(username=username, password=password, email='test@kakhneshin.com', is_active=True)
+def create_user(username='test', password='test', **kwargs):
+    user = User.objects.create_user(username=username, password=password, email='test@kakhneshin.com', **kwargs)
     Member.objects.create(user=user)
+    setattr(user, 'raw_password', password)
     return user
 
 

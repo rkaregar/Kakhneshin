@@ -1,4 +1,4 @@
-from accounts.forms import ChargeForm
+from accounts.forms import TransactionForm
 from accounts.models import Transaction
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
@@ -10,7 +10,7 @@ from django.views.generic import FormView, TemplateView
 class ChargeView(LoginRequiredMixin, FormView):
     login_url = reverse_lazy('users:login')
     template_name = 'accounts/deposit.html'
-    form_class = ChargeForm
+    form_class = TransactionForm
 
     def form_valid(self, form):
         transaction = Transaction.objects.create(to_user=self.request.user, verified=False, amount=form.cleaned_data['amount'])
