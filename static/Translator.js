@@ -4,12 +4,12 @@ for (let i = 0; i < inputs.length; i++) {
         inputs[i].innerText = 'نام:';
     else if (inputs[i].innerText.includes('Last name'))
         inputs[i].innerText = 'نام خانوادگی:';
+    else if (inputs[i].innerText.includes('Gender'))
+        inputs[i].innerText = 'جنسیت:';
+    else if (inputs[i].innerText.includes('Photo'))
+        inputs[i].innerText = 'تصویر:';
     else if (inputs[i].innerText.includes('Username'))
         inputs[i].innerText = 'نام کاربری:';
-    // else if (inputs[i].innerText.includes('Password:'))
-    //     inputs[i].innerText = 'رمز عبور:';
-    // else if (inputs[i].innerText.includes('confirmation'))
-    //     inputs[i].innerText = 'تکرار رمز عبور:';
     else if (inputs[i].innerText.includes('Password1'))
         inputs[i].innerText = 'رمز عبور:';
     else if (inputs[i].innerText.includes('Password2'))
@@ -23,6 +23,34 @@ for (let i = 0; i < inputs.length; i++) {
         inputs[i].innerText = 'شماره تماس:';
     else if (inputs[i].innerText.includes('Role'))
         inputs[i].innerText = 'نقش:';
+}
+
+divs = document.getElementsByTagName('div');
+for (let i = 0; i < inputs.length; i++) {
+    inputs[i].innerText = inputs[i].innerText.replace(/Currently/g, 'فعلی');
+    inputs[i].innerText = inputs[i].innerText.replace(/Clear/g, 'پاک کردن');
+    inputs[i].innerText = inputs[i].innerText.replace(/Change/g, 'تغییر');
+    inputs[i].innerText = inputs[i].innerText.replace(/No file chosen/g, 'فایلی انتخاب نشده');
+}
+
+badges = document.getElementsByTagName("span");
+for (let i = 0; i < badges.length; i++) {
+    if (badges[i].innerText.includes('has_breakfast'))
+        badges[i].innerText = 'صبحانه';
+    else if (badges[i].innerText.includes('has_telephone'))
+        badges[i].innerText = 'تلفن';
+    else if (badges[i].innerText.includes('has_wifi'))
+        badges[i].innerText = 'وای‌فای';
+    else if (badges[i].innerText.includes('has_minibar'))
+        badges[i].innerText = 'مینی‌بار';
+    else if (badges[i].innerText.includes('has_foreign_wc'))
+        badges[i].innerText = 'توالت فرنگی';
+    else if (badges[i].innerText.includes('has_bath_tub'))
+        badges[i].innerText = 'وان حمام';
+    else if (badges[i].innerText.includes('has_shower'))
+        badges[i].innerText = 'دوش';
+    else if (badges[i].innerText.includes('has_wc'))
+        badges[i].innerText = 'توالت';
 }
 
 creationTime = document.getElementById("creation_time");

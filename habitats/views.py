@@ -1,11 +1,26 @@
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, View
+from django.shortcuts import render, get_object_or_404, redirect
 
 from habitats.forms import CreateHabitatForm
 from habitats.models import Habitat
 
+import re
+
 
 def all(request):
     raise NotImplementedError
+
+
+class HomeView(View):
+    def get(self, request):
+        return render(request, 'homepage.html')
+
+    def post(self, request):
+        dates = re.split('/| - ', request.POST['daterange'])
+        from_date = '-'.join([dates[2], dates[0], dates[1]])
+        to_date = '-'.join([dates[5], dates[3], dates[4]])
+        # return redirect('/habitats/{}/{}'.format(from_date, to_date))
+        return render(request, 'homepage.html')
 
 
 class HabitatCreateView(CreateView):
@@ -16,9 +31,6 @@ class HabitatCreateView(CreateView):
     def form_valid(self, form):
         form.instance.owner = self.request.user.member
         return super(HabitatCreateView, self).form_valid(form)
-
-
-
 
 
 class HabitatUpdateView(UpdateView):
@@ -36,7 +48,7 @@ class HabitatUpdateView(UpdateView):
 
     def get_success_url(self):
         habitat_pk = self.get_habitat_pk()
-        return '/habitats/%s/update' % habitat_pk;
+        return '/habitats/%s/update' % habitat_pk
 
 
 class HabitatDeleteView(DeleteView):
@@ -53,3 +65,13 @@ class HabitatDeleteView(DeleteView):
 
 class HabitatListView(ListView):
     model = Habitat
+
+
+class HabitatDetailView(View):
+    def get(self, request, **kwargs):
+        habitat = get_object_or_404(Habitat, pk=kwargs.get('habitat_pk', None))
+
+        room_types = habitat.roomtype_set.all().values()
+        return render(request, 'habitats/habitat_detail.html', {'habitat': habitat,
+                                                                'room_types': room_types,
+                                                                })
