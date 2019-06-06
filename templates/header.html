@@ -7,17 +7,17 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          {% if user.is_authenticated %}
-            <a href={% url 'users:edit_profile' %}>
-              {% if member.photo %}
-                <img alt="عکس باز نشد" src={{ member.photo.url }} width="40px" height="100%">
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a href="{% url 'users:edit_profile' %}">
+              {% if user.member.photo %}
+                <img alt="عکس باز نشد" src="{{ member.photo.url }}" width="40px" height="100%">
               {% else %}
                 <img alt="عکس باز نشد" src="/static/images/no_image.png" width="40px" height="100%">
               {% endif %}
             </a>
-          {% endif %}
-        </li>
+          </li>
+        {% endif %}
         <li class="nav-item">
           {#          <a class="nav-link" href="/about" id="about">دربارهٔ ما</a>#}
         </li>
@@ -32,6 +32,17 @@
                  style="padding-left: 18px">
               <a class="dropdown-item" href="{% url 'users:change_password' %}">تغییر رمز عبور</a>
               <a class="dropdown-item" href="{% url 'users:edit_profile' %}">تغییر پروفایل</a>
+            </div>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="account" data-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">
+              {{ user.member.balance }} ریال
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog"
+                 style="padding-left: 18px">
+              <a class="dropdown-item" href="{% url 'accounts:deposit' %}">شارژ حساب</a>
+              <a class="dropdown-item" href="#">برداشت از حساب</a>
             </div>
           </li>
           <li class="nav-item">

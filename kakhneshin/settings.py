@@ -42,8 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'habitats',
     'users',
+    'habitats',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -154,4 +155,8 @@ TEST_SETTINGS = {
     'ALLOWED_HOSTS': ['*'],
 }
 
+ALLOWED_HOSTS = ['*']
+
 HEADLESS_SELENIUM = False
+
+DEBUG = True
