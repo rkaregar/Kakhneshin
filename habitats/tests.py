@@ -52,8 +52,8 @@ class HabitatSeleniumTest(HabitatsCRUDTest, SeleniumTestCase):
         def setUp(self):
             super().setUp()
             self.client = self.selenium_client
-            create_user(username='test', password='test')
-            self.client.login(username='test', password='test')
+            test_user = create_user(username='test', password='test')
+            self.client.login(username=test_user.username, password='test')
 
 
 

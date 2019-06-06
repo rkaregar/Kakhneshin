@@ -155,4 +155,8 @@ TEST_SETTINGS = {
     'ALLOWED_HOSTS': ['*'],
 }
 
+ALLOWED_HOSTS = ['*']
+
 HEADLESS_SELENIUM = False
+
+DEBUG = True

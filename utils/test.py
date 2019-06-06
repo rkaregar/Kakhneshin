@@ -1,11 +1,10 @@
-from unittest import skip
+from time import sleep
 
 import random
 from copy import copy
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import LiveServerTestCase, tag
-from django.test.selenium import SeleniumTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
@@ -14,6 +13,7 @@ from users.models import Member
 
 class SeleniumResponse(object):
     def __init__(self, web_driver):
+        sleep(0.5)
         self.status_code = 404 if '404' in web_driver.page_source else 200
         self.content = web_driver.page_source.encode('utf8')
         self.web_driver = web_driver
@@ -64,6 +64,7 @@ class SeleniumDjangoTestClient(object):
 
     def login(self, username, password, login_path='/users/login'):
         self.post(login_path, data={'username': username, 'password': password})
+        return
 
 
 
@@ -167,7 +168,7 @@ class KakhneshinCRUDTestCase:
 
 
 def create_user(username='test', password='test'):
-    user = User.objects.create(username=username, password=password, email='test@kakhneshin.com')
+    user = User.objects.create_user(username=username, password=password, email='test@kakhneshin.com', is_active=True)
     Member.objects.create(user=user)
     return user
 
