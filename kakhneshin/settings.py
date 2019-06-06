@@ -40,7 +40,11 @@ INSTALLED_APPS = [
 
     'habitats',
     'users',
+
+    'crispy_forms',
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -72,6 +76,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'kakhneshin.wsgi.application'
+
 
 
 # Database

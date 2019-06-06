@@ -10,27 +10,23 @@
 
                     <div class="card" style="background: #E0E0E0">
                         <div class="card-header text-right">آیا مطمین هستید که می‌خواهید اتاق
-                            "{{ object }}"
-                            را حذف کنید؟</div>
+                            {{ object }}
+                            را حذف کنید؟
+                        </div>
 
                         <div class="card-body" align="center">
                             <form method="post">
                                 {% csrf_token %}
-                                <div class="form-group row mb-0">
-                                    <div class="col-md-8 offset-md-4">
-                                        <button type="submit" class="btn btn-outline-primary">
-                                          حذف اقامتگاه
-                                        </button>
-                                    </div>
-                                </div>
+                                <button type="submit" class="btn btn-outline-danger btn-lg btn-block">
+                                    حذف اتاق
+                                </button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-</div>
-    <script src="/static/Translator.js"></script>
+    </div>
 {% endblock %}
 
 
