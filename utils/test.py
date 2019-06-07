@@ -1,42 +1,84 @@
-from unittest import skip
+from time import sleep
 
 import random
 from copy import copy
-# from selenium.webdriver import Chrome
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.test import LiveServerTestCase, tag
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.options import Options
+from users.models import Member
 
-# class SeleniumResponse(object):
-#     def __init__(self, web_driver):
-#         self.status_code = 404 if '404' in web_driver.page_source else 200
-#         self.content = web_driver.page_source
-#         self.web_driver = web_driver
-#
-# class SeleniumDjangoTestClient(object):
-#
-#     def __init__(self, web_driver=Chrome(), live_server_url=None):
-#         self.web_driver = web_driver
-#         self.live_server_url = live_server_url
-#
-#     def get_absolute_url(self, path):
-#         return self.live_server_url + path
-#
-#     def get(self, path):
-#         self.web_driver.get(path)
-#         return SeleniumResponse(self.web_driver)
-#
-#
-#     def post(self, path, data: dict = None):
-#         self.web_driver.get(path)
-#         last_element = None
-#         for name, value in data.items():
-#             element = self.web_driver.find_element_by_name(name)
-#             element.send_keys(value)
-#             last_element = element
-#         last_element.submit()
-#
-#     def delete(self, path):
-#         self.get(path)
-#         return SeleniumResponse(self.web_driver)
-#
+
+class SeleniumResponse(object):
+    def __init__(self, web_driver):
+        sleep(0.5)
+        self.status_code = 404 if '404' in web_driver.page_source else 200
+        self.content = web_driver.page_source.encode('utf8')
+        self.web_driver = web_driver
+
+class SeleniumDjangoTestClient(object):
+
+    implicit_wait = 10
+
+    def __init__(self, web_driver=None, live_server_url='http://127.0.0.1:8000'):
+        if web_driver is None:
+            firefox_options = Options()
+            if settings.HEADLESS_SELENIUM:
+                firefox_options.add_argument('-headless')
+            self.web_driver = webdriver.Firefox(options=firefox_options,)
+        else:
+            self.web_driver = web_driver
+        self.web_driver.implicitly_wait(self.implicit_wait)
+        self.live_server_url = live_server_url
+
+    def get_absolute_url(self, path):
+        return self.live_server_url + path
+
+    def get(self, path):
+        self.web_driver.get(self.get_absolute_url(path))
+        return SeleniumResponse(self.web_driver)
+
+
+    def post(self, path, data: dict = None, follow=True):
+        if not follow:
+            raise Exception('follow=True is not allowed when using selenium client.')
+        self.web_driver.get(self.get_absolute_url(path))
+        if data:
+            last_element = None
+            for name, value in data.items():
+                element = self.web_driver.find_element_by_name(name)
+                if element.get_attribute('type') == 'hidden':
+                    if element.get_attribute('value') != value:
+                        raise Exception('hidden field is not correctly valued.')
+                    else:
+                        continue
+                element.send_keys(Keys.CONTROL, 'a')
+                element.send_keys(value)
+                last_element = element
+            if last_element is not None:
+                last_element.submit()
+            else:
+                self.web_driver.find_element_by_tag_name('form').submit()
+        else:
+            self.web_driver.find_element_by_tag_name('form').submit()
+        return SeleniumResponse(self.web_driver)
+
+    def delete(self, path):
+        self.get(self.get_absolute_url(path))
+        return SeleniumResponse(self.web_driver)
+
+    def login(self, username, password, login_path='/users/login'):
+        self.post(login_path, data={'username': username, 'password': password})
+
+    def force_login(self, user):
+        self.login(user.username, user.raw_password)
+
+    def logout(self, logout_path='/users/logout'):
+        self.get(logout_path)
+
+
 
 class KakhneshinCRUDTestCase:
 
@@ -82,7 +124,8 @@ class KakhneshinCRUDTestCase:
         objs = self.populate_with_test_data()
 
         for obj in objs:
-            response = self.client.get(self.read_url.format(obj.id))
+            obj_id = obj.id
+            response = self.client.get(self.read_url.format(obj_id))
             self.assert_object_in_response(obj, response)
 
     def test_list(self):
@@ -121,7 +164,7 @@ class KakhneshinCRUDTestCase:
             response = self.client.post(
                 path=self.update_url.format(obj.id),
                 data=shuffled_test_data[obj_place],
-                follow=True
+                follow=True,
             )
             self.assert_object_page_ok_response(response)
             obj.refresh_from_db()
@@ -134,3 +177,31 @@ class KakhneshinCRUDTestCase:
         self.assertTrue(self.model.objects.filter(id=object_to_delete.id).exists())
         self.client.post(path=self.delete_url.format(object_to_delete.id))
         self.assertFalse(self.model.objects.filter(id=object_to_delete.id).exists())
+
+
+def create_user(username='test', password='test', **kwargs):
+    user = User.objects.create_user(username=username, password=password, email='test@kakhneshin.com', **kwargs)
+    Member.objects.create(user=user)
+    setattr(user, 'raw_password', password)
+    return user
+
+
+@tag('abstract')
+class SeleniumTestCase(LiveServerTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.selenium_client = SeleniumDjangoTestClient(
+            live_server_url=cls.live_server_url
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.selenium_client.web_driver.close()
+        super().tearDownClass()
+
+
+    def tearDown(self):
+        self.client.logout()
+        super().tearDown()

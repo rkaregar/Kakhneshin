@@ -1,3 +1,4 @@
+from accounts.models import Transaction
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.deletion import CASCADE
@@ -33,6 +34,10 @@ class Member(models.Model):
     @property
     def is_active(self):
         return self.user.is_active
+
+    @property
+    def balance(self):
+        return Transaction.get_balance_from_user(self.user)
 
     def save(self, *args, **kwargs):
         self.user.save()

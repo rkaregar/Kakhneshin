@@ -1,4 +1,4 @@
-image: joyzoursky/python-chromedriver:3.7-selenium
+image: selenium/standalone-firefox
 
 services:
   - postgres:latest
@@ -11,11 +11,16 @@ variables:
 test:
   stage: test
   script:
+  - sudo apt-get update -yq > /dev/null
+  - sudo apt-get install -yq virtualenv libpq-dev python3-dev build-essential > /dev/null
+  - virtualenv -p /usr/bin/python3 venv > /dev/null
+  - source venv/bin/activate
   - pip install -r requirements.txt
   - python manage.py test --settings=kakhneshin.ci_settings
 
 
 deploy:
+  image: joyzoursky/python-chromedriver:3.7-selenium
   stage: deploy
   script:
   - apt-get update -qy
