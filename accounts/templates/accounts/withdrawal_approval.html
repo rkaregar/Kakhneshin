@@ -2,44 +2,50 @@
 
 {% block content %}
 
-    <div id="page-content-wrapper" align="center">
+  <div id="page-content-wrapper" align="center">
 
-        <div class="container p-5" dir="rtl">
-            <div class="row justify-content-center">
-                <div class="col-md-6" align="center">
+    <div class="container p-5" dir="rtl">
+      <div class="row justify-content-center">
+        <div class="col-md-6" align="center">
 
-                    <div class="card" style="background: #E0E0E0">
-                        <div class="card-header text-right">نتیجه تراکنش</div>
+          <div class="card" style="background: #E0E0E0">
+            <div class="card-header text-right">نتیجه تراکنش</div>
 
-                        <div class="card-body" align="center">
-                            <table>
-                                <thead>
-                                    <td>شماره</td>
-                                    <td>کاربر</td>
-                                    <td>مبلغ</td>
-                                    <td>تایید</td>
-                                </thead>
-                            </table>
-                            {% for t in object_list %}
-                                <tr>
-                                    <td>{{ t.id }}</td>
-                                    <td>{{ t.from_user.username }}</td>
-                                    <td>{{ t.amount }}</td>
-                                    <td>
-                                        <form action="{% url 'accounts:update' t.id %}" method="post">
-                                            <input type="hidden" name="verified" value="1">
-                                            <input type="submit" value="انجام">
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
+            <div class="card-body" align="center">
+              <table class="table table-striped table-hover">
+                <thead class="thead-dark">
+                <tr>
+                  <th>شماره</th>
+                  <th>کاربر</th>
+                  <th>مبلغ</th>
+                  <th>تایید</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for t in object_list %}
+                  <tr>
+                    <td>{{ t.id }}</td>
+                    <td>{{ t.from_user.username }}</td>
+                    <td>{{ t.amount }}</td>
+                    <td>
+                      <form action="{% url 'accounts:update' t.id %}" method="post">
+                        <input type="hidden" name="verified" value="1">
+                        <input type="submit" class="btn btn-sm btn-primary" value="انجام">
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+
             </div>
+          </div>
         </div>
-</div>
-    <script src="/static/Translator.js"></script>
+      </div>
+    </div>
+  </div>
+  <script src="/static/Translator.js"></script>
 {% endblock %}
 
 

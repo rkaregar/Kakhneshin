@@ -15,7 +15,8 @@ class ChargeView(LoginRequiredMixin, FormView):
     form_class = TransactionForm
 
     def form_valid(self, form):
-        transaction = Transaction.objects.create(to_user=self.request.user, verified=False, amount=form.cleaned_data['amount'])
+        transaction = Transaction.objects.create(to_user=self.request.user, verified=False,
+                                                 amount=form.cleaned_data['amount'])
         return redirect('accounts:callback', token=transaction.token)
 
 
@@ -48,6 +49,7 @@ class WithdrawalsView(LoginRequiredMixin, CreateView):
     def get_form_class(self):
         class RequestForm(self.form_class):
             request = self.request
+
         return RequestForm
 
 
@@ -59,7 +61,6 @@ class WithdrawalApprovalView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return super().get_queryset().filter(verified=False, to_user=None)
-
 
 
 @method_decorator(staff_member_required, name='dispatch')
