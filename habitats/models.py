@@ -8,6 +8,7 @@ class Habitat(models.Model):
     address = models.CharField(max_length=500, default='', verbose_name='آدرس')
     town = models.CharField(max_length=50, default='', verbose_name='شهر')
     owner = models.ForeignKey(Member, on_delete=models.CASCADE, null=True, verbose_name='صاحب اقامتگاه')
+    confirm = models.BooleanField(default=False)
 
     # TODO: add new additional fields
 
@@ -15,7 +16,7 @@ class Habitat(models.Model):
         return self.name
 
     def validate_unique(self, exclude=None):
-        if Habitat.objects.filter(name=self.name).exists():
+        if Habitat.objects.filter(name=self.name).exclude(id=self.id).exists():
             raise ValidationError('اقامتگاهی با این اسم وجود دارد. نام دیگری انتخاب کنید.')
 
     def save(self, *args, **kwargs):
@@ -45,7 +46,7 @@ class RoomType(models.Model):
 
     def validate_unique(self, exclude=None):
         qs = RoomType.objects.filter(habitat=self.habitat)
-        if qs.filter(type_name=self.type_name).exists():
+        if qs.filter(type_name=self.type_name).exclude(id=self.id).exists():
             raise ValidationError('نام انواع اتاق در هر اقامتگاه باید یکتا باشد.')
 
     def save(self, *args, **kwargs):
@@ -65,13 +66,14 @@ class Room(models.Model):
 
     def validate_unique(self, exclude=None):
         qs = Room.objects.filter(number=self.number)
-        if qs.filter(room_type__habitat=self.room_type.habitat).exists():
+        if qs.filter(room_type__habitat=self.room_type.habitat).exclude(id=self.id).exists():
             raise ValidationError('شماره‌ی اتاق‌ها در هر اقامتگاه باید یکتا باشد.')
 
     def save(self, *args, **kwargs):
         self.validate_unique()
 
         super(Room, self).save(*args, **kwargs)
+
 
 class RoomOutOfService(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, verbose_name='اتاق مورد نظر')

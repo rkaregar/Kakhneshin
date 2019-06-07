@@ -1,0 +1,16 @@
+{% extends "master.html" %}
+
+{% block content %}
+    {% load group_by %}
+    <div class="container-fluid" align="center">
+        <div class="card h-100 mx-1 w-75">
+            <img class="card-img-top" src="/static/images/kakhneshin.png" alt="کاخ">
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ object.type_name }}</h5>
+                <p class="card-text">{{ object.detail }} </p>
+                <a href="{% url 'habitats:room_type_update' habitat_pk=object.habitat.pk room_type_pk=object.pk%}" class="btn btn-primary mt-auto mb-1">ویرایش مشخصات نوع اتاق</a>
+            </div>
+        </div>
+    </div>
+    <script src="/static/Translator.js"></script>
+{% endblock %}

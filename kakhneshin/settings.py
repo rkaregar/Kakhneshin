@@ -142,6 +142,7 @@ MEDIA_URL = '/media/'
 
 LOGIN_REDIRECT_URL = '/users/edit-profile/'
 LOGOUT_REDIRECT_URL = '/users/login'
+LOGIN_URL = '/users/login'
 
 TEMPLATES[0]['OPTIONS']['context_processors'].append('users.context_processors.categories_processor')
 

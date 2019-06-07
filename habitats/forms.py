@@ -13,7 +13,6 @@ class CreateHabitatForm(forms.ModelForm):  # TODO: change name to HabitatForm
 
 
 class CreateRoomTypeForm(forms.ModelForm):
-
     class Meta:
         model = RoomType
         fields = ('type_name', 'capacity_in_person',
@@ -37,9 +36,6 @@ class CreateRoomTypeForm(forms.ModelForm):
     def save(self, commit=True):
         self.instance.habitat = self.cleaned_data['habitat']
         return super(CreateRoomTypeForm, self).save(commit=commit)
-
-
-
 
 
 class CreateRoomForm(forms.ModelForm):
