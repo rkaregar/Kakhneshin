@@ -94,6 +94,7 @@ class HabitatListView(ListView):
 
 
 class HabitatDetailView(DetailView):
+    template_name = 'habitats/habitat_detail_tiny.html'
 
     def get_object(self, queryset=None):
         self.habitat_pk = self.kwargs.get('habitat_pk', None)
