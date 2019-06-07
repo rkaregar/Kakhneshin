@@ -4,8 +4,8 @@ from .views import *
 
 urlpatterns = [
     path('login/',
-         auth_views.LoginView.as_view(template_name='login.html', success_url=reverse_lazy('users:edit_profile')),
-         name='login'),
+         auth_views.LoginView.as_view(template_name='login.html', success_url=reverse_lazy('users:edit_profile'),
+                                      redirect_authenticated_user=True), name='login'),
 
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('change-password/', auth_views.PasswordChangeView.as_view(template_name='change_password.html',

@@ -19,13 +19,14 @@ class Member(models.Model):
     gender = models.CharField(choices=GENDERS, max_length=1, null=True)
     photo = models.ImageField(upload_to='gallery', null=True)
     phone_number = models.CharField(max_length=12, null=True)
+    is_habitat_owner = models.BooleanField(default=False, null=True, verbose_name='صاحب اقامت‌گاه؟')
 
     def __str__(self):
-        return self.first_name + ' ' + self.last_name + ', ' + self.user.username
+        return '{} {} {}'.format(self.first_name, self.last_name, self.user.username)
 
     @property
     def name(self):
-        return self.first_name + ' ' + self.last_name
+        return '{} {}'.format(self.first_name, self.last_name)
 
     @property
     def email(self):

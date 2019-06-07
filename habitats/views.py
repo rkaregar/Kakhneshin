@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from habitats.forms import CreateHabitatForm
 from habitats.models import Habitat
 
+from users.models import Member
 import re
 
 
@@ -19,7 +20,7 @@ class HomeView(View):
         dates = re.split('/| - ', request.POST['daterange'])
         from_date = '-'.join([dates[2], dates[0], dates[1]])
         to_date = '-'.join([dates[5], dates[3], dates[4]])
-        # return redirect('/habitats/{}/{}'.format(from_date, to_date))
+        # return redirect('/habitats/{}/{}'.format(from_date, to_date))  redirect to named url is also possible
         return render(request, 'homepage.html')
 
 
@@ -29,6 +30,9 @@ class HabitatCreateView(CreateView):
     success_url = '/habitats/create'
 
     def form_valid(self, form):
+        if not hasattr(self.request.user, 'member'):
+            self.request.user.member = Member(user=self.request.user)
+
         form.instance.owner = self.request.user.member
         return super(HabitatCreateView, self).form_valid(form)
 
