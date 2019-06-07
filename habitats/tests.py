@@ -23,16 +23,14 @@ class HabitatsCRUDTest(KakhneshinCRUDTestCase):
             'name': 'اقامتگاه اول',
             'address': 'اول آنجایی که می‌دانی',
             'town': 'تهران',
-            'cost': 100000,
         },
         {
             'name': 'دومین اقامتگاه اول',
             'address': 'اول آنجایی که می‌دانی',
             'town': 'تهران',
-            'cost': 100000,
         }
     ]
-    visible_fields = ('name', 'address', 'town', 'cost')
+    visible_fields = ('name', 'address', 'town')
 
 
 @tag('backend')

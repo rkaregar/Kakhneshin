@@ -31,7 +31,7 @@ class HabitatCreateView(CreateView):
 
     def form_valid(self, form):
         if not hasattr(self.request.user, 'member'):
-            self.request.user.member = Member(user=self.request.user)
+            self.request.user.member, _ = Member.objects.get_or_create(user=self.request.user)
 
         form.instance.owner = self.request.user.member
         return super(HabitatCreateView, self).form_valid(form)
