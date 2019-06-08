@@ -92,8 +92,7 @@ class HabitatListView(ListView):
         return qs.filter(owner=self.request.user.member)
 
 
-
-class HabitatDetailView(DetailView):
+class HabitatTinyDetailView(DetailView):
     template_name = 'habitats/habitat_detail_tiny.html'
 
     def get_object(self, queryset=None):
@@ -111,5 +110,5 @@ class HabitatDetailView(DetailView):
         if self.habitat is None:
             raise Http404
         if self.user_passed_test(request):
-            return super(HabitatDetailView, self).dispatch(request, *args, **kwargs)
+            return super(HabitatTinyDetailView, self).dispatch(request, *args, **kwargs)
         raise PermissionDenied('شما امکان  دیدن جزییات این اقامتگاه را ندارید')

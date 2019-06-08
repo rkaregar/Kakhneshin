@@ -1,6 +1,6 @@
 from django.urls import path, reverse_lazy
 from habitats.views import HabitatCreateView, HabitatDeleteView, HabitatUpdateView, HabitatListView
-from habitats.views.habitat import HabitatDetailView
+from habitats.views.habitat import HabitatTinyDetailView
 from habitats.views.room import RoomTypeCreateView, RoomTypeDeleteView, RoomTypeUpdateView, RoomTypeListView, \
     RoomUpdateView, RoomDeleteView, RoomCreateView, RoomListView, RoomTypeDetailView, RoomDetailView
 
@@ -9,7 +9,7 @@ urlpatterns = [
     path('create/', HabitatCreateView.as_view(), name='habitat_create'),
     path('<int:habitat_pk>/delete/', HabitatDeleteView.as_view(), name='delete'),
     path('<int:habitat_pk>/update/', HabitatUpdateView.as_view(), name='habitat_update'),
-    path('<int:habitat_pk>/detail/', HabitatDetailView.as_view(), name='habitat_detail'),
+    path('<int:habitat_pk>/detail/', HabitatTinyDetailView.as_view(), name='habitat_detail'),
     path('<int:habitat_pk>/room_types/', RoomTypeListView.as_view(), name='all_room_types'),
     path('<int:habitat_pk>/room_types/<int:room_type_pk>/delete', RoomTypeDeleteView.as_view(),
          name='delete_room_type'),
