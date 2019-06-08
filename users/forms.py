@@ -71,7 +71,6 @@ class EditProfileForm(forms.ModelForm):
     phone_validator = RegexValidator(regex=r'^\d{6,12}$', message=_('لطفا شماره تماس خود را درست وارد نمایید'))
     phone_number = forms.CharField(required=False, validators=[phone_validator])
 
-    is_habitat_owner = forms.BooleanField()
 
     class Meta:
         model = Member
