@@ -246,6 +246,11 @@ class RoomListView(LoginRequiredMixin, ListView):
         qs = super(RoomListView, self).get_queryset()
         return qs.filter(room_type__habitat=self.habitat)
 
+    def get_context_data(self, **kwargs):
+        context = super(RoomListView, self).get_context_data(**kwargs)
+        context['habitat_pk'] = self.habitat_pk
+        return context
+
 
 class RoomDetailView(LoginRequiredMixin, DetailView):
     template_name = 'rooms/room_detail.html'
