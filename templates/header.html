@@ -36,6 +36,21 @@
               <a class="dropdown-item" href="{% url 'users:edit_profile' %}">تغییر پروفایل</a>
             </div>
           </li>
+
+          {% if member.is_habitat_owner %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="profile" data-toggle="dropdown"
+                 aria-haspopup="true" aria-expanded="false">
+                مدیریت اقامت‌گاه
+              </a>
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog"
+                   style="padding-left: 18px">
+                <a class="dropdown-item" href="{% url 'habitats:all' %}">مشاهدهٔ اقامت‌گاه‌ها</a>
+                <a class="dropdown-item" href="{% url 'habitats:habitat_create' %}">ساخت اقامت‌گاه</a>
+              </div>
+            </li>
+          {% endif %}
+
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="account" data-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false">

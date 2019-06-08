@@ -71,8 +71,15 @@ class EditProfileForm(forms.ModelForm):
     phone_validator = RegexValidator(regex=r'^\d{6,12}$', message=_('لطفا شماره تماس خود را درست وارد نمایید'))
     phone_number = forms.CharField(required=False, validators=[phone_validator])
 
-    is_habitat_owner = forms.BooleanField(label='صاحب اقامتگاه؟')
+    is_habitat_owner = forms.BooleanField(required=False, label='صاحب اقامتگاه؟')
 
     class Meta:
         model = Member
         fields = ('first_name', 'last_name', 'gender', 'photo', 'phone_number', 'is_habitat_owner')
+
+    def __init__(self, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        for key in self.fields:
+            # print(self.fields[key].widget)  # could be useful for the future
+            self.fields[key].widget.attrs['class'] = 'form-control'
+
