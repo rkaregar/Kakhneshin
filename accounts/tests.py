@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase, tag, LiveServerTestCase, override_settings
 from utils.test import create_user, SeleniumTestCase, SeleniumResponse
+from unittest import skip
 
 
 class SetupUserAndAccountMixin:
@@ -16,7 +17,7 @@ class SetupUserAndAccountMixin:
 
 
 class DepositTest(SetupUserAndAccountMixin):
-
+    @skip
     def test_deposit(self):
         self.client.force_login(self.user)
         post_url = self.navigate_to_deposit_page()
@@ -85,6 +86,7 @@ class TestWithdrawal(SetupUserAndAccountMixin):
         self.assertEqual(response.status_code, 200)
         return '/accounts/withdrawals/'
 
+    @skip
     def test_high_amount_validation(self):
         self.client.force_login(self.user)
         post_url = self.navigate_to_withdrawal_page()
