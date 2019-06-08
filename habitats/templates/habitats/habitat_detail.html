@@ -64,7 +64,8 @@
 
             {% else %}
               <div class="carousel-item active"
-                   style="background-image: url('/static/images/no_building_photo.png')">
+                   style="background-image: url(
+                           {% if habitat.photo %}{{ habitat.photo.url }}{% else %}'/static/images/kakhneshin.png'{% endif %})">
               </div>
             {% endif %}
 
@@ -98,11 +99,10 @@
 
     <div class="col-lg-3 mb-3">
       <div class="card h-100">
-
-        {% if type.image %}
+        {% if type.photo %}
           {#          <a href="{% url 'habitats:room_type' habitat_pk=type.habitat_id room_type_pk=type.id %}"><img#}
           {#                  class="card-img-top" src="{{ type.image.image.url }}" alt=""></a>#}
-          <a href="#"><img class="card-img-top" src="{{ type.image.image.url }}" alt=""></a>
+          <a href="#"><img class="card-img-top" src="{{ type.photo.url }}" alt=""></a>
         {% else %}
           <a href="#"><img class="card-img-top" src="/static/images/no_building_photo.png" alt=""></a>
         {% endif %}
