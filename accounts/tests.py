@@ -15,7 +15,6 @@ class SetupUserAndAccountMixin:
         Transaction.objects.create(to_user=self.user, amount=self.prior_balance, verified=True)
 
 
-
 class DepositTest(SetupUserAndAccountMixin):
 
     def test_deposit(self):
@@ -36,6 +35,7 @@ class DepositTest(SetupUserAndAccountMixin):
 class DepositBackendTest(DepositTest, TestCase):
     pass
 
+
 @tag('ui')
 class DepositSeleniumTest(DepositTest, SeleniumTestCase):
 
@@ -55,7 +55,6 @@ class DepositSeleniumTest(DepositTest, SeleniumTestCase):
 class TestWithdrawal(SetupUserAndAccountMixin):
 
     def test_withdrawal_request(self):
-
         # request withdrawal
         self.client.force_login(self.user)
         post_url = self.navigate_to_withdrawal_page()
@@ -75,7 +74,6 @@ class TestWithdrawal(SetupUserAndAccountMixin):
         transaction.refresh_from_db()
         self.assertTrue(transaction.verified)
         self.assertEqual(Transaction.get_balance_from_user(self.user), self.prior_balance - amount)
-
 
     def navigate_to_withdrawal_approval_page(self):
         response = self.client.get('/accounts/withdrawal_approval/')
@@ -113,11 +111,10 @@ class BackendWithdrawalTestCase(TestWithdrawal, TestCase):
 
     pass
 
+
 @tag('ui')
 @override_settings(**settings.TEST_SETTINGS)
 class SeleniumWithdrawalTestCase(TestWithdrawal, SeleniumTestCase):
-
-
 
     def setUp(self):
         super().setUp()
@@ -138,7 +135,3 @@ class SeleniumWithdrawalTestCase(TestWithdrawal, SeleniumTestCase):
         link_path = charge_link.get_attribute('pathname')
         charge_link.click()
         return link_path, SeleniumResponse(self.client.web_driver)
-
-
-
-

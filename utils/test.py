@@ -18,8 +18,8 @@ class SeleniumResponse(object):
         self.content = web_driver.page_source.encode('utf8')
         self.web_driver = web_driver
 
-class SeleniumDjangoTestClient(object):
 
+class SeleniumDjangoTestClient(object):
     implicit_wait = 10
 
     def __init__(self, web_driver=None, live_server_url='http://127.0.0.1:8000'):
@@ -27,7 +27,7 @@ class SeleniumDjangoTestClient(object):
             firefox_options = Options()
             if settings.HEADLESS_SELENIUM:
                 firefox_options.add_argument('-headless')
-            self.web_driver = webdriver.Firefox(options=firefox_options,)
+            self.web_driver = webdriver.Firefox(options=firefox_options, )
         else:
             self.web_driver = web_driver
         self.web_driver.implicitly_wait(self.implicit_wait)
@@ -39,7 +39,6 @@ class SeleniumDjangoTestClient(object):
     def get(self, path):
         self.web_driver.get(self.get_absolute_url(path))
         return SeleniumResponse(self.web_driver)
-
 
     def post(self, path, data: dict = None, follow=True):
         if not follow:
@@ -79,9 +78,7 @@ class SeleniumDjangoTestClient(object):
         self.get(logout_path)
 
 
-
 class KakhneshinCRUDTestCase:
-
     read_url = None
     list_url = None
     create_url = None
@@ -200,7 +197,6 @@ class SeleniumTestCase(LiveServerTestCase):
     def tearDownClass(cls):
         cls.selenium_client.web_driver.close()
         super().tearDownClass()
-
 
     def tearDown(self):
         self.client.logout()
