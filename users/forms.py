@@ -76,3 +76,10 @@ class EditProfileForm(forms.ModelForm):
     class Meta:
         model = Member
         fields = ('first_name', 'last_name', 'gender', 'photo', 'phone_number', 'is_habitat_owner')
+
+    def __init__(self, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        for key in self.fields:
+            # print(self.fields[key].widget)  # could be useful for the future
+            self.fields[key].widget.attrs['class'] = 'form-control'
+
