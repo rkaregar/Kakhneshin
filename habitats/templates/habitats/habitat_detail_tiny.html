@@ -1,10 +1,11 @@
 {% extends "master.html" %}
+{% load static %}
 
 {% block content %}
     {% load group_by %}
     <div class="container-fluid" align="center">
         <div class="card h-100 mx-1 w-75">
-            <img class="card-img-top" src="/static/images/kakhneshin.png" alt="کاخ">
+            <img class="card-img-top" src="{% if object.photo %}{{ object.photo.url }}{% else %}{% static 'images/kakhneshin.png' %}{% endif %}" alt="کاخ">
             <div class="card-body d-flex flex-column">
                 <h5 class="card-title">{{ object.name }}</h5>
                 <p class="card-text">{{ object.address }} </p>

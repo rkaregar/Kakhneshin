@@ -6,19 +6,13 @@ from django.core.exceptions import ValidationError
 from habitats.models import Habitat, RoomType, Room, RoomOutOfService
 
 
-class CreateHabitatForm(forms.ModelForm):  # TODO: change name to HabitatForm
-    class Meta:
-        model = Habitat
-        fields = ('name', 'address', 'town')
-
-
 class CreateRoomTypeForm(forms.ModelForm):
     class Meta:
         model = RoomType
         fields = ('type_name', 'capacity_in_person',
                   'cost_per_night', 'has_breakfast', 'has_telephone',
                   'has_wifi', 'has_minibar', 'has_foreign_wc',
-                  'has_bath_tub', 'has_shower', 'has_wc', 'details')
+                  'has_bath_tub', 'has_shower', 'has_wc', 'details', 'photo')
 
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', {})

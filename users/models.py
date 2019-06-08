@@ -17,7 +17,7 @@ class Member(models.Model):
     first_name = models.CharField(max_length=20, null=True)
     last_name = models.CharField(max_length=20, null=True)
     gender = models.CharField(choices=GENDERS, max_length=1, null=True)
-    photo = models.ImageField(upload_to='gallery', null=True)
+    photo = models.ImageField(upload_to='members', null=True, blank=True)
     phone_number = models.CharField(max_length=12, null=True)
     is_habitat_owner = models.BooleanField(default=False, null=True, verbose_name='صاحب اقامت‌گاه؟')
 

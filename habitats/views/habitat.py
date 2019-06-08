@@ -8,14 +8,14 @@ from django.views.generic import CreateView, UpdateView, DeleteView, ListView, D
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import View
 
-from habitats.forms import CreateHabitatForm
 from habitats.models import Habitat
 
 
 class HabitatCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
-    form_class = CreateHabitatForm
+    model = Habitat
+    fields = ['name', 'address', 'town', 'photo']
     template_name = 'habitats/create_habitat.html'
-    success_url = '/habitats/create'
+    success_url = '/habitats'
     success_message = 'اقامتگاه %s با موفقیت ثبت شد!'
 
     def form_valid(self, form):
@@ -28,13 +28,13 @@ class HabitatCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
 # noinspection PyAttributeOutsideInit
 class HabitatUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
-    form_class = CreateHabitatForm
+    model = Habitat
+    fields = ['name', 'address', 'town', 'photo']
     template_name = 'habitats/update_habitat.html'
-    success_url = '/habitats/update'
     success_message = 'اقامتگاه %s با موفقیت ویرایش شد!'
 
     def get_success_url(self):
-        return '/habitats/%s/update' % self.habitat_pk
+        return '/habitats/%s/detail' % self.habitat_pk
 
     def get_success_message(self, cleaned_data):
         print(cleaned_data.get('name'))

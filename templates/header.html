@@ -13,7 +13,7 @@
           <li class="nav-item">
             <a href="{% url 'users:edit_profile' %}">
               {% if user.member.photo %}
-                <img alt="عکس باز نشد" src="{{ member.photo.url }}" width="40px" height="100%">
+                <img alt="عکس باز نشد" src="{{ user.member.photo.url }}" width="40px" height="100%">
               {% else %}
                 <img alt="عکس باز نشد" src="/static/images/no_image.png" width="40px" height="100%">
               {% endif %}

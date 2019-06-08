@@ -2,7 +2,7 @@
 
 {% block form_content %}
     {% load crispy_forms_tags %}
-    <form method="post" novalidate>
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form|crispy }}
         <button type="submit" class="btn btn-success btn-block btn-lg">ویرایش اقامتگاه</button>
