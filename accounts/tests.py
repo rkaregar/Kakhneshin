@@ -54,7 +54,7 @@ class DepositSeleniumTest(DepositTest, SeleniumTestCase):
 
 
 class TestWithdrawal(SetupUserAndAccountMixin):
-
+    @skip
     def test_withdrawal_request(self):
         # request withdrawal
         self.client.force_login(self.user)
