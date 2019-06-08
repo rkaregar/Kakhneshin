@@ -18,6 +18,8 @@ class CreateRoomTypeForm(forms.ModelForm):
         initial = kwargs.get('initial', {})
         self.habitat = initial['habitat']
         super(CreateRoomTypeForm, self).__init__(*args, **kwargs)
+        for key in self.fields:
+            self.fields[key].widget.attrs['class'] = 'form-control'
 
     def clean(self):
         self.cleaned_data = super(CreateRoomTypeForm, self).clean()

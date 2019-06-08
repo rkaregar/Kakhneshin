@@ -1,11 +1,23 @@
 {% extends "form.html" %}
 
 {% block form_content %}
-    {% load crispy_forms_tags %}
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form|crispy }}
-        <button type="submit" class="btn btn-success btn-block btn-lg">ثبت نوع اتاق</button>
+
+        {% for field in form %}
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">{{ field.label_tag }}</label>
+                <div class="col-sm-7">
+                    {{ field }}
+                </div>
+            </div>
+        {% endfor %}
+
+        <div style="padding-left: 150px">
+            <button type="submit" class="btn btn-success btn-lg btn-block" name="submit_button">ثبت</button>
+        </div>
+
     </form>
 {% endblock %}
 
