@@ -118,6 +118,11 @@ class RoomTypeListView(LoginRequiredMixin, ListView):
         qs = super(RoomTypeListView, self).get_queryset()
         return qs.filter(habitat=self.habitat)
 
+    def get_context_data(self, **kwargs):
+        context = super(RoomTypeListView, self).get_context_data(**kwargs)
+        context['habitat_pk'] = self.habitat_pk
+        return context
+
 
 class RoomCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = CreateRoomForm

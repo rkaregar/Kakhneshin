@@ -16,7 +16,7 @@ urlpatterns = [
     path('<int:habitat_pk>/room_types/', RoomTypeListView.as_view(), name='all_room_types'),
     path('<int:habitat_pk>/room_types/<int:room_type_pk>/delete', RoomTypeDeleteView.as_view(),
          name='delete_room_type'),
-    path('<int:habitat_pk>/room_types/create', RoomTypeCreateView.as_view(), name='create_room_type'),
+    path('<int:habitat_pk>/room_types/create', RoomTypeCreateView.as_view(), name='room_type_create'),
     path('<int:habitat_pk>/room_types/<int:room_type_pk>/update', RoomTypeUpdateView.as_view(),
          name='room_type_update'),
     path('<int:habitat_pk>/room_types/<int:room_type_pk>/detail', RoomTypeDetailView.as_view(),

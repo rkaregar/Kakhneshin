@@ -4,19 +4,34 @@
     {% load group_by %}
     <div class="container-fluid" align="center">
         <h1>نوع اتاق‌های شما</h1>
-        {% for room_type_group in object_list|group_by:3 %}
+        {% for room_type_group in object_list|add_str:'add'|group_by:3 %}
             <div class="row">
                 {% for room_type in room_type_group %}
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100 mx-1">
-                            <img class="card-img-top" src="/static/images/no_image.png" alt="نوع اتاق">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">{{ room_type.type_name }}</h5>
-                                <p class="card-text">{{ room_type.detail }} </p>
-                                <a href="{% url 'habitats:room_type_detail' habitat_pk=room_type.habitat.pk room_type_pk=room_type.pk %}" class="btn btn-primary mt-auto">مشاهده‌ی نوع اتاق</a>
+                    {% if room_type == 'add' %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 mx-1">
+                                <img class="card-img-top" src="/static/images/no_image.png" alt="نوع اتاق">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title"></h5>
+                                    <p class="card-text"></p>
+                                    <a href="{% url 'habitats:room_type_create' habitat_pk=habitat_pk%}" class="btn btn-primary mt-auto">ایجاد
+                                        نوع اتاق</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% else %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 mx-1">
+                                <img class="card-img-top" src="/static/images/no_image.png" alt="نوع اتاق">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">{{ room_type.type_name }}</h5>
+                                    <p class="card-text">{{ room_type.detail }} </p>
+                                    <a href="{% url 'habitats:room_type_detail' habitat_pk=room_type.habitat.pk room_type_pk=room_type.pk %}"
+                                       class="btn btn-primary mt-auto">مشاهده‌ی نوع اتاق</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         {% empty %}
