@@ -3,7 +3,7 @@ import re
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import View
@@ -129,11 +129,4 @@ class HabitatDetailView(View):
 
 class HomeView(View):
     def get(self, request):
-        return render(request, 'homepage.html')
-
-    def post(self, request):
-        dates = re.split('/| - ', request.POST['daterange'])
-        from_date = '-'.join([dates[2], dates[0], dates[1]])
-        to_date = '-'.join([dates[5], dates[3], dates[4]])
-        # return redirect('/habitats/{}/{}'.format(from_date, to_date))  redirect to named url is also possible
         return render(request, 'homepage.html')

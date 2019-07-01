@@ -27,6 +27,7 @@ urlpatterns = [
     path('users/', include(('users.urls', 'users'), namespace='users')),
     path('habitats/', include(('habitats.urls', 'habitats'), namespace='habitats')),
     path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
+    path('reservation/', include(('reservation.urls', 'reservation'), namespace='reservation')), 
 ]
 
 urlpatterns += staticfiles_urlpatterns()

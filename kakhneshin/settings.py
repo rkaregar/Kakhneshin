@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'habitats',
     'accounts',
+    'reservation',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
