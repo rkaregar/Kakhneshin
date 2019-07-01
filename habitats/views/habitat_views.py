@@ -97,11 +97,20 @@ class HabitatListView(ListView):
 
 class HabitatTinyDetailView(DetailView):
     template_name = 'habitats/habitat_detail_tiny.html'
+    context_object_name = 'habitat'
 
     def get_object(self, queryset=None):
         self.habitat_pk = self.kwargs.get('habitat_pk', None)
         self.habitat = get_object_or_404(Habitat, pk=self.habitat_pk)
         return self.habitat
+
+    def get_context_data(self, **kwargs):
+        context = super(HabitatTinyDetailView, self).get_context_data(**kwargs)
+
+        room_types = self.habitat.roomtype_set.all().values()
+        context['room_types'] = room_types
+
+        return context
 
     def user_passed_test(self, request):
         if self.habitat.owner == self.request.user.member:

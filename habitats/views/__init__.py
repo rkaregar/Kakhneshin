@@ -1,1 +1,1 @@
-from .habitat import HabitatCreateView, HabitatListView, HabitatDeleteView, HabitatUpdateView
+from .habitat_views import HabitatCreateView, HabitatListView, HabitatDeleteView, HabitatUpdateView
