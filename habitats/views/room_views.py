@@ -1,14 +1,15 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render, HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
+from django.views.generic import CreateView, UpdateView, DeleteView, FormView, DetailView, TemplateView
 
-from habitats.forms import CreateRoomTypeForm
-from habitats.models import RoomType, Habitat
+from habitats.forms import CreateRoomTypeForm, CreateRoomOutOfServiceForm
+from habitats.models import RoomType, Habitat, RoomOutOfService
 
 from django.forms.models import model_to_dict
+import re
 
 
 class RoomTypeCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -129,3 +130,29 @@ class RoomTypeDetailView(LoginRequiredMixin, DetailView):
         if self.room_type.habitat != self.habitat or self.habitat.owner != self.request.user.member:
             raise PermissionDenied('شما امکان مشاهده‌ی نوع اتاق برای این اقامتگاه را ندارید.')
         return super(RoomTypeDetailView, self).dispatch(request, *args, **kwargs)
+
+
+class RoomOutOfServiceView(LoginRequiredMixin, TemplateView):
+    template_name = 'room_types/room_out_of_service.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(RoomOutOfServiceView, self).get_context_data(**kwargs)
+        out_of_services = RoomOutOfService.objects.filter(room_id=self.kwargs.get('room_type_pk', None))
+        context['out_of_services'] = out_of_services
+        context['room_type'] = RoomType.objects.get(pk=self.kwargs.get('room_type_pk', None))
+
+        return context
+
+    def post(self, request, **kwargs):
+        dates = re.split('/| - ', request.POST.get('daterange', None))
+        from_date = '-'.join([dates[2], dates[0], dates[1]])
+        to_date = '-'.join([dates[5], dates[3], dates[4]])
+
+        num_of_affected_rooms = request.POST.get('num_of_rooms', None)
+        details = request.POST.get('details', None)
+
+        RoomOutOfService.objects.create(room_id=kwargs.get('room_type_pk'), inclusive_since=from_date,
+                                        inclusive_until=to_date, number_of_affected_rooms=num_of_affected_rooms,
+                                        details=details)
+
+        return self.get(request)

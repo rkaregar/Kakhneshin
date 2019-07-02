@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from users.models import Member
 
+from django.urls import reverse
+
 
 class Habitat(models.Model):
     name = models.CharField(max_length=200, default='', verbose_name='نام', unique=True)
@@ -62,9 +64,15 @@ class RoomType(models.Model):
 
 class RoomOutOfService(models.Model):
     room = models.ForeignKey(RoomType, on_delete=models.CASCADE, verbose_name='اتاق مورد نظر')
-    inclusive_since = models.DateTimeField(verbose_name='تاریخ شروع')
-    inclusive_until = models.DateTimeField(verbose_name='تاریخ پایان')
+    inclusive_since = models.DateField(verbose_name='تاریخ شروع')
+    inclusive_until = models.DateField(verbose_name='تاریخ پایان')
+    number_of_affected_rooms = models.PositiveIntegerField(default=1, verbose_name='تعداد اتاق‌ها')
     details = models.CharField(max_length=1000, null=True, blank=True, verbose_name='توضیحات')
 
     def __str__(self):
-        raise NotImplementedError
+        return 'اتاق {}، از {} تا {}، دلیل: {}'.format(self.room, self.inclusive_since, self.inclusive_until,
+                                                       self.details)
+
+    def get_absolute_url(self):
+        return reverse('habitats:room_out_of_service',
+                       kwargs={'habitat_pk': self.room.habitat_id, 'room_type_pk': self.room_id})

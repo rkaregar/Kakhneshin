@@ -1,0 +1,128 @@
+{% extends "master.html" %}
+{% load static %}
+
+{% block content %}
+    <head>
+        <style>
+            .row {
+                padding-top: 20px;
+            }
+
+            .card-footer {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+            }
+
+            .card-deck .card {
+                padding-bottom: 50px;
+            }
+        </style>
+    </head>
+
+
+    <div class="container" align="right" id="features">
+        <h2>مدیریت محدودیت‌های اتاق {{ room_type }}</h2>
+        <br>
+        <div class="card">
+            <div class="card-header text-right"><h5 class="my-4">جزئیات محدودیت اعمالی را مشخص کنید</h5></div>
+            <br>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <label for="daterange" class="col-sm-3 col-form-label text-md-right">بازهٔ از دسترس خارج
+                        بودن</label>
+                    <div class="col-md-3">
+                        <input type="text" name="daterange" id="daterange" value="" style="width: 200px"/>
+                        <script>
+                            $(function () {
+                                $('input[name="daterange"]').daterangepicker({
+                                    opens: 'left'
+                                }, function (start, end, label) {
+                                    console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+                                });
+                            });
+                        </script>
+                    </div>
+
+                    <label for="num_of_rooms" class="col-sm-3 col-form-label text-md-right">تعداد اتاق‌های تحت تاثیر
+                        قرار گرفته</label>
+                    <div class="col-md-3">
+                        <input type="number" name="num_of_rooms" id="num_of_rooms" value="1" min="1"
+                               style="width: 75px"/>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="details" class="col-sm-3 col-form-label text-md-right">توضیحات</label>
+                    <div class="col-md-4">
+                        <textarea name="details" id="details"></textarea>
+                    </div>
+
+                    <div class="form-group row mb-0">
+                        <div class="col-md-8 offset-md-4">
+                            <button type="submit" class="btn btn-outline-primary" id="submit_button"
+                                    name="submit_button">
+                                اضافه کردن محدودیت
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+            </form>
+        </div>
+    </div>
+
+    <br><br>
+
+    <div class="container" align="right" id="features">
+        <h3>محدودیت‌های ثبت شده</h3>
+
+        {% for out_of_service in out_of_services %}
+            {% if forloop.counter0|divisibleby:4 %}
+                <div class="row" align="center">
+            {% endif %}
+
+        <div class="col-lg-3 mb-3">
+            <div class="card h-100">
+                {#                <h4 class="card-header">salam</h4>#}
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <td>از تاریخ:</td>
+                        <td>{{ out_of_service.inclusive_since }}</td>
+                    </tr>
+                    <tr>
+                        <td>تا تاریخ:</td>
+                        <td>{{ out_of_service.inclusive_until }}</td>
+                    </tr>
+                    <tr>
+                        <td>تعداد اتاق‌ها:</td>
+                        <td>{{ out_of_service.number_of_affected_rooms }}</td>
+                    </tr>
+                    <tr class="desc">
+                        <td>توضیحات:</td>
+                        <td>{{ out_of_service.details }}</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+<br><br>
+                <div class="card-footer">
+                    <a href="#" class="btn btn-danger">حذف محدودیت</a>
+                </div>
+
+            </div>
+        </div>
+
+        {% if forloop.counter0|add:1|divisibleby:4 or forloop.counter == ss|length %}
+            </div>
+        {% endif %}
+
+        {% empty %}
+            <h4>متاسفانه اتاقی برای این اقامت‌گاه ثبت نشده است.</h4>
+        {% endfor %}
+
+    </div>
+
+{% endblock %}
