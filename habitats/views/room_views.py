@@ -144,19 +144,27 @@ class RoomOutOfServiceView(LoginRequiredMixin, TemplateView):
         return context
 
     def post(self, request, **kwargs):
-        dates = re.split('/| - ', request.POST.get('daterange', None))
-        from_date = '-'.join([dates[2], dates[0], dates[1]])
-        to_date = '-'.join([dates[5], dates[3], dates[4]])
-
-        num_of_affected_rooms = request.POST.get('num_of_rooms', None)
-        details = request.POST.get('details', None)
-
-        RoomOutOfService.objects.create(room_id=kwargs.get('room_type_pk'), inclusive_since=from_date,
-                                        exclusive_until=to_date, number_of_affected_rooms=num_of_affected_rooms,
-                                        details=details)
-
         context = self.get_context_data(**kwargs)
-        context['errors'] = ['bad input', 'wrong name']
+
+        if request.POST.get('delete', None):
+            out_of_service_id = request.POST.get('out_of_service_id', None)
+            RoomOutOfService.objects.get(pk=out_of_service_id).delete()
+        else:
+            dates = re.split('/| - ', request.POST.get('daterange', None))
+            from_date = '-'.join([dates[2], dates[0], dates[1]])
+            to_date = '-'.join([dates[5], dates[3], dates[4]])
+
+            num_of_affected_rooms = request.POST.get('num_of_rooms', None)
+            details = request.POST.get('details', None)
+
+            current_room = RoomType.objects.get(pk=self.kwargs.get('room_type_pk', None))
+            if current_room.is_limitation_valid(from_date, to_date, num_of_affected_rooms):
+                RoomOutOfService.objects.create(room_id=kwargs.get('room_type_pk'), inclusive_since=from_date,
+                                                exclusive_until=to_date, number_of_affected_rooms=num_of_affected_rooms,
+                                                details=details)
+            else:
+                context['errors'] = [
+                    'با توجه به تعداد اتاق‌های از این نوع، محدودیت‌های'
+                    ' اعمال‌شدهٔ قبلی و رزروهای انجام شده،‌ امکان اعمال این محدودیت جدید وجود ندارد.']
 
         return self.render_to_response(context)
-

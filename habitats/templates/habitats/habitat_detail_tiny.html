@@ -69,7 +69,7 @@
                         {% else %}
                             <div class="carousel-item active"
                                  style="background-image: url(
-                                         {% if habitat.photo %}{{ habitat.photo.url }}{% else %}'images/no_hotel.jpg'{% endif %})">
+                                         {% if habitat.photo %}{{ habitat.photo.url }}{% else %}{% static 'images/no_hotel.jpg' %}{% endif %})">
                             </div>
                         {% endif %}
 

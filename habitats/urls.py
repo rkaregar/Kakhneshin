@@ -20,5 +20,5 @@ urlpatterns = [
     path('<int:habitat_pk>/room_types/<int:room_type_pk>/detail', RoomTypeDetailView.as_view(),
          name='room_type_detail'),
     path('<int:habitat_pk>/room_types/<int:room_type_pk>/out_of_service', RoomOutOfServiceView.as_view(),
-         name='room_out_of_service')
+         name='room_out_of_service'),
 ]

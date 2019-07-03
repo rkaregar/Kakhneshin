@@ -71,14 +71,13 @@ class RoomType(models.Model):
         for day in [from_date + timedelta(i) for i in range((to_date - from_date).days)]:
             num_of_out_of_service_rooms = \
                 intersected_out_of_services.filter(Q(inclusive_since__lte=day) & Q(exclusive_until__gt=day)).aggregate(
-                    rooms=Sum('number_of_affected_rooms'))['rooms']
-            num_of_reserved_rooms = intersected_reservations.filter(Q(from_date__lte=day) & Q(to_date__gt=day)).count()
+                    rooms=Sum('number_of_affected_rooms'))['rooms'] or 0
+            num_of_reserved_rooms = intersected_reservations.filter(
+                Q(from_date__lte=day) & Q(to_date__gt=day)).count() or 0
 
             if num_of_out_of_service_rooms + num_of_reserved_rooms + \
-                    num_of_affected_rooms > self.number_of_rooms_of_this_kind:
+                    int(num_of_affected_rooms) > self.number_of_rooms_of_this_kind:
                 return False
-
-            print('{}: {}, {}'.format(day, num_of_out_of_service_rooms, num_of_reserved_rooms))
 
         return True
 

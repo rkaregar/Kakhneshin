@@ -44,7 +44,7 @@
                     <label for="daterange" class="col-sm-3 col-form-label text-md-right">بازهٔ از دسترس خارج
                         بودن</label>
                     <div class="col-md-3">
-                        <input type="text" name="daterange" id="daterange" value="" style="width: 200px"/>
+                        <input type="text" class="form-control" name="daterange" id="daterange" value="" style="width: 200px" required/>
                         <script>
                             $(function () {
                                 $('input[name="daterange"]').daterangepicker({
@@ -59,14 +59,14 @@
                     <label for="num_of_rooms" class="col-sm-3 col-form-label text-md-right">تعداد اتاق‌های تحت تاثیر
                         قرار گرفته</label>
                     <div class="col-md-3">
-                        <input type="number" name="num_of_rooms" id="num_of_rooms" value="1" min="1"
+                        <input type="number" class="form-control" name="num_of_rooms" id="num_of_rooms" value="1" min="1" required
                                style="width: 75px"/>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="details" class="col-sm-3 col-form-label text-md-right">توضیحات</label>
-                    <div class="col-md-4">
-                        <textarea name="details" id="details"></textarea>
+                    <div class="col-md-3">
+                        <textarea class="form-control" name="details" id="details"></textarea>
                     </div>
 
                     <div class="form-group row mb-0">
@@ -96,7 +96,6 @@
 
         <div class="col-lg-3 mb-3">
             <div class="card h-100">
-                {#                <h4 class="card-header">salam</h4>#}
                 <table class="table">
                     <tbody>
                     <tr>
@@ -120,7 +119,36 @@
                 </table>
                 <br><br>
                 <div class="card-footer">
-                    <a href="#" class="btn btn-danger">حذف محدودیت</a>
+                    <button id="btn-delete{{ out_of_service.id }}" type="button" name="delete"
+                            class="btn btn-danger btn-delete" data-id={{ out_of_service.id }} data-toggle="modal"
+                            data-target="#myModal" style="margin-top: 5px"
+                    >حذف محدودیت
+                    </button>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" dir="rtl">حذف محدودیت</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>آیا با حذف این محدودیت موافقید؟</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">خیر</button>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="delete" value="true">
+                            <input type="hidden" name="out_of_service_id" id="modal_id">
+                            <button type="submit" class="btn btn-success"
+                                    style="margin-right: 5px;">بله
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
             </div>
@@ -131,8 +159,18 @@
         {% endif %}
 
         {% empty %}
-            <h4>متاسفانه اتاقی برای این اقامت‌گاه ثبت نشده است.</h4>
+            <h4>هنوز محدودیتی برای این اتاق ثبت نشده است.</h4>
         {% endfor %}
+
+        <script>
+            $(document).ready(function () {
+                $(".btn-delete").bind('click', function () {
+                    const id = $(this).attr('data-id');
+                    $('#modal_id').attr('value', id);
+                })
+            })
+
+        </script>
 
     </div>
 
