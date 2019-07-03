@@ -152,7 +152,11 @@ class RoomOutOfServiceView(LoginRequiredMixin, TemplateView):
         details = request.POST.get('details', None)
 
         RoomOutOfService.objects.create(room_id=kwargs.get('room_type_pk'), inclusive_since=from_date,
-                                        inclusive_until=to_date, number_of_affected_rooms=num_of_affected_rooms,
+                                        exclusive_until=to_date, number_of_affected_rooms=num_of_affected_rooms,
                                         details=details)
 
-        return self.get(request)
+        context = self.get_context_data(**kwargs)
+        context['errors'] = ['bad input', 'wrong name']
+
+        return self.render_to_response(context)
+

@@ -36,7 +36,7 @@ class CreateRoomTypeForm(forms.ModelForm):
 
 class CreateRoomOutOfServiceForm(forms.ModelForm):
     inclusive_since = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), label='تاریخ شروع')
-    inclusive_until = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), label='تاریخ پایان')
+    exclusive_until = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), label='تاریخ پایان')
 
     # def __init__(self, *args, **kwargs):
     #     super(CreateRoomOutOfServiceForm, self).__init__(*args, **kwargs)
@@ -46,4 +46,4 @@ class CreateRoomOutOfServiceForm(forms.ModelForm):
 
     class Meta:
         model = RoomOutOfService
-        fields = ('room', 'inclusive_since', 'inclusive_until', 'details')
+        fields = ('room', 'inclusive_since', 'exclusive_until', 'details')
