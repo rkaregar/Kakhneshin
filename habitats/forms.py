@@ -3,14 +3,14 @@ from crispy_forms.layout import Layout, Row, Column, Field
 from django import forms
 from django.core.exceptions import ValidationError
 
-from habitats.models import Habitat, RoomType, Room, RoomOutOfService
+from habitats.models import Habitat, RoomType, RoomOutOfService
 
 
 class CreateRoomTypeForm(forms.ModelForm):
     class Meta:
         model = RoomType
         fields = ('type_name', 'capacity_in_person',
-                  'cost_per_night', 'has_breakfast', 'has_telephone',
+                  'cost_per_night', 'number_of_rooms_of_this_kind', 'has_breakfast', 'has_telephone',
                   'has_wifi', 'has_minibar', 'has_foreign_wc',
                   'has_bath_tub', 'has_shower', 'has_wc', 'details', 'photo')
 
@@ -32,12 +32,6 @@ class CreateRoomTypeForm(forms.ModelForm):
     def save(self, commit=True):
         self.instance.habitat = self.cleaned_data['habitat']
         return super(CreateRoomTypeForm, self).save(commit=commit)
-
-
-class CreateRoomForm(forms.ModelForm):
-    class Meta:
-        model = Room
-        fields = ('room_type', 'number', 'details')
 
 
 class CreateRoomOutOfServiceForm(forms.ModelForm):
