@@ -1,10 +1,11 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from users.models import Member
+from reservation.models import Reservation
 from django.urls import reverse
-from django.db.models import Q
+from django.db.models import Q, Sum
 
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 
 
 class Habitat(models.Model):
@@ -63,10 +64,23 @@ class RoomType(models.Model):
         to_date = datetime.strptime(to_date, '%Y-%m-%d')
 
         intersected_out_of_services = RoomOutOfService.objects.filter(
-            ~Q(exclusive_until__lte=from_date) | ~Q(inclusive_since__gte=to_date))
+            Q(room=self) & ~Q(exclusive_until__lte=from_date) | ~Q(inclusive_since__gte=to_date))
+        intersected_reservations = Reservation.objects.filter(
+            Q(room=self) & ~Q(to_date__lte=from_date) | ~Q(from_date__gte=to_date))
 
         for day in [from_date + timedelta(i) for i in range((to_date - from_date).days)]:
-            print(day)
+            num_of_out_of_service_rooms = \
+                intersected_out_of_services.filter(Q(inclusive_since__lte=day) & Q(exclusive_until__gt=day)).aggregate(
+                    rooms=Sum('number_of_affected_rooms'))['rooms']
+            num_of_reserved_rooms = intersected_reservations.filter(Q(from_date__lte=day) & Q(to_date__gt=day)).count()
+
+            if num_of_out_of_service_rooms + num_of_reserved_rooms + \
+                    num_of_affected_rooms > self.number_of_rooms_of_this_kind:
+                return False
+
+            print('{}: {}, {}'.format(day, num_of_out_of_service_rooms, num_of_reserved_rooms))
+
+        return True
 
     def save(self, *args, **kwargs):
         self.validate_unique()
