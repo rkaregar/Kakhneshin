@@ -1,6 +1,10 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from users.models import Member
+from django.urls import reverse
+from django.db.models import Q
+
+from datetime import datetime, timedelta, date
 
 
 class Habitat(models.Model):
@@ -54,6 +58,16 @@ class RoomType(models.Model):
         if qs.filter(type_name=self.type_name).exclude(id=self.id).exists():
             raise ValidationError('نام انواع اتاق در هر اقامتگاه باید یکتا باشد.')
 
+    def is_limitation_valid(self, from_date, to_date, num_of_affected_rooms):
+        from_date = datetime.strptime(from_date, '%Y-%m-%d')
+        to_date = datetime.strptime(to_date, '%Y-%m-%d')
+
+        intersected_out_of_services = RoomOutOfService.objects.filter(
+            ~Q(exclusive_until__lte=from_date) | ~Q(inclusive_since__gte=to_date))
+
+        for day in [from_date + timedelta(i) for i in range((to_date - from_date).days)]:
+            print(day)
+
     def save(self, *args, **kwargs):
         self.validate_unique()
 
@@ -62,9 +76,15 @@ class RoomType(models.Model):
 
 class RoomOutOfService(models.Model):
     room = models.ForeignKey(RoomType, on_delete=models.CASCADE, verbose_name='اتاق مورد نظر')
-    inclusive_since = models.DateTimeField(verbose_name='تاریخ شروع')
-    inclusive_until = models.DateTimeField(verbose_name='تاریخ پایان')
+    inclusive_since = models.DateField(verbose_name='تاریخ شروع')
+    exclusive_until = models.DateField(verbose_name='تاریخ پایان')
+    number_of_affected_rooms = models.PositiveIntegerField(default=1, verbose_name='تعداد اتاق‌ها')
     details = models.CharField(max_length=1000, null=True, blank=True, verbose_name='توضیحات')
 
     def __str__(self):
-        raise NotImplementedError
+        return 'اتاق {}، از {} تا {}، دلیل: {}'.format(self.room, self.inclusive_since, self.exclusive_until,
+                                                       self.details)
+
+    def get_absolute_url(self):
+        return reverse('habitats:room_out_of_service',
+                       kwargs={'habitat_pk': self.room.habitat_id, 'room_type_pk': self.room_id})

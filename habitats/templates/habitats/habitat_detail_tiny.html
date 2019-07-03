@@ -117,6 +117,10 @@
                     <a href="{% url 'habitats:room_type_detail' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}"
                        class="btn btn-primary">مشاهده‌ی نوع اتاق</a>
                 </div>
+                <div class="card-footer">
+                    <a href="{% url 'habitats:room_out_of_service' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}"
+                       class="btn btn-warning">مدیریت محدودیت‌های اتاق</a>
+                </div>
 
             </div>
         </div>

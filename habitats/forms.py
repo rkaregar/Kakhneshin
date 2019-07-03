@@ -35,6 +35,15 @@ class CreateRoomTypeForm(forms.ModelForm):
 
 
 class CreateRoomOutOfServiceForm(forms.ModelForm):
+    inclusive_since = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), label='تاریخ شروع')
+    exclusive_until = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), label='تاریخ پایان')
+
+    # def __init__(self, *args, **kwargs):
+    #     super(CreateRoomOutOfServiceForm, self).__init__(*args, **kwargs)
+    #     self.fields['room'].queryset = RoomType.objects.filter(habitat_id=kwargs['habitat_pk'])
+    def form_valid(self, form):
+        return super(CreateRoomOutOfServiceForm, self).form_valid(form)
+
     class Meta:
         model = RoomOutOfService
-        fields = ('room', 'inclusive_since', 'inclusive_until', 'details')
+        fields = ('room', 'inclusive_since', 'exclusive_until', 'details')

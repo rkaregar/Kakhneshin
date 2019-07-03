@@ -1,7 +1,8 @@
 from django.urls import path
 from habitats.views.habitat_views import HabitatTinyDetailView, HomeView, HabitatDetailView, HabitatListView, \
     HabitatCreateView, HabitatDeleteView, HabitatUpdateView
-from habitats.views.room_views import RoomTypeCreateView, RoomTypeDeleteView, RoomTypeUpdateView, RoomTypeDetailView
+from habitats.views.room_views import RoomTypeCreateView, RoomTypeDeleteView, RoomTypeUpdateView, RoomTypeDetailView, \
+    RoomOutOfServiceView
 
 urlpatterns = [
     path('home/', HomeView.as_view(), name='home'),
@@ -18,4 +19,6 @@ urlpatterns = [
          name='room_type_update'),
     path('<int:habitat_pk>/room_types/<int:room_type_pk>/detail', RoomTypeDetailView.as_view(),
          name='room_type_detail'),
+    path('<int:habitat_pk>/room_types/<int:room_type_pk>/out_of_service', RoomOutOfServiceView.as_view(),
+         name='room_out_of_service')
 ]

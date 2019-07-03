@@ -47,6 +47,9 @@
 
                 <a href="{% url 'habitats:room_type_update' habitat_pk=room_type.habitat room_type_pk=room_type.id %}"
                    class="btn btn-primary mt-auto mb-1">ویرایش مشخصات نوع اتاق</a>
+                <br>
+                <a href="{% url 'habitats:room_out_of_service' habitat_pk=room_type.habitat room_type_pk=room_type.id %}"
+                   class="btn btn-warning mt-auto mb-1">تنظیمات خارج از سرویس بودن اتاق</a>
             </div>
 
             <div class="col-lg-1">
