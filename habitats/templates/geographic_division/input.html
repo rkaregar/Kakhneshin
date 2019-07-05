@@ -1,0 +1,56 @@
+<input type="hidden" id="id_division" name="division"/>
+<input type="text" list="division_suggestions_list"
+       autocomplete="off"
+       id="division_textinput" required/>
+<datalist id="division_suggestions_list">
+</datalist>
+<script>
+    let suggestionMap = {};
+
+    function fetchSuggestions() {
+        let $division_textinput = $("#division_textinput");
+        const value = $division_textinput.val();
+        if (value.length === 0) {
+            $('#id_division').val(-1);
+            return;
+        }
+        if (value in suggestionMap)
+            $('#id_division').val(suggestionMap[value]);
+        $("#division_suggestions_list").find('option').remove();
+        suggestionMap = {};
+        $division_textinput.addClass('loadinggif');
+        $.ajax({
+            url: '{% url 'habitats:ajax-search-divisions' %}',
+            data: {
+                'value': value,
+                'only_cities': {{ only_cities }}
+            },
+            dataType: 'json',
+            success: function (data) {
+                let $division_textinput = $("#division_textinput");
+                if (data.word !== $division_textinput.val()) {
+                    $division_textinput.removeClass('loadinggif');
+                    return;
+                }
+                if (data.suggestions.length > 0)
+                    $('#id_division').val(data.suggestions[0].pk);
+                for (i in data.suggestions) {
+                    if (i > 9) {
+                        break;
+                    }
+                    suggestionMap[data.suggestions[i].name] = data.suggestions[i].pk;
+                    const name = data.suggestions[i].name;
+                    $("#division_suggestions_list").append('<option value="' + name + '"/>');
+                }
+                $division_textinput.removeClass('loadinggif');
+            },
+            error: () => {
+                $('#division_textinput').removeClass('loadinggif');
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $('#division_textinput').on("change paste keyup", fetchSuggestions)
+    });
+</script>

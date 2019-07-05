@@ -1,4 +1,6 @@
 from django.urls import path
+
+from habitats.views.geographic_divisions_views import GeographicDivisionsSearchView
 from habitats.views.habitat_views import HabitatTinyDetailView, HomeView, HabitatDetailView, HabitatListView, \
     HabitatCreateView, HabitatDeleteView, HabitatUpdateView
 from habitats.views.room_views import RoomTypeCreateView, RoomTypeDeleteView, RoomTypeUpdateView, RoomTypeDetailView, \
@@ -21,4 +23,5 @@ urlpatterns = [
          name='room_type_detail'),
     path('<int:habitat_pk>/room_types/<int:room_type_pk>/out_of_service', RoomOutOfServiceView.as_view(),
          name='room_out_of_service'),
+    path('ajax/search-divisions', GeographicDivisionsSearchView.as_view(), name='ajax-search-divisions')
 ]

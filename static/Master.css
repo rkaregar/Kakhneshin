@@ -26,3 +26,12 @@ body {
 * {
     font-family: 'myFont';
 }
+
+input.loadinggif
+{
+       background:
+     url('/static/spinner.gif')
+     no-repeat
+     left center;
+    background-size: 30px;
+}

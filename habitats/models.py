@@ -1,5 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.functional import cached_property
+
 from users.models import Member
 from reservation.models import Reservation
 from django.urls import reverse
@@ -101,3 +103,21 @@ class RoomOutOfService(models.Model):
     def get_absolute_url(self):
         return reverse('habitats:room_out_of_service',
                        kwargs={'habitat_pk': self.room.habitat_id, 'room_type_pk': self.room_id})
+
+
+class GeographicDivision(models.Model):
+    name = models.CharField(max_length=100)
+    region = models.ForeignKey(to="habitats.GeographicDivision", null=True, blank=True, on_delete=models.CASCADE)
+    is_city = models.BooleanField()
+
+    def __str__(self):
+        return self.name
+
+    @cached_property
+    def hierarchy_name(self):
+        name = ''
+        division = self
+        while division is not None:
+            name += '{}، '.format(division.name)
+            division = division.region
+        return name[:-2]

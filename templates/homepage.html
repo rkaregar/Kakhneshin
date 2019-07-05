@@ -1,5 +1,7 @@
 {% extends "master.html" %}
 
+{% load autocomplete %}
+
 {% block content %}
     <header>
         <div id="carousel" class="carousel slide" data-ride="carousel">
@@ -51,7 +53,7 @@
                 <div class="form-group row">
                     <label for="daterange" class="col-sm-1 col-form-label text-md-right">بازهٔ سفر</label>
                     <div class="col-md-3">
-                        <input type="text" name="daterange" id="daterange" value="" style="width: 200px"/>
+                        <input type="text" name="daterange" id="daterange" value="" style="width: 200px" required/>
                         <script>
                             $(function () {
                                 $('input[name="daterange"]').daterangepicker({
@@ -64,8 +66,13 @@
                     </div>
 
                     <label for="persons" class="col-sm-1 col-form-label text-md-right">تعداد مسافران</label>
+                    <div class="col-md-1">
+                        <input type="number" id="persons" name="persons" style="width: 75px" required/>
+                    </div>
+
+                    <label for="city_textinput" class="col-sm-1 col-form-label text-md-right">مقصد</label>
                     <div class="col-md-3">
-                        <input type="number" id="persons" name="persons" value="2" style="width: 75px"/>
+                        {% divisions_autocomplete_input %}
                     </div>
 
                     <div class="form-group row mb-0">
