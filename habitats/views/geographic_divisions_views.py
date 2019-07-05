@@ -8,7 +8,6 @@ from habitats.models import GeographicDivision
 class GeographicDivisionsSearchView(LoginRequiredMixin, View):
     def get(self, request):
         input = request.GET['value']
-        print(request.GET['only_cities'])
         if request.GET['only_cities'] == 'true':
             divisions = GeographicDivision.objects.filter(name__contains=input, is_city=True)
         else:
