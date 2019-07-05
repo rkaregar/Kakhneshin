@@ -2,9 +2,19 @@
 
 {% block form_content %}
     {% load crispy_forms_tags %}
+    {% load autocomplete %}
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form|crispy }}
+        {% for field in form %}
+            {% if field.name != 'town' %}
+                {{ field|as_crispy_field }}
+            {% endif %}
+        {% endfor %}
+    <div class="form-group">
+        <label for="town" class="col-form-label  requiredField">
+            شهر<span class="asteriskField">*</span> </label>
+        {% divisions_autocomplete_input field_name='town' %}
+    </div>
         <button type="submit" class="btn btn-success btn-block btn-lg">ثبت اقامتگاه</button>
     </form>
 {% endblock %}

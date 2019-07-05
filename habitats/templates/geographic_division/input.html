@@ -1,24 +1,24 @@
-<input type="hidden" id="id_division" name="division"/>
-<input type="text" list="division_suggestions_list"
+<input type="hidden" id="hidden_division" name="{{ field_name }}" value="{{ default_value }}"/>
+<input type="text" list="division_suggestions_list" value="{{ default_value_name }}"
        autocomplete="off"
-       id="division_textinput" required/>
+       id="id_{{ field_name }}" required class="textinput textInput form-control"/>
 <datalist id="division_suggestions_list">
 </datalist>
 <script>
     let suggestionMap = {};
 
     function fetchSuggestions() {
-        let $division_textinput = $("#division_textinput");
-        const value = $division_textinput.val();
+        let $id_{{ field_name}} = $("#id_{{ field_name}}");
+        const value = $id_{{ field_name}}.val();
         if (value.length === 0) {
-            $('#id_division').val(-1);
+            $('#hidden_division').val(-1);
             return;
         }
         if (value in suggestionMap)
-            $('#id_division').val(suggestionMap[value]);
+            $('#hidden_division').val(suggestionMap[value]);
         $("#division_suggestions_list").find('option').remove();
         suggestionMap = {};
-        $division_textinput.addClass('loadinggif');
+        $id_{{ field_name}}.addClass('loadinggif');
         $.ajax({
             url: '{% url 'habitats:ajax-search-divisions' %}',
             data: {
@@ -27,30 +27,33 @@
             },
             dataType: 'json',
             success: function (data) {
-                let $division_textinput = $("#division_textinput");
-                if (data.word !== $division_textinput.val()) {
-                    $division_textinput.removeClass('loadinggif');
+                let $id_{{ field_name}} = $("#id_{{ field_name}}");
+                if (data.word !== $id_{{ field_name}}.val()) {
+                    $id_{{ field_name}}.removeClass('loadinggif');
                     return;
                 }
+                $division_suggestions_list=$("#division_suggestions_list");
+                $division_suggestions_list.find('option').remove();
+                suggestionMap = {};
                 if (data.suggestions.length > 0)
-                    $('#id_division').val(data.suggestions[0].pk);
+                    $('#hidden_division').val(data.suggestions[0].pk);
                 for (i in data.suggestions) {
                     if (i > 9) {
                         break;
                     }
                     suggestionMap[data.suggestions[i].name] = data.suggestions[i].pk;
                     const name = data.suggestions[i].name;
-                    $("#division_suggestions_list").append('<option value="' + name + '"/>');
+                    $division_suggestions_list.append('<option value="' + name + '"/>');
                 }
-                $division_textinput.removeClass('loadinggif');
+                $id_{{ field_name}}.removeClass('loadinggif');
             },
             error: () => {
-                $('#division_textinput').removeClass('loadinggif');
+                $('#id_{{ field_name}}').removeClass('loadinggif');
             }
         });
     }
 
     $(document).ready(function () {
-        $('#division_textinput').on("change paste keyup", fetchSuggestions)
+        $('#id_{{ field_name}}').on("change paste keyup", fetchSuggestions)
     });
 </script>

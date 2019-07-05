@@ -53,7 +53,8 @@
                 <div class="form-group row">
                     <label for="daterange" class="col-sm-1 col-form-label text-md-right">بازهٔ سفر</label>
                     <div class="col-md-3">
-                        <input type="text" name="daterange" id="daterange" value="" style="width: 200px" required/>
+                        <input type="text" name="daterange" id="daterange" value="" style="width: 200px" required
+                               class="textinput textInput form-control"/>
                         <script>
                             $(function () {
                                 $('input[name="daterange"]').daterangepicker({
@@ -67,7 +68,8 @@
 
                     <label for="persons" class="col-sm-1 col-form-label text-md-right">تعداد مسافران</label>
                     <div class="col-md-1">
-                        <input type="number" id="persons" name="persons" style="width: 75px" required/>
+                        <input type="number" class="textinput textInput form-control" id="persons" name="persons"
+                               style="width: 75px" required/>
                     </div>
 
                     <label for="city_textinput" class="col-sm-1 col-form-label text-md-right">مقصد</label>

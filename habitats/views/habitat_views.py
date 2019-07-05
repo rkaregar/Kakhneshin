@@ -50,6 +50,14 @@ class HabitatUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
             return True
         return False
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['town_name']=self.habitat.town.name
+        except Exception:
+            context['town_name'] = ''
+        return context
+
     def dispatch(self, request, *args, **kwargs):
         self.get_object()
         if self.habitat is None:

@@ -10,10 +10,28 @@ from django.db.models import Q, Sum
 from datetime import datetime, timedelta
 
 
+class GeographicDivision(models.Model):
+    name = models.CharField(max_length=100)
+    region = models.ForeignKey(to="habitats.GeographicDivision", null=True, blank=True, on_delete=models.CASCADE)
+    is_city = models.BooleanField()
+
+    def __str__(self):
+        return self.name
+
+    @cached_property
+    def hierarchy_name(self):
+        name = ''
+        division = self
+        while division is not None:
+            name += '{}، '.format(division.name)
+            division = division.region
+        return name[:-2]
+
+
 class Habitat(models.Model):
     name = models.CharField(max_length=200, default='', verbose_name='نام', unique=True)
     address = models.CharField(max_length=500, default='', verbose_name='آدرس')
-    town = models.CharField(max_length=50, default='', verbose_name='شهر')
+    town = models.ForeignKey(GeographicDivision, verbose_name='شهر', on_delete=models.CASCADE, null=True)
     owner = models.ForeignKey(Member, on_delete=models.CASCADE, null=True, verbose_name='صاحب اقامتگاه')
     confirm = models.BooleanField(default=False)
     photo = models.ImageField(upload_to='habitats', null=True, blank=True, verbose_name='تصویر')
@@ -103,21 +121,3 @@ class RoomOutOfService(models.Model):
     def get_absolute_url(self):
         return reverse('habitats:room_out_of_service',
                        kwargs={'habitat_pk': self.room.habitat_id, 'room_type_pk': self.room_id})
-
-
-class GeographicDivision(models.Model):
-    name = models.CharField(max_length=100)
-    region = models.ForeignKey(to="habitats.GeographicDivision", null=True, blank=True, on_delete=models.CASCADE)
-    is_city = models.BooleanField()
-
-    def __str__(self):
-        return self.name
-
-    @cached_property
-    def hierarchy_name(self):
-        name = ''
-        division = self
-        while division is not None:
-            name += '{}، '.format(division.name)
-            division = division.region
-        return name[:-2]
