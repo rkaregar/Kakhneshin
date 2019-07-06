@@ -84,9 +84,9 @@ class RoomType(models.Model):
         to_date = datetime.strptime(to_date, '%Y-%m-%d')
 
         intersected_out_of_services = RoomOutOfService.objects.filter(
-            Q(room=self) & ~Q(exclusive_until__lte=from_date) | ~Q(inclusive_since__gte=to_date))
+            Q(room=self) & ~(Q(exclusive_until__lte=from_date) | Q(inclusive_since__gte=to_date)))
         intersected_reservations = Reservation.objects.filter(
-            Q(room=self) & ~Q(to_date__lte=from_date) | ~Q(from_date__gte=to_date))
+            Q(room=self) & Q(is_active=True) & ~(Q(to_date__lte=from_date) | Q(from_date__gte=to_date)))
 
         for day in [from_date + timedelta(i) for i in range((to_date - from_date).days)]:
             num_of_out_of_service_rooms = \
@@ -121,3 +121,12 @@ class RoomOutOfService(models.Model):
     def get_absolute_url(self):
         return reverse('habitats:room_out_of_service',
                        kwargs={'habitat_pk': self.room.habitat_id, 'room_type_pk': self.room_id})
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        if not self.room.is_limitation_valid(str(self.inclusive_since), str(self.exclusive_until),
+                                             self.number_of_affected_rooms):
+            raise ValidationError('اضافه کردن این محدودیت امکان‌پذیر نمی‌باشد.')
+
+        super(RoomOutOfService, self).save()
+
