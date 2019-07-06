@@ -1,5 +1,7 @@
 {% extends "master.html" %}
 
+{% load static %}
+
 {% load autocomplete %}
 
 {% block content %}
@@ -45,47 +47,41 @@
     </header>
 
     <br>
-    <div class="container" align="right" id="features">
+    <div align="right" id="features">
         <div class="card">
             <div class="card-header text-right"><h5 class="my-4">مشخصات سفر خود را انتخاب کنید</h5></div>
             <br>
-            <form method="GET" action="{% url 'reservation:search' %}">
-                <div class="form-group row">
-                    <label for="daterange" class="col-sm-1 col-form-label text-md-right">بازهٔ سفر</label>
-                    <div class="col-md-3">
-                        <input type="text" name="daterange" id="daterange" value="" style="width: 200px" required
+            <form method="GET" action="{% url 'reservation:search' %}" id="homepage-form">
+                <div class="form-row" style="padding-right: 30px;margin-bottom: 20px">
+                    <label for="id_from_date" class="col-auto col-form-label text-md-right">آغاز سفر</label>
+                    <div class="col-md-2">
+                        <input type="text" name="from_date" id="id_from_date" value="" required autocomplete="off"
                                class="textinput textInput form-control"/>
-                        <script>
-                            $(function () {
-                                $('input[name="daterange"]').daterangepicker({
-                                    opens: 'left'
-                                }, function (start, end, label) {
-                                    console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-                                });
-                            });
-                        </script>
+                    </div>
+                    <label for="id_to_date" class="col-auto col-form-label text-md-right">پایان سفر</label>
+                    <div class="col-md-2">
+                        <input type="text" name="to_date" id="id_to_date" value="" required autocomplete="off"
+                               class="textinput textInput form-control"/>
                     </div>
 
-                    <label for="persons" class="col-sm-1 col-form-label text-md-right">تعداد مسافران</label>
-                    <div class="col-md-1">
+                    <label for="persons" class="col-auto col-form-label text-md-right">تعداد مسافران</label>
+                    <div class="col-auto">
                         <input type="number" class="textinput textInput form-control" id="persons" name="persons"
                                style="width: 75px" required/>
                     </div>
 
-                    <label for="city_textinput" class="col-sm-1 col-form-label text-md-right">مقصد</label>
+                    <label for="city_textinput" class="col-auto col-form-label text-md-right">مقصد</label>
                     <div class="col-md-3">
                         {% divisions_autocomplete_input %}
                     </div>
-
-                    <div class="form-group row mb-0">
-                        <div class="col-md-8 offset-md-4">
-                            <button type="submit" class="btn btn-outline-primary" id="submit_button">
-                                جستجوی اقامتگاه
-                            </button>
-                        </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-11" align="left">
+                        <button type="submit" class="btn btn-primary" id="submit_button">
+                            جستجوی اقامتگاه
+                        </button>
                     </div>
                 </div>
-
             </form>
         </div>
     </div>
@@ -170,3 +166,7 @@
 
     </div>
 {% endblock content %}
+
+{% block extra_script %}
+    <script src="{% static 'datepickers.js' %}"></script>
+{% endblock %}
