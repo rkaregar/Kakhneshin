@@ -125,9 +125,8 @@ class RoomOutOfService(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        if not self.room.is_limitation_valid(str(self.inclusive_since), str(self.exclusive_until),
-                                             self.number_of_affected_rooms):
+        if not self.room.has_empty_rooms(self.inclusive_since, self.exclusive_until,
+                                         self.number_of_affected_rooms):
             raise ValidationError('اضافه کردن این محدودیت امکان‌پذیر نمی‌باشد.')
 
         super(RoomOutOfService, self).save()
-
