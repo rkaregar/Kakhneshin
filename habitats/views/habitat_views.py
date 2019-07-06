@@ -134,16 +134,6 @@ class HabitatTinyDetailView(DetailView):
         raise PermissionDenied('شما امکان  دیدن جزییات این اقامتگاه را ندارید')
 
 
-class HabitatDetailView(View):
-    def get(self, request, **kwargs):
-        habitat = get_object_or_404(Habitat, pk=kwargs.get('habitat_pk', None))
-
-        room_types = habitat.roomtype_set.all().values()
-        return render(request, 'habitats/habitat_detail.html', {'habitat': habitat,
-                                                                'room_types': room_types,
-                                                                })
-
-
 class HomeView(View):
     def get(self, request):
         return render(request, 'homepage.html')

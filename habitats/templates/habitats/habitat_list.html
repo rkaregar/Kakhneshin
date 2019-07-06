@@ -8,30 +8,25 @@
         <h1>اقامتگاه‌های شما</h1>
         {% for habitat_group in object_list|add_str:'add'|group_by:3 %}
             <div class="row">
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100 mx-1">
-                        <a href="{% url 'habitats:habitat_create' %}"><img class="card-img-top" src="
-                                        {% static 'images/add_new.jpg' %}" alt="کاخ"></a>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title"></h5>
-                            <p class="card-text"></p>
-                            <a href="{% url 'habitats:habitat_create' %}" class="btn btn-primary mt-auto">ایجاد
-                                اقامتگاه</a>
-                        </div>
-                    </div>
-                </div>
                 {% for habitat in habitat_group %}
                     {% if habitat == 'add' %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 mx-1">
+                                <a href="{% url 'habitats:habitat_create' %}"><img class="card-img-top" src="
+                                        {% static 'images/add_new.jpg' %}" alt="کاخ"></a>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title"></h5>
+                                    <p class="card-text"></p>
+                                    <a href="{% url 'habitats:habitat_create' %}" class="btn btn-primary mt-auto">ایجاد
+                                        اقامتگاه</a>
+                                </div>
+                            </div>
+                        </div>
                     {% else %}
                         <div class="col-md-4 mb-3">
                             <div class="card h-100 mx-1">
                                 <a href="{% url 'habitats:habitat_detail' habitat_pk=habitat.pk %}"><img
-                                        class="card-img-top" src="
-
-
-
-
-                                        {% if habitat.photo %}{{ habitat.photo.url }}{% else %}{% static 'images/no_hotel.jpg' %}{% endif %}"
+                                        class="card-img-top" src="{% if habitat.photo %}{{ habitat.photo.url }}{% else %}{% static 'images/no_hotel.jpg' %}{% endif %}"
                                         alt="کاخ"></a>
                                 <div class="card-body d-flex flex-column">
                                     <h5 class="card-title">{{ habitat.name }}</h5>
@@ -45,7 +40,7 @@
                 {% endfor %}
             </div>
         {% empty %}
-            No articles yet.
+            اقامتگاهی تا الان ثبت نکرده‌اید.
         {% endfor %}
     </div>
     <script src="/static/Translator.js"></script>

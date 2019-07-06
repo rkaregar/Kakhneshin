@@ -4,6 +4,8 @@
 
 {% load autocomplete %}
 
+{% load group_by %}
+
 {% block content %}
     <div class="row">
         <div id="sidebar-wrapper" class="col-3" style="padding-right: 50px;">
@@ -74,8 +76,29 @@
         </div>
 
         <div id="list_of_ads" class="col-8" style="padding-left: 50px; padding-right: 50px">
-            {% for habitat in habitats %}
-                {{ habitat.name }}
+            {% for habitat_group in habitats|group_by:3 %}
+                <div class="row">
+                    {% for habitat in habitat_group %}
+                        <div class="col-md-4 mb-3">
+                            <a class="card h-100 mx-1" align="center" style="text-decoration: none;color: inherit"
+                               href="{% url 'reservation:habitat' habitat_pk=habitat.pk %}?persons={{ form.persons.value }}&from_date={{ form.from_date.value }}&to_date={{ form.to_date.value }}">
+                                <img
+                                        class="card-img-top" src="
+
+
+
+                                        {% if habitat.photo %}{{ habitat.photo.url }}{% else %}{% static 'images/no_hotel.jpg' %}{% endif %}"
+                                        alt="کاخ">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">{{ habitat.name }}</h5>
+                                    <p class="card-text">{{ habitat.address }} </p>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% empty %}
+                اقامتگاهی با شرایط ذکر شده موجود نیست.
             {% endfor %}
         </div>
 
