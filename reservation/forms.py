@@ -4,7 +4,7 @@ from django import forms
 class HabitatSearchForm(forms.Form):
     from_date = forms.DateField()
     to_date = forms.DateField()
-    division = forms.IntegerField()
+    division = forms.IntegerField(required=True)
     persons = forms.IntegerField()
 
     def __init__(self, *args, **kwargs):
