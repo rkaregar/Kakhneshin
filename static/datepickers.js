@@ -1,17 +1,20 @@
 $(function () {
     var dateFormat = "yy-mm-dd";
-    from = $('input[name="from_date"]')
-        .datepicker().datepicker(
+    var $from_date_input = $('input[name="from_date"]');
+    var from_default_date = $from_date_input.val();
+    from = $from_date_input
+        .datepicker().datepicker("option", "dateFormat", dateFormat).datepicker("setDate", from_default_date).datepicker(
             "option", "showAnim", "fadeIn"
-        ).datepicker("option", "dateFormat", dateFormat)
+        )
         .on("change", function () {
             to.datepicker("option", "minDate", getDate(this));
         });
-    to = $('input[name="to_date"]')
-        .datepicker().datepicker(
+    var $to_date_input = $('input[name="to_date"]');
+    var to_default_date = $to_date_input.val();
+    to = $to_date_input
+        .datepicker().datepicker("option", "dateFormat", dateFormat).datepicker("setDate", to_default_date).datepicker(
             "option", "showAnim", "fadeIn"
-        ).datepicker("option", "dateFormat", dateFormat)
-        .on("change", function () {
+        ).on("change", function () {
             from.datepicker("option", "maxDate", getDate(this));
         });
 

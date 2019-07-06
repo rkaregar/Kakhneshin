@@ -28,4 +28,8 @@ class ReservationSearchView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = self.form
+        try:
+            context['division_name'] = GeographicDivision.objects.get(pk=self.form.cleaned_data['division']).hierarchy_name
+        except Exception:
+            context['division_name'] = ''
         return context

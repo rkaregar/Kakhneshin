@@ -1,26 +1,47 @@
 {% extends "master.html" %}
 
+{% load static %}
+
+{% load autocomplete %}
+
 {% block content %}
     <div class="row">
         <div id="sidebar-wrapper" class="col-3" style="padding-right: 50px;">
             <form method="GET" enctype="multipart/form-data">
                 <div class="form-group row">
-                    <label for="title" class="col-form-label">عنوان&nbsp;&nbsp;</label>
+                    <label for="id_from_date" class="col-form-label">آغاز سفر</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" id="title"
-                               name="title"
-                               dir="rtl">
+                        <input type="text" class="form-control" id="id_from_date"
+                               name="from_date" autocomplete="off" required value="{{ form.from_date.value }}">
                     </div>
                 </div>
 
-                <table class="table">
-                    {{ images }}
-                </table>
+                <div class="form-group row">
+                    <label for="id_to_date" class="col-form-label">پایان سفر</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="id_to_date"
+                               name="to_date" autocomplete="off" required value="{{ form.to_date.value }}">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="id_persons" class="col-form-label">تعداد مسافران</label>
+                    <div class="col-sm-5">
+                        <input type="number" class="form-control" id="id_persons"
+                               name="persons" required value="{{ form.persons.value }}">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="id_division" class="col-form-label">مقصد</label>
+                    <div class="col-sm-10">
+                        {% divisions_autocomplete_input default_value=form.division.value default_value_name=division_name errors=form.division.errors %}
+                    </div>
+                </div>
 
                 <div class="form-group row mb-0">
                     <div class="col-md-8 offset-md-4">
-                        <button type="button" class="btn btn-outline-primary" id="search" name="search"
-                                onclick="searchAds('search')">
+                        <button type="submit" class="btn btn-outline-primary" id="search">
                             جستجو
                         </button>
                     </div>
@@ -66,3 +87,6 @@
     </div>
 {% endblock content %}
 
+{% block extra_script %}
+    <script src="{% static 'datepickers.js' %}"></script>
+{% endblock %}
