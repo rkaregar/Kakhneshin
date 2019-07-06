@@ -13,6 +13,8 @@ class HabitatSearchForm(forms.Form):
             field.error_messages['required'] = 'پر کردن این فیلد اجباری است.'
 
     def clean_division(self):
-        if self.cleaned_data['division'] == -1:
+        data = self.cleaned_data['division']
+        if data == -1:
             self.add_error('شهر وارد شده در پایگاه داده موجود نیست.', 'division')
             return None
+        return data

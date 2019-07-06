@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
@@ -153,12 +155,13 @@ class RoomOutOfServiceView(LoginRequiredMixin, TemplateView):
             dates = re.split('/| - ', request.POST.get('daterange', None))
             from_date = '-'.join([dates[2], dates[0], dates[1]])
             to_date = '-'.join([dates[5], dates[3], dates[4]])
+            from_date = datetime.strptime(from_date, '%Y-%m-%d')
+            to_date = datetime.strptime(to_date, '%Y-%m-%d')
 
             num_of_affected_rooms = request.POST.get('num_of_rooms', None)
             details = request.POST.get('details', None)
-
             current_room = RoomType.objects.get(pk=self.kwargs.get('room_type_pk', None))
-            if current_room.is_limitation_valid(from_date, to_date, num_of_affected_rooms):
+            if current_room.has_empty_rooms(from_date, to_date, num_of_affected_rooms):
                 RoomOutOfService.objects.create(room_id=kwargs.get('room_type_pk'), inclusive_since=from_date,
                                                 exclusive_until=to_date, number_of_affected_rooms=num_of_affected_rooms,
                                                 details=details)

@@ -79,9 +79,10 @@ class RoomType(models.Model):
         if qs.filter(type_name=self.type_name).exclude(id=self.id).exists():
             raise ValidationError('نام انواع اتاق در هر اقامتگاه باید یکتا باشد.')
 
-    def is_limitation_valid(self, from_date, to_date, num_of_affected_rooms):
-        from_date = datetime.strptime(from_date, '%Y-%m-%d')
-        to_date = datetime.strptime(to_date, '%Y-%m-%d')
+    def has_empty_room(self, from_date, to_date):
+        return self.has_empty_rooms(from_date, to_date, 1)
+
+    def has_empty_rooms(self, from_date, to_date, num_of_affected_rooms):
 
         intersected_out_of_services = RoomOutOfService.objects.filter(
             Q(room=self) & ~Q(exclusive_until__lte=from_date) | ~Q(inclusive_since__gte=to_date))

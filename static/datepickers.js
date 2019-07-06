@@ -3,14 +3,14 @@ $(function () {
     from = $('input[name="from_date"]')
         .datepicker().datepicker(
             "option", "showAnim", "fadeIn"
-        ).datepicker("option", "dateFormat", 'yy-mm-dd')
+        ).datepicker("option", "dateFormat", dateFormat)
         .on("change", function () {
             to.datepicker("option", "minDate", getDate(this));
         });
     to = $('input[name="to_date"]')
         .datepicker().datepicker(
             "option", "showAnim", "fadeIn"
-        ).datepicker("option", "dateFormat", 'yy-mm-dd')
+        ).datepicker("option", "dateFormat", dateFormat)
         .on("change", function () {
             from.datepicker("option", "maxDate", getDate(this));
         });

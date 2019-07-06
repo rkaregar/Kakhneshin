@@ -1,6 +1,13 @@
 {% extends "master.html" %}
 {% load static %}
 
+{% block extra_head %}
+      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+{% endblock %}
+
 {% block content %}
     <head>
         <style>
@@ -44,7 +51,8 @@
                     <label for="daterange" class="col-sm-3 col-form-label text-md-right">بازهٔ از دسترس خارج
                         بودن</label>
                     <div class="col-md-3">
-                        <input type="text" class="form-control" name="daterange" id="daterange" value="" style="width: 200px" required/>
+                        <input type="text" class="form-control" name="daterange" id="daterange" value=""
+                               style="width: 200px" required/>
                         <script>
                             $(function () {
                                 $('input[name="daterange"]').daterangepicker({
@@ -59,7 +67,8 @@
                     <label for="num_of_rooms" class="col-sm-3 col-form-label text-md-right">تعداد اتاق‌های تحت تاثیر
                         قرار گرفته</label>
                     <div class="col-md-3">
-                        <input type="number" class="form-control" name="num_of_rooms" id="num_of_rooms" value="1" min="1" required
+                        <input type="number" class="form-control" name="num_of_rooms" id="num_of_rooms" value="1"
+                               min="1" required
                                style="width: 75px"/>
                     </div>
                 </div>
