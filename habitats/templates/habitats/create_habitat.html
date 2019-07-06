@@ -10,12 +10,13 @@
                 {{ field|as_crispy_field }}
             {% endif %}
         {% endfor %}
-    <div class="form-group">
-        <label for="town" class="col-form-label  requiredField">
-            شهر<span class="asteriskField">*</span> </label>
-        {% divisions_autocomplete_input field_name='town' %}
-    </div>
+        <div class="form-group">
+            <label for="town" class="col-form-label  requiredField">
+                شهر<span class="asteriskField">*</span> </label>
+            {% divisions_autocomplete_input field_name='town' %}
+        </div>
         <button type="submit" class="btn btn-success btn-block btn-lg">ثبت اقامتگاه</button>
+        <a href="{% url 'habitats:all' %}" class="btn btn-danger btn-block btn-lg">بازگشت به لیست اقامتگاه‌ها</a>
     </form>
 {% endblock %}
 

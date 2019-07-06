@@ -23,9 +23,13 @@
         </style>
     </head>
 
+    <a href="{% url 'habitats:room_type_detail' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}"
+       class="btn btn-info mt-auto mb-1">بازگشت به صفحهٔ اتاق</a>
+    <a href="{% url 'habitats:habitat_detail' habitat_pk=room_type.habitat_id %}"
+       class="btn btn-info mt-auto mb-1">بازگشت به صفحهٔ اقامتگاه</a>
 
     <div class="container" align="right" id="features">
-        <h2>مدیریت محدودیت‌های اتاق {{ room_type }}</h2>
+        <h2>بازه‌های خارج از سرویس بودن اتاق {{ room_type }}</h2>
         <br>
         <div class="card">
 
@@ -43,7 +47,7 @@
                 </div>
             {% endif %}
 
-            <div class="card-header text-right"><h5 class="my-4">جزئیات محدودیت اعمالی را مشخص کنید</h5></div>
+            <div class="card-header text-right"><h5 class="my-4">جزئیات خارج از سرویس بودن اعمالی را مشخص کنید</h5></div>
             <br>
             <form method="POST">
                 {% csrf_token %}
@@ -80,9 +84,9 @@
 
                     <div class="form-group row mb-0">
                         <div class="col-md-8 offset-md-4">
-                            <button type="submit" class="btn btn-outline-primary" id="submit_button"
+                            <button type="submit" class="btn btn-primary" id="submit_button"
                                     name="submit_button">
-                                اضافه کردن محدودیت
+                                اضافه کردن بازه
                             </button>
                         </div>
                     </div>
@@ -96,7 +100,7 @@
     <br><br>
 
     <div class="container" align="right" id="features">
-        <h3>محدودیت‌های ثبت شده</h3>
+        <h3>بازه‌های خارج از سرویس ثبت شده</h3>
 
         {% for out_of_service in out_of_services %}
             {% if forloop.counter0|divisibleby:4 %}
@@ -131,7 +135,7 @@
                     <button id="btn-delete{{ out_of_service.id }}" type="button" name="delete"
                             class="btn btn-danger btn-delete" data-id={{ out_of_service.id }} data-toggle="modal"
                             data-target="#myModal" style="margin-top: 5px"
-                    >حذف محدودیت
+                    >حذف
                     </button>
                 </div>
 
@@ -142,10 +146,10 @@
 
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title" dir="rtl">حذف محدودیت</h4>
+                        <h4 class="modal-title" dir="rtl">حذف بازهٔ خارج از سرویس بودن</h4>
                     </div>
                     <div class="modal-body">
-                        <p>آیا با حذف این محدودیت موافقید؟</p>
+                        <p>آیا با حذف این بازه موافقید؟</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">خیر</button>
@@ -168,7 +172,7 @@
         {% endif %}
 
         {% empty %}
-            <h4>هنوز محدودیتی برای این اتاق ثبت نشده است.</h4>
+            <h4>هنوز هیچ بازهٔ خارج از سرویسی برای این اتاق ثبت نشده است.</h4>
         {% endfor %}
 
         <script>

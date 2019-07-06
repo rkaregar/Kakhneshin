@@ -2,6 +2,9 @@
 {% load static %}
 
 {% block content %}
+    <a href="{% url 'habitats:all' %}"
+                   class="btn btn-info mt-auto mb-1">بازگشت به لیست اقامتگاه‌ها</a>
+    <br><br>
     <div class="container" align="right" id="features">
         <div class="row" id="properties">
             <div class="col-lg-5">
@@ -33,7 +36,7 @@
                     مشخصات اقامتگاه</a>
                 <br>
                 <a href="{% url 'habitats:room_type_create' habitat_pk=habitat.id %}"
-                   class="btn btn-primary mt-auto mb-1">اضافه کردن نوع اتاق جدید</a>
+                   class="btn btn-primary mt-auto mb-1">اضافه کردن اتاق جدید</a>
 
             </div>
 
@@ -94,7 +97,7 @@
     </div>
 
     <div class="container" align="right" id="features">
-        <h2>انواع اتاق‌ها</h2>
+        <h2>اتاق‌ها</h2>
 
         {% for room_type in room_types %}
             {% if forloop.counter0|divisibleby:4 %}
@@ -115,11 +118,11 @@
 
                 <div class="card-footer">
                     <a href="{% url 'habitats:room_type_detail' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}"
-                       class="btn btn-primary">مشاهده‌ی نوع اتاق</a>
+                       class="btn btn-primary">مشاهده‌ی اتاق</a>
                 </div>
                 <div class="card-footer">
                     <a href="{% url 'habitats:room_out_of_service' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}"
-                       class="btn btn-warning">مدیریت محدودیت‌های اتاق</a>
+                       class="btn btn-warning">بازه‌های خارج از سرویس</a>
                 </div>
 
             </div>
