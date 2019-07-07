@@ -138,7 +138,13 @@
         </table>
 
         <div class="card-footer">
-          <a href="#" class="btn btn-primary">رزرو اتاق</a>
+          <form action="{% url 'reservations:reserve' %}">
+            {% csrf_token %}
+            <input type="hidden" name="room" value="{{ type.id }}">
+            <input type="hidden" name="from_date" value="">
+            <input type="hidden" name="to_date" value="">
+            <input type="submit" class="btn btn-primary">رزرو اتاق</input>
+          </form>
         </div>
 
         <table class="table">

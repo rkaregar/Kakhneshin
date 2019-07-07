@@ -1,3 +1,4 @@
+from accounts.models import Transaction
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
@@ -15,4 +16,4 @@ class Reservation(models.Model):
     member = models.ForeignKey(to=Member, null=True, on_delete=models.SET_NULL)
     room = models.ForeignKey(to='habitats.RoomType', null=True, on_delete=models.SET_NULL)
 
-    # TODO: add the transaction field
+    transaction = models.ForeignKey(to=Transaction, on_delete=models.CASCADE, verbose_name='تراکنش')
