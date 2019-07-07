@@ -25,13 +25,20 @@ for (let i = 0; i < inputs.length; i++) {
         inputs[i].innerText = 'نقش:';
 }
 
-divs = document.getElementsByTagName('div');
-for (let i = 0; i < inputs.length; i++) {
-    inputs[i].innerText = inputs[i].innerText.replace(/Currently/g, 'فعلی');
-    inputs[i].innerText = inputs[i].innerText.replace(/Clear/g, 'پاک کردن');
-    inputs[i].innerText = inputs[i].innerText.replace(/Change/g, 'تغییر');
-    inputs[i].innerText = inputs[i].innerText.replace(/No file chosen/g, 'فایلی انتخاب نشده');
+// divs = document.getElementsByTagName('div');
+// for (let i = 0; i < inputs.length; i++) {
+//     divs[i].innerText = inputs[i].innerText.replace(/Currently/g, 'فعلی');
+//     divs[i].innerText = inputs[i].innerText.replace(/Clear/g, 'پاک کردن');
+//     divs[i].innerText = inputs[i].innerText.replace(/Change/g, 'تغییر');
+//     divs[i].innerText = inputs[i].innerText.replace(/No file chosen/g, 'فایلی انتخاب نشده');
+// }
+
+tds = document.getElementsByTagName('td');
+for (let i = 0; i < tds.length; i++) {
+    if (tds[i].innerText.includes('None'))
+        tds[i].innerText = '--';
 }
+
 
 badges = document.getElementsByTagName("span");
 for (let i = 0; i < badges.length; i++) {

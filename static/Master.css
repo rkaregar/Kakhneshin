@@ -18,6 +18,14 @@ body {
     background-size: cover;
 }
 
+.carousel-item-room-detail {
+    height: 65vh;
+}
+
+.carousel-item-habitat-detail-tiny, .carousel-item-habitat-detail, .carousel-item-place-detail {
+    height: 55vh;
+}
+
 @font-face {
     font-family: 'myFont';
     src: url('/static/fonts/IRANSans.ttf');
