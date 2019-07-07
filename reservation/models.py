@@ -1,3 +1,5 @@
+import datetime
+
 from accounts.models import Transaction
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -17,3 +19,10 @@ class Reservation(models.Model):
     room = models.ForeignKey(to='habitats.RoomType', null=True, on_delete=models.SET_NULL)
 
     transaction = models.ForeignKey(to=Transaction, on_delete=models.CASCADE, verbose_name='تراکنش')
+
+    @property
+    def cost(self):
+        return (self.to_date - self.from_date) / datetime.timedelta(days=1)
+
+
+

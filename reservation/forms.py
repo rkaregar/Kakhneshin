@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 
 
 class HabitatSearchForm(forms.Form):
@@ -42,11 +43,23 @@ class ReservationForm(ModelForm):
         if room_type and from_date and to_date:
             days = (to_date - from_date) / timedelta(days=1) + 1
             required_money = room_type.cost_per_night * days
-            balance = Transaction.get_balance_from_user(self.member)
+            balance = Transaction.get_balance_from_user(self.member.user)
             if balance < required_money:
                 raise ValidationError('باید حداقل {} در حساب خود داشته باشد. لطفا حساب خود را شارژ کنید.'.format(
                     required_money
                 ))
+        cleaned_data['member'] = self.member
+
+    def save(self, commit=True):
+        if commit:
+            self.instance.transaction = Transaction.objects.create(
+                from_user=self.member.user, to_user=None, amount=self.instance.cost, verified=True
+            )
+            self.instance.transaction = Transaction.objects.create(
+                from_user=self.member.user, to_user=self.instance.room.habitat.owner.user,
+                amount=self.instance.cost * (1 - settings.RESERVATION_FEE), verified=False
+            )
+        return super().save(commit)
 
     class Meta:
         model = Reservation

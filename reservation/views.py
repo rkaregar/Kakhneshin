@@ -1,9 +1,8 @@
 import re
 from datetime import datetime
 
-from django.shortcuts import get_object_or_404, render
-from django.views.generic import ListView, TemplateView
 from django.shortcuts import get_object_or_404, render, redirect
+from django.urls import reverse_lazy
 from django.views.generic import View, TemplateView, ListView, UpdateView, CreateView
 from reservation.forms import ReservationForm
 from reservation.models import Reservation
@@ -52,27 +51,23 @@ class ReservationHabitatView(TemplateView):
         if 'persons' in self.request.GET:
             roomtypes = roomtypes.filter(capacity_in_person=2)
         if 'from_date' and 'to_date' in self.request.GET:
+            from_date = datetime.strptime(self.request.GET['from_date'], '%Y-%m-%d')
+            to_date = datetime.strptime(self.request.GET['to_date'], '%Y-%m-%d')
             for roomtype in roomtypes:
-                if not roomtype.has_empty_room(datetime.strptime(self.request.GET['from_date'], '%Y-%m-%d'),
-                                               datetime.strptime(self.request.GET['to_date'], '%Y-%m-%d')):
+                if not roomtype.has_empty_room(from_date,
+                                               to_date):
                     roomtypes = roomtypes.exclude(pk=roomtype.pk)
+            context['from_date'] = from_date.strftime('%m/%d/%Y')
+            context['to_date'] = to_date.strftime('%m/%d/%Y')
         context['room_types'] = roomtypes.values()
+
         return context
 
 
 
 class ReservationListView(ListView):
 
-    template_name = 'reservations/list.html'
-
-    def get_queryset(self):
-        return Reservation.objects.filter(member=self.request.user.member)
-
-
-class ReservationUpdateView(UpdateView):
-
-    form_class = ReservationForm
-    template_name = 'reservations/change.html'
+    template_name = 'reservation/list.html'
 
     def get_queryset(self):
         return Reservation.objects.filter(member=self.request.user.member)
@@ -81,12 +76,15 @@ class ReservationUpdateView(UpdateView):
 class ReservationCreateView(CreateView):
 
     form_class = ReservationForm
+    template_name = 'reservation/error.html'
+    success_url = reverse_lazy('reservation:list')
 
     def get_form_kwargs(self):
         super_kwargs = super().get_form_kwargs()
         super_kwargs['member'] = self.request.user.member
         return super_kwargs
 
-    def form_valid(self, form):
-        super().form_valid(form)
-        redirect('change', form.instance.id)
+    def form_invalid(self, form):
+        return render(self.request, self.template_name, {'form': form})
+
+

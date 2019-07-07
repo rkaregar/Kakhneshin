@@ -1,6 +1,7 @@
 from time import sleep
 
 import random
+from accounts.models import Transaction
 from copy import copy
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -13,7 +14,7 @@ from users.models import Member
 
 class SeleniumResponse(object):
     def __init__(self, web_driver):
-        sleep(0.5)
+        sleep(1)
         self.status_code = 404 if '404' in web_driver.page_source else 200
         self.content = web_driver.page_source.encode('utf8')
         self.web_driver = web_driver
