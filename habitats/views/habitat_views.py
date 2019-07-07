@@ -1,11 +1,9 @@
-import re
-
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
-from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import View
 
 from habitats.models import Habitat
@@ -132,16 +130,6 @@ class HabitatTinyDetailView(DetailView):
         if self.user_passed_test(request):
             return super(HabitatTinyDetailView, self).dispatch(request, *args, **kwargs)
         raise PermissionDenied('شما امکان  دیدن جزییات این اقامتگاه را ندارید')
-
-
-class HabitatDetailView(View):
-    def get(self, request, **kwargs):
-        habitat = get_object_or_404(Habitat, pk=kwargs.get('habitat_pk', None))
-
-        room_types = habitat.roomtype_set.all().values()
-        return render(request, 'habitats/habitat_detail.html', {'habitat': habitat,
-                                                                'room_types': room_types,
-                                                                })
 
 
 class HomeView(View):

@@ -5,7 +5,10 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form|crispy }}
-        <button type="submit" class="btn btn-success btn-block btn-lg">ویرایش نوع اتاق</button>
+        <button type="submit" class="btn btn-success btn-block btn-lg">ویرایش اتاق</button>
+        <a href="{% url 'habitats:room_type_detail' habitat_pk=habitat.id room_type_pk=room_type.id %}"
+           class="btn btn-danger btn-block btn-lg">بازگشت</a>
+
     </form>
 {% endblock %}
 

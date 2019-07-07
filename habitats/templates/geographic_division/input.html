@@ -1,7 +1,7 @@
 <input type="hidden" id="hidden_division" name="{{ field_name }}" value="{{ default_value }}"/>
 <input type="text" list="division_suggestions_list" value="{{ default_value_name }}"
        autocomplete="off"
-       id="id_{{ field_name }}" required class="textinput textInput form-control"/>
+       id="id_{{ field_name }}" required class="textinput textInput form-control {{ input_class }}"/>
 <datalist id="division_suggestions_list">
 </datalist>
 <script>
@@ -16,8 +16,9 @@
         }
         if (value in suggestionMap)
             $('#hidden_division').val(suggestionMap[value]);
+        else
+            $('#hidden_division').val(-1);
         $("#division_suggestions_list").find('option').remove();
-        suggestionMap = {};
         $id_{{ field_name}}.addClass('loadinggif');
         $.ajax({
             url: '{% url 'habitats:ajax-search-divisions' %}',
@@ -34,7 +35,6 @@
                 }
                 $division_suggestions_list=$("#division_suggestions_list");
                 $division_suggestions_list.find('option').remove();
-                suggestionMap = {};
                 if (data.suggestions.length > 0)
                     $('#hidden_division').val(data.suggestions[0].pk);
                 for (i in data.suggestions) {

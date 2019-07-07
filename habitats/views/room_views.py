@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
@@ -16,7 +18,7 @@ class RoomTypeCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = CreateRoomTypeForm
     template_name = 'room_types/create_room_type.html'
     success_url = 'create'
-    success_message = 'نوع اتاق %s با موفقیت ثبت شد!'
+    success_message = 'اتاق %s با موفقیت ثبت شد!'
 
     def get_success_message(self, cleaned_data):
         return self.success_message % cleaned_data.get('type_name')
@@ -31,10 +33,15 @@ class RoomTypeCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         initial['habitat'] = self.habitat
         return initial
 
+    def get_context_data(self, **kwargs):
+        context = super(RoomTypeCreateView, self).get_context_data(**kwargs)
+        context['habitat'] = self.habitat
+        return context
+
     def dispatch(self, request, *args, **kwargs):
         self.set_habitat_pk()
         if self.habitat.owner != self.request.user.member:
-            raise PermissionDenied('شما امکان ایجاد نوع اتاق برای این اقامتگاه را ندارید.')
+            raise PermissionDenied('شما امکان ایجاد اتاق برای این اقامتگاه را ندارید.')
         return super(RoomTypeCreateView, self).dispatch(request, *args, **kwargs)
 
 
@@ -42,7 +49,7 @@ class RoomTypeUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     form_class = CreateRoomTypeForm
     template_name = 'room_types/update_room_type.html'
     success_url = 'update'
-    success_message = 'نوع اتاق %s با موفقیت ویرایش شد!'
+    success_message = 'اتاق %s با موفقیت ویرایش شد!'
 
     def get_success_message(self, cleaned_data):
         return self.success_message % cleaned_data.get('type_name')
@@ -61,16 +68,22 @@ class RoomTypeUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         initial['habitat'] = self.habitat
         return initial
 
+    def get_context_data(self, **kwargs):
+        context = super(RoomTypeUpdateView, self).get_context_data(**kwargs)
+        context['habitat'] = self.habitat
+        context['room_type'] = self.room_type
+        return context
+
     def dispatch(self, request, *args, **kwargs):
         self.set_objects()
         if self.room_type.habitat != self.habitat or self.habitat.owner != self.request.user.member:
-            raise PermissionDenied('شما امکان ویرایش نوع اتاق برای این اقامتگاه را ندارید.')
+            raise PermissionDenied('شما امکان ویرایش اتاق برای این اقامتگاه را ندارید.')
         return super(RoomTypeUpdateView, self).dispatch(request, *args, **kwargs)
 
 
 class RoomTypeDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     template_name = 'room_types/room_type_confirm_delete.html'
-    success_message = 'نوع اتاق %s با موفقیت حذف شد!'
+    success_message = 'اتاق %s با موفقیت حذف شد!'
 
     def get_success_message(self, cleaned_data):
         return self.success_message % cleaned_data.get('type_name')
@@ -99,7 +112,7 @@ class RoomTypeDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     def dispatch(self, request, *args, **kwargs):
         self.set_objects()
         if self.room_type.habitat != self.habitat or self.habitat.owner != self.request.user.member:
-            raise PermissionDenied('شما امکان حذف نوع اتاق برای این اقامتگاه را ندارید.')
+            raise PermissionDenied('شما امکان حذف اتاق برای این اقامتگاه را ندارید.')
         return super(RoomTypeDeleteView, self).dispatch(request, *args, **kwargs)
 
 
@@ -128,7 +141,7 @@ class RoomTypeDetailView(LoginRequiredMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         self.set_objects()
         if self.room_type.habitat != self.habitat or self.habitat.owner != self.request.user.member:
-            raise PermissionDenied('شما امکان مشاهده‌ی نوع اتاق برای این اقامتگاه را ندارید.')
+            raise PermissionDenied('شما امکان مشاهده‌ی اتاق برای این اقامتگاه را ندارید.')
         return super(RoomTypeDetailView, self).dispatch(request, *args, **kwargs)
 
 
@@ -153,18 +166,19 @@ class RoomOutOfServiceView(LoginRequiredMixin, TemplateView):
             dates = re.split('/| - ', request.POST.get('daterange', None))
             from_date = '-'.join([dates[2], dates[0], dates[1]])
             to_date = '-'.join([dates[5], dates[3], dates[4]])
+            from_date = datetime.strptime(from_date, '%Y-%m-%d')
+            to_date = datetime.strptime(to_date, '%Y-%m-%d')
 
             num_of_affected_rooms = request.POST.get('num_of_rooms', None)
             details = request.POST.get('details', None)
-
             current_room = RoomType.objects.get(pk=self.kwargs.get('room_type_pk', None))
-            if current_room.is_limitation_valid(from_date, to_date, num_of_affected_rooms):
+            if current_room.has_empty_rooms(from_date, to_date, num_of_affected_rooms):
                 RoomOutOfService.objects.create(room_id=kwargs.get('room_type_pk'), inclusive_since=from_date,
                                                 exclusive_until=to_date, number_of_affected_rooms=num_of_affected_rooms,
                                                 details=details)
             else:
                 context['errors'] = [
-                    'با توجه به تعداد اتاق‌های از این نوع، محدودیت‌های'
+                    'با توجه به تعداد اتاق‌های موجود از این نوع، محدودیت‌های'
                     ' اعمال‌شدهٔ قبلی و رزروهای انجام شده،‌ امکان اعمال این محدودیت جدید وجود ندارد.']
 
         return self.render_to_response(context)

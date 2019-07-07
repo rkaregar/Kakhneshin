@@ -20,7 +20,9 @@ class TestReservation(LiveServerTestCase):
 
     @override_settings(DEBUG=True)
     def test_reserve(self):
-        self.web_driver.get(self.live_server_url + '/reservation/search?daterange=07/07/2019 - 07/07/2019')
+        self.web_driver.get(
+            self.live_server_url + '/reservation/{}/?from_date=2019-07-07&to_date=2019-07-07'.format(self.habitat.id)
+        )
         sleep(10)
 
     def tearDown(self):

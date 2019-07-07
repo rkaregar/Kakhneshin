@@ -12,7 +12,7 @@ def group_by(objects, count=1):
 
 
 @register.filter(name='add_str')
-def add_str(objects, s=''):
-    objects=list(objects)
-    objects.append(s)
+def add_str_first(objects, s=''):
+    objects = list(objects)
+    objects = [s] + objects
     return objects

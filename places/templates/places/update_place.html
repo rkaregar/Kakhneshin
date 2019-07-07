@@ -15,12 +15,12 @@
                 شهر<span class="asteriskField">*</span> </label>
             {% divisions_autocomplete_input default_value=form.town.value default_value_name=town_name field_name='town' %}
         </div>
-        <button type="submit" class="btn btn-success btn-block btn-lg">ویرایش اقامتگاه</button>
-        <a href="{% url 'habitats:habitat_detail' habitat_pk=habitat.id %}" class="btn btn-danger btn-block btn-lg">بازگشت</a>
+        <button type="submit" class="btn btn-success btn-block btn-lg">ویرایش مکان دیدنی</button>
+        <a href="{% url 'places:place_delete' place_pk=place.id %}" class="btn btn-danger btn-block btn-lg">حذف مکان دیدنی</a>
+        <a href="{% url 'places:place_detail' place_pk=place.id %}" class="btn btn-warning btn-block btn-lg">بازگشت</a>
 
     </form>
 {% endblock %}
-
 
 
 

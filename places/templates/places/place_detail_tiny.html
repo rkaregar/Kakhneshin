@@ -2,42 +2,35 @@
 {% load static %}
 
 {% block content %}
-    <a href="{% url 'habitats:all' %}"
-                   class="btn btn-info mt-auto mb-1">بازگشت به لیست اقامتگاه‌ها</a>
+    <a href="{% url 'places:all' %}"
+                   class="btn btn-info mt-auto mb-1">بازگشت به لیست مکان‌های دیدنی</a>
     <br><br>
     <div class="container" align="right" id="features">
         <div class="row" id="properties">
             <div class="col-lg-5">
-                <h2>اقامتگاه {{ habitat.name }}</h2>
+                <h2>مکان دیدنی {{ place.name }}</h2>
 
                 <table class="table">
                     <tbody>
                     <tr>
                         <td>شهر</td>
-                        <td>{{ habitat.town }}</td>
+                        <td>{{ place.town }}</td>
                     </tr>
                     <tr>
                         <td>آدرس</td>
-                        <td>{{ habitat.address }}</td>
+                        <td>{{ place.address }}</td>
                     </tr>
                     <tr>
-                    </tr>
-                    <tr>
-                        <td>صاحب</td>
-                        <td>{{ habitat.owner }}</td>
                     </tr>
                     </tbody>
                 </table>
 
                 <p>{{ description }}</p>
 
-                <a href="{% url 'habitats:habitat_update' habitat_pk=habitat.id %}"
+                <a href="{% url 'places:place_update' place_pk=place.id %}"
                    class="btn btn-primary mt-auto mb-1">ویرایش
-                    مشخصات اقامتگاه</a>
+                    مشخصات مکان دیدنی</a>
                 <br>
-                <a href="{% url 'habitats:room_type_create' habitat_pk=habitat.id %}"
-                   class="btn btn-primary mt-auto mb-1">اضافه کردن اتاق جدید</a>
-
             </div>
 
             <div class="col-lg-1">
@@ -72,7 +65,7 @@
                         {% else %}
                             <div class="carousel-item active"
                                  style="background-image: url(
-                                         {% if habitat.photo %}{{ habitat.photo.url }}{% else %}{% static 'images/no_hotel.jpg' %}{% endif %})">
+                                         {% if place.photo %}{{ place.photo.url }}{% else %}{% static 'images/no_hotel.jpg' %}{% endif %})">
                             </div>
                         {% endif %}
 
@@ -96,47 +89,6 @@
         <hr>
     </div>
 
-    <div class="container" align="right" id="features">
-        <h2>اتاق‌ها</h2>
-
-        {% for room_type in room_types %}
-            {% if forloop.counter0|divisibleby:4 %}
-                <div class="row" align="center">
-            {% endif %}
-
-        <div class="col-lg-3 mb-3">
-            <div class="card h-100">
-                <a href="{% url 'habitats:room_type_detail' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}">
-                    {% if room_type.photo %}
-                        <img class="card-img-top" src="/media/{{ room_type.photo }}" alt="">
-                    {% else %}
-                        <img class="card-img-top" src="/static/images/no_room1.png" alt="">
-                    {% endif %}
-                </a>
-
-                <h4 class="card-header">{{ room_type.type_name }}</h4>
-
-                <div class="card-footer">
-                    <a href="{% url 'habitats:room_type_detail' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}"
-                       class="btn btn-primary">مشاهده‌ی اتاق</a>
-                </div>
-                <div class="card-footer">
-                    <a href="{% url 'habitats:room_out_of_service' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}"
-                       class="btn btn-warning">بازه‌های خارج از سرویس</a>
-                </div>
-
-            </div>
-        </div>
-
-        {% if forloop.counter0|add:1|divisibleby:4 or forloop.counter == ss|length %}
-            </div>
-        {% endif %}
-
-        {% empty %}
-            <h4>متاسفانه اتاقی برای این اقامت‌گاه ثبت نشده است.</h4>
-        {% endfor %}
-
-    </div>
 
     <script src="/static/Translator.js"></script>
 {% endblock %}

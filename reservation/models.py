@@ -10,7 +10,7 @@ class Reservation(models.Model):
     to_date = models.DateField(verbose_name='تاریخ پایان')
     is_active = models.BooleanField(default=False)
 
-    rating = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+    rating = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(5)])
     comment = models.CharField(max_length=1024, null=True, blank=True)
 
     member = models.ForeignKey(to=Member, null=True, on_delete=models.SET_NULL)

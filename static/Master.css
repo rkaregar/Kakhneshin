@@ -35,3 +35,8 @@ input.loadinggif
      left center;
     background-size: 30px;
 }
+
+#homepage-form label
+{
+    margin-right: 10px;
+}

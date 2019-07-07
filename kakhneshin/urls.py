@@ -26,6 +26,7 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/habitats/home'), name='home'),
     path('users/', include(('users.urls', 'users'), namespace='users')),
     path('habitats/', include(('habitats.urls', 'habitats'), namespace='habitats')),
+    path('places/', include(('places.urls', 'places'), namespace='places')),
     path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
     path('reservation/', include(('reservation.urls', 'reservation'), namespace='reservation')), 
 ]
