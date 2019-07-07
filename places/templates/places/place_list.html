@@ -1,0 +1,47 @@
+{% extends "master.html" %}
+
+{% load static %}
+
+{% block content %}
+    {% load group_by %}
+    <div class="container-fluid" align="center">
+        <h1>مکان دیدنی‌های شما</h1>
+        {% for place_group in object_list|add_str:'add'|group_by:3 %}
+            <div class="row">
+                {% for place in place_group %}
+                    {% if place == 'add' %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 mx-1">
+                                <a href="{% url 'places:place_create' %}"><img class="card-img-top" src="
+                                        {% static 'images/add_new.jpg' %}" alt="کاخ"></a>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title"></h5>
+                                    <p class="card-text"></p>
+                                    <a href="{% url 'places:place_create' %}" class="btn btn-primary mt-auto">ایجاد
+                                        مکان دیدنی</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 mx-1">
+                                <a href="{% url 'places:place_detail' place_pk=place.pk %}"><img
+                                        class="card-img-top" src="{% if place.photo %}{{ place.photo.url }}{% else %}{% static 'images/no_hotel.jpg' %}{% endif %}"
+                                        alt="کاخ"></a>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">{{ place.name }}</h5>
+                                    <p class="card-text">{{ place.address }} </p>
+                                    <a href="{% url 'places:place_detail' place_pk=place.pk %}"
+                                       class="btn btn-primary mt-auto">مشاهده‌ی مکان دیدنی</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% empty %}
+            مکان دیدنی‌‌ای تا الان ثبت نکرده‌اید.
+        {% endfor %}
+    </div>
+    <script src="/static/Translator.js"></script>
+{% endblock %}

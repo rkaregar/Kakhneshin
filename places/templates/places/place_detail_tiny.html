@@ -1,0 +1,94 @@
+{% extends "master.html" %}
+{% load static %}
+
+{% block content %}
+    <a href="{% url 'places:all' %}"
+                   class="btn btn-info mt-auto mb-1">بازگشت به لیست مکان‌های دیدنی</a>
+    <br><br>
+    <div class="container" align="right" id="features">
+        <div class="row" id="properties">
+            <div class="col-lg-5">
+                <h2>مکان دیدنی {{ place.name }}</h2>
+
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <td>شهر</td>
+                        <td>{{ place.town }}</td>
+                    </tr>
+                    <tr>
+                        <td>آدرس</td>
+                        <td>{{ place.address }}</td>
+                    </tr>
+                    <tr>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <p>{{ description }}</p>
+
+                <a href="{% url 'places:place_update' place_pk=place.id %}"
+                   class="btn btn-primary mt-auto mb-1">ویرایش
+                    مشخصات مکان دیدنی</a>
+                <br>
+            </div>
+
+            <div class="col-lg-1">
+            </div>
+
+            <div class="col-lg-6">
+
+
+                <div id="carousel" class="carousel slide" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                        {% for img in images %}
+                            {% if forloop.counter == 1 %}
+                                <li data-target="#carousel" data-slide-to={{ forloop.counter0 }} class="active"></li>
+                            {% else %}
+                                <li data-target="#carousel" data-slide-to={{ forloop.counter0 }}></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ol>
+
+                    <div class="carousel-inner" role="listbox">
+                        {% if images %}
+                            {% for img in images %}
+                                {% if forloop.counter0 == 0 %}
+                                    <div class="carousel-item active"
+                                         style="background-image: url({{ img.image.url }})">
+                                {% else %}
+                                    <div class="carousel-item" style="background-image: url({{ img.image.url }})">
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+
+                        {% else %}
+                            <div class="carousel-item active"
+                                 style="background-image: url(
+                                         {% if place.photo %}{{ place.photo.url }}{% else %}{% static 'images/no_hotel.jpg' %}{% endif %})">
+                            </div>
+                        {% endif %}
+
+                        </div>
+                    </div>
+
+                    <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+
+
+            </div>
+        </div>
+
+        <hr>
+    </div>
+
+
+    <script src="/static/Translator.js"></script>
+{% endblock %}

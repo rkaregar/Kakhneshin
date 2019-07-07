@@ -1,0 +1,25 @@
+{% extends "form.html" %}
+
+{% block form_content %}
+    {% load crispy_forms_tags %}
+    {% load autocomplete %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+            {% if field.name != 'town' %}
+                {{ field|as_crispy_field }}
+            {% endif %}
+        {% endfor %}
+        <div class="form-group">
+            <label for="town" class="col-form-label  requiredField">
+                شهر<span class="asteriskField">*</span> </label>
+            {% divisions_autocomplete_input default_value=form.town.value default_value_name=town_name field_name='town' %}
+        </div>
+        <button type="submit" class="btn btn-success btn-block btn-lg">ویرایش مکان دیدنی</button>
+        <a href="{% url 'places:place_detail' place_pk=place.id %}" class="btn btn-danger btn-block btn-lg">بازگشت</a>
+
+    </form>
+{% endblock %}
+
+
+

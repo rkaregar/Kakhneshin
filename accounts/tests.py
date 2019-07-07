@@ -54,7 +54,6 @@ class DepositSeleniumTest(DepositTest, SeleniumTestCase):
 
 
 class TestWithdrawal(SetupUserAndAccountMixin):
-    @skip
     def test_withdrawal_request(self):
         # request withdrawal
         self.client.force_login(self.user)
@@ -86,7 +85,6 @@ class TestWithdrawal(SetupUserAndAccountMixin):
         self.assertEqual(response.status_code, 200)
         return '/accounts/withdrawals/'
 
-    @skip
     def test_high_amount_validation(self):
         self.client.force_login(self.user)
         post_url = self.navigate_to_withdrawal_page()
@@ -98,7 +96,7 @@ class TestWithdrawal(SetupUserAndAccountMixin):
 @tag('backend')
 class BackendWithdrawalTestCase(TestWithdrawal, TestCase):
 
-    def test_permissions(self):
+    def test_0ions(self):
         response = self.client.get('/accounts/withdrawals/')
         self.assertNotEqual(response.status_code, 200)
         self.client.force_login(self.user)

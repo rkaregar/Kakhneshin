@@ -1,11 +1,9 @@
-import re
-
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
-from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import View
 
 from habitats.models import Habitat

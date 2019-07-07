@@ -85,6 +85,20 @@
                         </li>
                     {% endif %}
 
+                    {% if user.is_superuser %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="profile" data-toggle="dropdown"
+                               aria-haspopup="true" aria-expanded="false">
+                                مدیریت مکان‌های دیدنی
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog"
+                                 style="padding-left: 18px">
+                                <a class="dropdown-item" href="{% url 'places:all' %}">مشاهدهٔ مکان‌های دیدنی</a>
+                                <a class="dropdown-item" href="{% url 'places:place_create' %}">ساخت مکان دیدنی</a>
+                            </div>
+                        </li>
+                    {% endif %}
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="account" data-toggle="dropdown"
                            aria-haspopup="true" aria-expanded="false">
