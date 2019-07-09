@@ -130,9 +130,9 @@
                             {% for feature, state in type.items %}
                                 {% if 'has_' in feature %}
                                     {% if state %}
-                                        <span class="badge badge-success">{{ feature }}</span>
+                                        <span class="badge badge-success">✔ {{ feature }}</span>
                                     {% else %}
-                                        <span class="badge badge-danger">{{ feature }}</span>
+                                        <span class="badge badge-danger">✘ {{ feature }}</span>
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}

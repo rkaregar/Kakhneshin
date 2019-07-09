@@ -42,22 +42,14 @@ for (let i = 0; i < tds.length; i++) {
 
 badges = document.getElementsByTagName("span");
 for (let i = 0; i < badges.length; i++) {
-    if (badges[i].innerText.includes('has_breakfast'))
-        badges[i].innerText = 'صبحانه';
-    else if (badges[i].innerText.includes('has_telephone'))
-        badges[i].innerText = 'تلفن';
-    else if (badges[i].innerText.includes('has_wifi'))
-        badges[i].innerText = 'وای‌فای';
-    else if (badges[i].innerText.includes('has_minibar'))
-        badges[i].innerText = 'مینی‌بار';
-    else if (badges[i].innerText.includes('has_foreign_wc'))
-        badges[i].innerText = 'توالت فرنگی';
-    else if (badges[i].innerText.includes('has_bath_tub'))
-        badges[i].innerText = 'وان حمام';
-    else if (badges[i].innerText.includes('has_shower'))
-        badges[i].innerText = 'دوش';
-    else if (badges[i].innerText.includes('has_wc'))
-        badges[i].innerText = 'توالت';
+    badges[i].innerText = badges[i].innerText.replace(/has_breakfast/g, 'صبحانه');
+    badges[i].innerText = badges[i].innerText.replace(/has_telephone/g, 'تلفن');
+    badges[i].innerText = badges[i].innerText.replace(/has_wifi/g, 'وای‌فای');
+    badges[i].innerText = badges[i].innerText.replace(/has_minibar/g, 'مینی‌بار');
+    badges[i].innerText = badges[i].innerText.replace(/has_foreign_wc/g, 'توالت فرنگی');
+    badges[i].innerText = badges[i].innerText.replace(/has_bath_tub/g, 'وان حمام');
+    badges[i].innerText = badges[i].innerText.replace(/has_wc/g, 'دوش');
+    badges[i].innerText = badges[i].innerText.replace(/has_shower/g, 'توالت');
 }
 
 creationTime = document.getElementById("creation_time");
