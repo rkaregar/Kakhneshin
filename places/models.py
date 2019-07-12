@@ -1,7 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
-# Create your models here.
 from habitats.models import GeographicDivision
 from users.models import Member
 
@@ -23,3 +22,11 @@ class Place(models.Model):
         self.validate_unique()
         super(Place, self).save(*args, **kwargs)
 
+
+class DistanceHabitatToPlace(models.Model):
+    place = models.ForeignKey(to='places.Place', on_delete=models.CASCADE, verbose_name='مکان گردشگری')
+    habitat = models.ForeignKey(to='habitats.Habitat', on_delete=models.CASCADE, verbose_name='اقامتگاه')
+    distance = models.FloatField(verbose_name='فاصله (کیلومتر)')
+
+    def __str__(self):
+        return 'فاصله از {} تا {} برابر با {} کیلومتر'.format(self.place, self.habitat, self.distance)

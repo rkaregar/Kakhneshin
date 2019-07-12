@@ -1,0 +1,170 @@
+{% extends "master.html" %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <head>
+        <style>
+            .row {
+                padding-top: 20px;
+            }
+
+            .card-footer {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+            }
+        </style>
+    </head>
+
+    <a href="{% url 'habitats:habitat_detail' habitat_pk=habitat.id %}"
+       class="btn btn-info mt-auto mb-1">بازگشت به صفحهٔ اقامتگاه</a>
+
+    <div class="container" align="right" id="features">
+        <h2>مکان‌های گردشگری نزدیک به اقامتگاه {{ habitat }}</h2>
+        <br>
+        <div class="card">
+
+            {% if errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" id="custom_errors">
+                    <ul>
+                        {% for error in errors %}
+                            <strong>خطاهای زیر پیش آمده:</strong>
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endif %}
+
+            <div class="card-header text-right"><h5 class="my-4">مکان گردشگری مورد نظر را انتخاب نمایید</h5></div>
+            <br>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <label for="place" class="col-auto col-form-label text-md-right">مکان گردشگری</label>
+                    <div class="col-md-2">
+                        <select class="form-control" name="place_id" id="place">
+                            {% for place in places %}
+                                <option value="{{ place.id }}">{{ place }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <label for="distance" class="col-auto col-form-label text-md-right">فاصله (کیلومتر)</label>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" name="distance" id="distance" value="1"
+                               min="1" step="0.1" required
+                               style="width: 75px"/>
+                    </div>
+
+                    <div class="col-md-3" align="left">
+                        <button type="submit" class="btn btn-primary" id="submit_button"
+                                name="submit_button">
+                            اضافه کردن مکان گردشگری
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <br><br>
+
+    <div class="container" align="right" id="features">
+        <h3>مکان‌های گردشگری نزدیک</h3>
+
+        {% for distance in distances %}
+            {% if forloop.counter0|divisibleby:4 %}
+                <div class="row" align="center">
+            {% endif %}
+
+        <div class="col-lg-3 mb-3">
+            <div class="card h-100">
+
+                {% if distance.place.photo %}
+                    <a href="#"><img class="card-img-top" src="/media/{{ distance.place.photo }}" alt=""></a>
+                {% else %}
+                    <a href="#"><img class="card-img-top" src="/static/images/no_place.jpg" alt=""></a>
+                {% endif %}
+                <h4 class="card-header">{{ distance.place.name }}</h4>
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <td>نشانی:</td>
+                        <td>{{ distance.place.address }}</td>
+                    </tr>
+                    <tr>
+                        <td>فاصله (کیلومتر):</td>
+                        <td>{{ distance.distance }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <br><br>
+                <div class="card-footer">
+                    <button id="btn-delete{{ distance.id }}" type="button" name="delete"
+                            class="btn btn-danger btn-delete" data-id={{ distance.id }} data-toggle="modal"
+                            data-target="#myModal" style="margin-top: 5px"
+                    >حذف
+                    </button>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" dir="rtl">حذف مکان گردشگری نزدیک</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>آیا با حذف این مکان گردشگری موافقید؟</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">خیر</button>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="delete" value="true">
+                            <input type="hidden" name="distance_id" id="modal_id">
+                            <button type="submit" class="btn btn-success"
+                                    style="margin-right: 5px;">بله
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        {% if forloop.counter0|add:1|divisibleby:4 or forloop.counter == ss|length %}
+            </div>
+        {% endif %}
+
+        {% empty %}
+            <h4>هنوز هیچ مکان گردشگری نزدیکی برای این اقامتگاه ثبت نشده است.</h4>
+        {% endfor %}
+
+        <script>
+            $(document).ready(function () {
+                $(".btn-delete").bind('click', function () {
+                    const id = $(this).attr('data-id');
+                    $('#modal_id').attr('value', id);
+                })
+            })
+
+        </script>
+
+    </div>
+
+{% endblock %}

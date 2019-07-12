@@ -3,10 +3,11 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView, TemplateView
 from django.views.generic import View
 
 from habitats.models import Habitat
+from places.models import Place, DistanceHabitatToPlace
 
 
 class HabitatCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -51,7 +52,7 @@ class HabitatUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            context['town_name']=self.habitat.town.name
+            context['town_name'] = self.habitat.town.name
         except Exception:
             context['town_name'] = ''
         return context
@@ -135,3 +136,41 @@ class HabitatTinyDetailView(DetailView):
 class HomeView(View):
     def get(self, request):
         return render(request, 'homepage.html')
+
+
+class DistanceToPlacesView(LoginRequiredMixin, TemplateView):
+    template_name = 'habitats/distance_to_places.html'
+    MAX_DISTANCES = 6
+
+    def get_context_data(self, **kwargs):
+        context = super(DistanceToPlacesView, self).get_context_data(**kwargs)
+
+        habitat = Habitat.objects.get(pk=self.kwargs.get('habitat_pk', None))
+        distances = DistanceHabitatToPlace.objects.filter(habitat=habitat).order_by('distance')
+        places = Place.objects.filter(town=habitat.town).exclude(id__in=distances.values('place_id'))
+
+        context['habitat'] = habitat
+        context['distances'] = distances
+        context['places'] = places
+
+        return context
+
+    def post(self, request, **kwargs):
+        context = self.get_context_data(**kwargs)
+        habitat = Habitat.objects.get(pk=self.kwargs.get('habitat_pk', None))
+
+        if request.POST.get('delete', None):
+            distance_id = request.POST.get('distance_id', None)
+            DistanceHabitatToPlace.objects.get(pk=distance_id).delete()
+        else:
+            place_id = request.POST.get('place_id', None)
+            distance = request.POST.get('distance', None)
+
+            if DistanceHabitatToPlace.objects.filter(habitat=habitat, place_id=place_id).exists():
+                context['errors'] = ['شما قبلا این مکان گردشگری را اضافه کرده‌اید']
+            elif DistanceHabitatToPlace.objects.filter(habitat=habitat).count() < self.MAX_DISTANCES:
+                DistanceHabitatToPlace.objects.create(place_id=place_id, habitat=habitat, distance=distance)
+            else:
+                context['errors'] = ['شما مجاز به اضافه کردن حداکثر {} مکان گردشگری هستید'.format(self.MAX_DISTANCES)]
+
+        return self.render_to_response(context)

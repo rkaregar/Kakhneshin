@@ -34,19 +34,46 @@
 
                 <p>{{ description }}</p>
 
+                <br>
+                <h5>مکان‌های گردشگری نزدیک اقامتگاه</h5>
+
+                {% for distance in distances %}
+                    {% if forloop.counter0|divisibleby:2 %}
+                        <div class="row">
+                    {% endif %}
+
+                <div class="col-lg-6">
+                    <table class="table table-sm">
+                        <tbody>
+                        <tr>
+                            <td>{{ distance.place.name }}</td>
+                            <td>{{ distance.distance }} کیلومتر</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if not forloop.counter0|divisibleby:2 or forloop.last %}
+                    </div>
+                {% endif %}
+
+                {% empty %}
+                    <h6>هنوز مکان گردشگری نزدیکی برای این اقامتگاه ثبت نشده است.</h6>
+
+                {% endfor %}
+
             </div>
 
             <div class="col-lg-1">
             </div>
 
             <div class="col-lg-6">
-
-
                 <div id="carousel" class="carousel slide" data-ride="carousel">
                     <ol class="carousel-indicators">
                         {% for img in images %}
                             {% if forloop.counter == 1 %}
-                                <li data-target="#carousel" data-slide-to={{ forloop.counter0 }} class="active"></li>
+                                <li data-target="#carousel"
+                                    data-slide-to={{ forloop.counter0 }} class="active"></li>
                             {% else %}
                                 <li data-target="#carousel" data-slide-to={{ forloop.counter0 }}></li>
                             {% endif %}

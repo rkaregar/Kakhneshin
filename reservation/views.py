@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView, TemplateView
 
 from habitats.models import Habitat, GeographicDivision, RoomType
+from places.models import DistanceHabitatToPlace
 from reservation.forms import HabitatSearchForm
 
 
@@ -44,6 +45,8 @@ class ReservationHabitatView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['habitat'] = get_object_or_404(Habitat, pk=kwargs.get('habitat_pk', None))
+        context['distances'] = DistanceHabitatToPlace.objects.filter(
+            habitat_id=kwargs.get('habitat_pk', None)).order_by('distance')
 
         context['form'] = {}
         context['form']['persons'] = self.request.GET.get('persons', None)
