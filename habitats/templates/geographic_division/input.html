@@ -1,7 +1,9 @@
-<input type="hidden" id="hidden_division" name="{{ field_name }}" value="{{ default_value }}"/>
+<input type="hidden" id="hidden_division" name="{{ field_name }}"
+       value="{% if default_value %} {{ default_value }} {% endif %}"/>
 <input type="text" list="division_suggestions_list" value="{{ default_value_name }}"
        autocomplete="off"
-       id="id_{{ field_name }}" required class="textinput textInput form-control {{ input_class }}"/>
+       id="id_{{ field_name }}" {% if is_required %} required {% endif %}
+       class="textinput textInput form-control {{ input_class }}"/>
 <datalist id="division_suggestions_list">
 </datalist>
 <script>
@@ -11,13 +13,18 @@
         let $id_{{ field_name}} = $("#id_{{ field_name}}");
         const value = $id_{{ field_name}}.val();
         if (value.length === 0) {
-            $('#hidden_division').val(-1);
+            {% if is_required %}
+                $('#hidden_division').val(-1);
+            {% else %}
+                $('#hidden_division').val('');
+            {% endif %}
             return;
         }
         if (value in suggestionMap)
             $('#hidden_division').val(suggestionMap[value]);
-        else
+        else {
             $('#hidden_division').val(-1);
+        }
         $("#division_suggestions_list").find('option').remove();
         $id_{{ field_name}}.addClass('loadinggif');
         $.ajax({
@@ -33,7 +40,7 @@
                     $id_{{ field_name}}.removeClass('loadinggif');
                     return;
                 }
-                $division_suggestions_list=$("#division_suggestions_list");
+                $division_suggestions_list = $("#division_suggestions_list");
                 $division_suggestions_list.find('option').remove();
                 if (data.suggestions.length > 0)
                     $('#hidden_division').val(data.suggestions[0].pk);

@@ -18,7 +18,7 @@ class HabitatCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = 'اقامتگاه %s با موفقیت ثبت شد!'
 
     def form_valid(self, form):
-        form.instance.owner = self.request.user.member
+        form.instance.creator = self.request.user.member
         return super(HabitatCreateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):
@@ -36,7 +36,6 @@ class HabitatUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return '/habitats/%s/detail' % self.habitat_pk
 
     def get_success_message(self, cleaned_data):
-        print(cleaned_data.get('name'))
         return self.success_message % cleaned_data.get('name')
 
     def get_object(self, queryset=None):
@@ -72,7 +71,6 @@ class HabitatDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     success_message = 'اقامتگاه %s با موفقیت حذف شد!'
 
     def get_success_message(self, cleaned_data):
-        print(cleaned_data.get('name'))
         return self.success_message % cleaned_data.get('name')
 
     def get_object(self, queryset=None):

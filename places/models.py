@@ -10,6 +10,7 @@ class Place(models.Model):
     address = models.CharField(max_length=500, default='', verbose_name='آدرس')
     town = models.ForeignKey(GeographicDivision, verbose_name='شهر', on_delete=models.CASCADE, null=True)
     photo = models.ImageField(upload_to='places', null=True, blank=True, verbose_name='تصویر')
+    creator = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, verbose_name='سازندهٔ مکان')
 
     def __str__(self):
         return self.name
