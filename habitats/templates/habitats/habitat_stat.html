@@ -1,0 +1,13 @@
+{% extends "master.html" %}
+{% load static %}
+
+{% block content %}
+    <a href="{% url 'habitats:habitat_detail' habitat_pk=habitat.pk %}"
+       class="btn btn-info mt-auto mb-1">بازگشت به صفحه‌‌ی اصلی مدیریت اقامتگاه</a>
+    <br><br>
+
+    {{ income_graph|safe }}
+
+
+    <script src="/static/Translator.js"></script>
+{% endblock %}

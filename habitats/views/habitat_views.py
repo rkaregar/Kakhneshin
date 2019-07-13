@@ -1,13 +1,24 @@
+from collections import defaultdict
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView, TemplateView
 from django.views.generic import View
 
+from accounts.models import Transaction
+from habitats.forms import HabitatStatForm
 from habitats.models import Habitat
 from places.models import Place, DistanceHabitatToPlace
+
+import plotly as py
+import plotly.graph_objs as go
+
+import pandas as pd
+from datetime import datetime
 
 
 class HabitatCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -134,6 +145,66 @@ class HabitatTinyDetailView(DetailView):
 class HomeView(View):
     def get(self, request):
         return render(request, 'homepage.html')
+
+
+class HabitatStatsView(LoginRequiredMixin, TemplateView):
+    template_name = 'habitats/habitat_stat.html'
+
+    def get_object(self, queryset=None):
+        self.habitat_pk = self.kwargs.get('habitat_pk', None)
+        self.habitat = get_object_or_404(Habitat, pk=self.habitat_pk)
+        return self.habitat
+
+    def get_context_data(self, **kwargs):
+        context = super(HabitatStatsView, self).get_context_data(**kwargs)
+        context['habitat'] = self.habitat
+        owner = self.request.user
+        self.form = HabitatStatForm(self.request.GET)
+        from_date, to_date = timezone.datetime(
+            year=2019, month=1,
+            day=1), timezone.now()  # TODO set this to something reasonable when nothing is specified
+        if self.form.is_valid():
+            from_date = self.form.cleaned_data['from_date']
+            to_date = self.form.cleaned_data['to_date']
+        inputs_money = Transaction.objects.filter(created__gte=from_date, created__lte=to_date, to_user=owner,
+                                                  verified=True).all()
+        outputs_money = Transaction.objects.filter(created__gte=from_date, created__lte=to_date, from_user=owner,
+                                                   verified=True).all()
+        income = defaultdict(int)
+        for im in inputs_money:
+            income[im.created] += im.amount
+        for im in outputs_money:
+            income[im.creared] -= im.amount
+        print(income)
+        x = list(income.keys())
+        y = list(income.values())
+        trace1 = go.Scatter(x=x, y=y, marker={'color': 'red', 'symbol': 104, 'size': 10},
+                            mode="lines", name='1st Trace')
+
+        data = go.Data([trace1])
+        layout = go.Layout(title="درآمد کل شما از این اقامتگاه", xaxis={'title': 'تاریخ'}, yaxis={'title': 'تومان'})
+        figure = go.Figure(data=data, layout=layout)
+        div = py.offline.plot(figure, auto_open=False, output_type='div')
+        context['income_graph'] = div
+        return context
+
+    def user_passed_test(self, request):
+        if self.habitat.owner == self.request.user.member:
+            return True
+        return False
+
+    def get_object(self):
+        self.habitat_pk = self.kwargs.get('habitat_pk', None)
+        self.habitat = get_object_or_404(Habitat, pk=self.habitat_pk)
+        return self.habitat
+
+    def dispatch(self, request, *args, **kwargs):
+        self.get_object()
+        if self.habitat is None:
+            raise Http404
+        if self.user_passed_test(request):
+            return super(HabitatStatsView, self).dispatch(request, *args, **kwargs)
+        raise PermissionDenied('شما امکان  دیدن آمارهای این اقامتگاه را ندارید')
 
 
 class DistanceToPlacesView(LoginRequiredMixin, TemplateView):

@@ -47,3 +47,18 @@ class CreateRoomOutOfServiceForm(forms.ModelForm):
     class Meta:
         model = RoomOutOfService
         fields = ('room', 'inclusive_since', 'exclusive_until', 'details')
+
+
+from django import forms
+
+
+class HabitatStatForm(forms.Form):
+    from_date = forms.DateField()
+    to_date = forms.DateField()
+
+    def __init__(self, *args, **kwargs):
+        super(HabitatStatForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.error_messages['required'] = 'پر کردن این فیلد اجباری است.'
+
+
