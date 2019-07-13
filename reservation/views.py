@@ -1,8 +1,7 @@
-import re
 from datetime import datetime
 
-from django.shortcuts import get_object_or_404, render
-from django.views.generic import ListView, TemplateView
+from django.shortcuts import get_object_or_404
+from django.views.generic import ListView
 
 from habitats.models import Habitat, GeographicDivision, RoomType
 from places.models import DistanceHabitatToPlace
@@ -39,28 +38,38 @@ class ReservationSearchView(ListView):
         return context
 
 
-class ReservationHabitatView(TemplateView):
+class ReservationHabitatView(ListView):
+    model = RoomType
     template_name = 'reservation/habitat_detail.html'
+    context_object_name = 'room_types'
+
+    def get_queryset(self, **kwargs):
+        self.form = HabitatSearchForm(self.request.GET)
+        if self.form.is_valid():
+            habitat = get_object_or_404(Habitat, pk=self.kwargs.get('habitat_pk', None))
+            roomtypes = habitat.roomtype_set.all()
+            if 'persons' in self.request.GET:
+                roomtypes = roomtypes.filter(capacity_in_person=self.request.GET['persons'])
+            if 'from_date' and 'to_date' in self.request.GET:
+                for roomtype in roomtypes:
+                    if not roomtype.has_empty_room(datetime.strptime(self.request.GET['from_date'], '%Y-%m-%d'),
+                                                   datetime.strptime(self.request.GET['to_date'], '%Y-%m-%d')):
+                        roomtypes = roomtypes.exclude(pk=roomtype.pk)
+            return roomtypes.values()
+        return []
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['habitat'] = get_object_or_404(Habitat, pk=kwargs.get('habitat_pk', None))
+
+        context['form'] = self.form
+        try:
+            context['division_name'] = GeographicDivision.objects.get(
+                pk=self.form.cleaned_data['division']).hierarchy_name
+        except Exception:
+            context['division_name'] = ''
+
+        context['habitat'] = get_object_or_404(Habitat, pk=self.kwargs.get('habitat_pk', None))
         context['distances'] = DistanceHabitatToPlace.objects.filter(
-            habitat_id=kwargs.get('habitat_pk', None)).order_by('distance')
+            habitat_id=self.kwargs.get('habitat_pk', None)).order_by('distance')
 
-        context['form'] = {}
-        context['form']['persons'] = self.request.GET.get('persons', None)
-        context['form']['from_date'] = self.request.GET.get('from_date', None)
-        context['form']['to_date'] = self.request.GET.get('to_date', None)
-        context['form']['division'] = self.request.GET.get('division', None)
-
-        roomtypes = context['habitat'].roomtype_set.all()
-        if 'persons' in self.request.GET:
-            roomtypes = roomtypes.filter(capacity_in_person=2)
-        if 'from_date' and 'to_date' in self.request.GET:
-            for roomtype in roomtypes:
-                if not roomtype.has_empty_room(datetime.strptime(self.request.GET['from_date'], '%Y-%m-%d'),
-                                               datetime.strptime(self.request.GET['to_date'], '%Y-%m-%d')):
-                    roomtypes = roomtypes.exclude(pk=roomtype.pk)
-        context['room_types'] = roomtypes.values()
         return context

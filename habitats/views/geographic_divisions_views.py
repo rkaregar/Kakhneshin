@@ -1,11 +1,10 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.views.generic import View
 
 from habitats.models import GeographicDivision
 
 
-class GeographicDivisionsSearchView(LoginRequiredMixin, View):
+class GeographicDivisionsSearchView(View):
     def get(self, request):
         input = request.GET['value']
         if request.GET['only_cities'] == 'true':

@@ -147,7 +147,7 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-LOGIN_REDIRECT_URL = '/users/edit-profile/'
+LOGIN_REDIRECT_URL = '/habitats/home/'
 LOGOUT_REDIRECT_URL = '/users/login'
 LOGIN_URL = '/users/login'
 
