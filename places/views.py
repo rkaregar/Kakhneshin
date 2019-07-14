@@ -3,10 +3,10 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView, TemplateView
 
 from habitats.models import GeographicDivision
-from places.models import Place
+from places.models import Place, PlaceComment, PlaceCommentPhoto, PlaceCommentVideo
 from places.forms import PlaceSearchForm
 
 
@@ -121,9 +121,12 @@ class PlaceTinyDetailView(DetailView):
 
         prev_url = self.request.META.get('HTTP_REFERER', None)
         if prev_url and 'search' in prev_url:
-            context['form'] = {}
-            context['form']['name'] = self.request.GET.get('name', None)
-            context['form']['division'] = self.request.GET.get('division', None)
+            context['prev_form'] = {}
+            context['prev_form']['name'] = self.request.GET.get('name', None)
+            context['prev_form']['division'] = self.request.GET.get('division', None)
+
+        context['comments'] = PlaceComment.objects.filter(place_id=self.kwargs.get('place_pk', None)).order_by(
+            '-created_at')
 
         return context
 
@@ -138,6 +141,30 @@ class PlaceTinyDetailView(DetailView):
         if self.user_passed_test(request):
             return super(PlaceTinyDetailView, self).dispatch(request, *args, **kwargs)
         raise PermissionDenied('شما امکان  دیدن جزییات این مکان دیدنی را ندارید')
+
+    def post(self, request, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(**kwargs)
+
+        rating = request.POST.get('rating', None)
+        if rating == '':
+            rating = None
+        review = request.POST.get('review', None)
+
+        print('hi {}, {}'.format(rating, review))
+        if not rating and not review:
+            context['errors'] = ['ثبت حداقل یکی از موارد امتیاز یا متن نظر الزامیست']
+        else:
+            place_comment = PlaceComment.objects.create(place_id=self.kwargs.get('place_pk', None),
+                                                        writer=self.request.user.member, rating=rating, review=review)
+
+            if self.request.FILES:
+                for image in self.request.FILES.getlist('image'):
+                    PlaceCommentPhoto.objects.create(place_comment=place_comment, photo=image)
+                for video in self.request.FILES.getlist('video'):
+                    PlaceCommentVideo.objects.create(place_comment=place_comment, video=video)
+
+        return self.render_to_response(context)
 
 
 class PlaceSearchView(ListView):

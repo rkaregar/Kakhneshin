@@ -39,6 +39,39 @@ for (let i = 0; i < tds.length; i++) {
         tds[i].innerText = '--';
 }
 
+creationTimes = document.getElementsByClassName("creation_time");
+
+for (let i = 0; i < creationTimes.length; i++) {
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/0/g, '۰');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/1/g, '۱');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/2/g, '۲');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/3/g, '۳');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/4/g, '۴');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/5/g, '۵');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/6/g, '۶');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/7/g, '۷');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/8/g, '۸');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/9/g, '۹');
+
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("January", "ژانویه");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("February", "فوریه");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("March", "مارس");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("April", "آوریل");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("May", "می");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("June", "ژوئن");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("July", "جولای");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("August", "اوت");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("September", "سپتامبر");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("October", "اکتبر");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("November", "نوامبر");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("December", "دسامبر");
+
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(",", "،");
+
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("a.m.", "صبح");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("p.m.", "عصر");
+
+}
 
 badges = document.getElementsByTagName("span");
 for (let i = 0; i < badges.length; i++) {
