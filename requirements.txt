@@ -8,3 +8,5 @@ psycopg2==2.8.2
 gunicorn==19.9.0
 dj-database-url
 django-crispy-forms==1.7.2
+plotly==3.10.0
+pandas==0.24.0
