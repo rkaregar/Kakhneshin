@@ -94,4 +94,9 @@ class ReservationCreateView(CreateView):
     def form_invalid(self, form):
         return render(self.request, self.template_name, {'form': form})
 
+    def form_valid(self, form):
+        return super().form_valid(form)
+
+
+
 
