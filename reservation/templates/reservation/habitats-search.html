@@ -81,9 +81,10 @@
                     {% for habitat in habitat_group %}
                         <div class="col-md-4 mb-3">
                             <a class="card h-100 mx-1" align="center" style="text-decoration: none;color: inherit"
-                               href="{% url 'reservation:habitat' habitat_pk=habitat.pk %}?persons={{ form.persons.value }}&from_date={{ form.from_date.value }}&to_date={{ form.to_date.value }}">
+                               href="{% url 'reservation:habitat' habitat_pk=habitat.pk %}?persons={{ form.persons.value }}&from_date={{ form.from_date.value }}&to_date={{ form.to_date.value }}&division={{ form.division.value }}">
                                 <img
                                         class="card-img-top" src="
+
 
 
 

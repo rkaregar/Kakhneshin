@@ -47,6 +47,13 @@ class ReservationHabitatView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['habitat'] = get_object_or_404(Habitat, pk=kwargs.get('habitat_pk', None))
+
+        context['form'] = {}
+        context['form']['persons'] = self.request.GET.get('persons', None)
+        context['form']['from_date'] = self.request.GET.get('from_date', None)
+        context['form']['to_date'] = self.request.GET.get('to_date', None)
+        context['form']['division'] = self.request.GET.get('division', None)
+
         roomtypes = context['habitat'].roomtype_set.all()
         if 'persons' in self.request.GET:
             roomtypes = roomtypes.filter(capacity_in_person=2)
