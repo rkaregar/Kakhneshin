@@ -1,3 +1,5 @@
+from typing import List, Iterable, Tuple
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
@@ -82,6 +84,36 @@ class RoomType(models.Model):
     def has_empty_room(self, from_date, to_date):
         return self.has_empty_rooms(from_date, to_date, 1)
 
+    def get_reserve_ready_out_count_list(self, from_date, to_date) -> Iterable[Tuple[int, int, int]]:
+        out_list = self.get_out_of_service_rooms_count_list(from_date, to_date)
+        reserve_list = self.get_reserved_rooms_count_list(from_date, to_date)
+        for out, reserve in zip(out_list, reserve_list):
+            yield reserve, self.number_of_rooms_of_this_kind - out - reserve, out
+
+    def get_out_of_service_rooms_count_list(self, from_date, to_date):
+        intersected_out_of_services = RoomOutOfService.objects.filter(
+            Q(room=self) & ~(Q(exclusive_until__lte=from_date) | Q(inclusive_since__gte=to_date)))
+
+        count_list = []
+        for day in [from_date + timedelta(i) for i in range((to_date - from_date).days)]:
+            num_of_out_of_service_rooms = \
+                intersected_out_of_services.filter(Q(inclusive_since__lte=day) & Q(exclusive_until__gt=day)).aggregate(
+                    rooms=Sum('number_of_affected_rooms'))['rooms'] or 0
+            count_list.append(num_of_out_of_service_rooms)
+        return count_list
+
+    def get_reserved_rooms_count_list(self, from_date, to_date):
+        intersected_reservations = Reservation.objects.filter(
+            Q(room=self) & Q(is_active=True) & ~(Q(to_date__lte=from_date) | Q(from_date__gte=to_date)))
+
+        count_list = []
+        for day in [from_date + timedelta(i) for i in range((to_date - from_date).days)]:
+            num_of_reserved_rooms = intersected_reservations.filter(
+                Q(from_date__lte=day) & Q(to_date__gt=day)).count() or 0
+            count_list.append(num_of_reserved_rooms)
+
+        return count_list
+
     def has_empty_rooms(self, from_date, to_date, num_of_affected_rooms):
 
         intersected_out_of_services = RoomOutOfService.objects.filter(
@@ -130,4 +162,3 @@ class RoomOutOfService(models.Model):
             raise ValidationError('اضافه کردن این محدودیت امکان‌پذیر نمی‌باشد.')
 
         super(RoomOutOfService, self).save()
-

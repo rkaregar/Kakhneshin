@@ -11,7 +11,7 @@ from django.views.generic import View
 
 from accounts.models import Transaction
 from habitats.forms import HabitatStatForm
-from habitats.models import Habitat
+from habitats.models import Habitat, RoomType
 from places.models import Place, DistanceHabitatToPlace
 from reservation.models import Reservation, ReservationComment
 
@@ -160,6 +160,11 @@ class HabitatStatsView(LoginRequiredMixin, TemplateView):
         self.habitat = get_object_or_404(Habitat, pk=self.habitat_pk)
         return self.habitat
 
+    @staticmethod
+    def to_unix_time(dt):
+        epoch = timezone.datetime.utcfromtimestamp(0)
+        return (dt - epoch).total_seconds() * 1000
+
     def get_context_data(self, **kwargs):
         context = super(HabitatStatsView, self).get_context_data(**kwargs)
         context['habitat'] = self.habitat
@@ -191,6 +196,85 @@ class HabitatStatsView(LoginRequiredMixin, TemplateView):
         figure = go.Figure(data=data, layout=layout)
         div = py.offline.plot(figure, auto_open=False, output_type='div')
         context['income_graph'] = div
+
+        ready_room_types = defaultdict(int)
+        disabled_room_types = defaultdict(int)
+        reserved_room_types = defaultdict(int)
+        room_types = {}
+        for room_type in self.habitat.roomtype_set.all():  # type: RoomType
+            num_of_disabled_today = room_type.get_out_of_service_rooms_count_list(timezone.now(),
+                                                                                  timezone.now() + timezone.timedelta(
+                                                                                      days=1))[0]
+            num_of_reserved_today = room_type.get_reserved_rooms_count_list(timezone.now(),
+                                                                            timezone.now() + timezone.timedelta(
+                                                                                days=1))[0]
+            disabled_room_types[room_type.type_name] = num_of_disabled_today
+            reserved_room_types[room_type.type_name] = num_of_reserved_today
+            ready_room_types[
+                room_type.type_name] = room_type.number_of_rooms_of_this_kind - num_of_reserved_today - num_of_disabled_today
+            room_types[room_type.type_name] = room_type.get_reserve_ready_out_count_list(timezone.now(), timezone.now()+timezone.timedelta(days=30))
+
+        ready_rooms_trace = go.Bar(x=list(ready_room_types.keys()), y=list(ready_room_types.values()),
+                                   name='آماده برای رزرو شدن')
+        disabled_rooms_trace = go.Bar(x=list(disabled_room_types.keys()), y=list(disabled_room_types.values()),
+                                      name='خارج از سرویس')
+        in_use_rooms_trace = go.Bar(x=list(reserved_room_types.keys()), y=list(reserved_room_types.values()),
+                                    name='رزرو '
+                                         'شده')
+        rooms_data = [ready_rooms_trace, disabled_rooms_trace, in_use_rooms_trace]
+        stack_bar_layout = go.Layout(
+            barmode='stack'
+        )
+        rooms_fig = go.Figure(data=rooms_data, layout=stack_bar_layout)
+        rooms_div = py.offline.plot(rooms_fig, auto_open=False, output_type='div')
+        context['rooms_graph'] = rooms_div
+        dates = [timezone.now()+timezone.timedelta(i) for i in range(30)]
+        rooms_time_data = []
+        for type_name, reserved_ready_out_list in room_types.items():
+            reserveds, readys, outs = [],[],[]
+            for res, rea, out in reserved_ready_out_list:
+                reserveds.append(res)
+                readys.append(rea)
+                outs.append(out)
+            trace_res = go.Scatter(x=dates, y=reserveds, name=type_name+' '+' رزرو شده')
+            trace_rea = go.Scatter(x=dates, y=readys, name=type_name+' '+'آماده‌')
+            trace_out = go.Scatter(x=dates, y=outs, name=type_name+' '+'خارج از سرویس')
+            rooms_time_data += [trace_res, trace_rea, trace_out]
+        layout = dict(
+            title='Time Series with Rangeslider',
+            xaxis=dict(
+                range=[dates[0], dates[-1]],
+                rangeselector=dict(
+                    buttons=list([
+                        dict(count=1,
+                             label='1m',
+                             step='month',
+                             stepmode='backward'),
+                        dict(count=6,
+                             label='6m',
+                             step='month',
+                             stepmode='backward'),
+                        dict(step='all')
+                    ])
+                ),
+                rangeslider=dict(
+                    visible=True
+                ),
+                type='date'
+            )
+        )
+
+        fig = go.Figure(data=rooms_time_data, layout=layout)
+        rooms_time_graph = py.offline.plot(fig, auto_open=False, output_type='div')
+        context['rooms_time_graph'] = rooms_time_graph
+
+
+
+
+
+
+
+
         return context
 
     def user_passed_test(self, request):
