@@ -1,12 +1,40 @@
 {% extends "master.html" %}
 {% load static %}
 
+{% block extra_head %}
+      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+{% endblock %}
+
 {% block content %}
     <a href="{% url 'habitats:habitat_detail' habitat_pk=habitat.pk %}"
        class="btn btn-info mt-auto mb-1">بازگشت به صفحه‌‌ی اصلی مدیریت اقامتگاه</a>
     <br><br>
 
     {{ income_graph|safe }}
+    <p>انواع اتاق‌های شما</p>
+    {{ rooms_graph|safe }}
+    <p>انواع اتاق‌های شما در گذر زمان</p>
+    <label for="daterange" class="col-sm-3 col-form-label text-md-right">بازهٔ از دسترس خارج
+                        بودن</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="daterange" id="daterange" value=""
+                               style="width: 200px" required/>
+                        <script>
+                            $(function () {
+                                $('input[name="daterange"]').daterangepicker({
+                                    opens: 'left'
+                                }, function (start, end, label) {
+                                    console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+                                });
+                            });
+                        </script>
+                    </div>
+    {{ rooms_time_graph|safe }}
+
+
 
 
     <script src="/static/Translator.js"></script>
