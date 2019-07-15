@@ -200,11 +200,10 @@
                 <h2>نظرات ثبت شده</h2>
                 <br>
                 {% for comment in comments %}
-                    <br>
                     <div class="row" align="center">
                     <div class="col-lg-12 mb-12">
                     <div class="card h-100">
-                        <h5 class="card-header creation_time">نظر
+                        <h5 class="card-header date-time">نظر
                             {{ comment.writer.name }}
                             ، ثبت شده در
                             {{ comment.created_at }}</h5>
@@ -385,6 +384,7 @@
 
                     </div>
 
+                    <br>
                 {% empty %}
                     <h4>هنوز نظری برای این مکان دیدنی ثبت نشده است.</h4>
                 {% endfor %}

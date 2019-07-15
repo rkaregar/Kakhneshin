@@ -13,6 +13,7 @@ from accounts.models import Transaction
 from habitats.forms import HabitatStatForm
 from habitats.models import Habitat
 from places.models import Place, DistanceHabitatToPlace
+from reservation.models import ReservationComment
 
 import plotly as py
 import plotly.graph_objs as go
@@ -123,9 +124,12 @@ class HabitatTinyDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(HabitatTinyDetailView, self).get_context_data(**kwargs)
 
-        room_types = self.habitat.roomtype_set.all().values()
-        context['room_types'] = room_types
+        habitat = Habitat.objects.get(pk=self.kwargs.get('habitat_pk', None))
+        room_types = habitat.roomtype_set.all().values()
 
+        context['room_types'] = room_types
+        context['comments'] = ReservationComment.objects.filter(reservation__room__habitat=habitat).order_by(
+            '-created_at')
         return context
 
     def user_passed_test(self, request):

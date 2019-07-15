@@ -45,7 +45,7 @@ class PlaceComment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ثبت نظر')
 
     def __str__(self):
-        return 'نظر {} برای اقامتگاه {}: {}. امتیاز: {}'.format(self.writer, self.place, self.review, self.rating)
+        return 'نظر {} برای مکان دیدنی {}: {}. امتیاز: {}'.format(self.writer, self.place, self.review, self.rating)
 
 
 class PlaceCommentPhoto(models.Model):

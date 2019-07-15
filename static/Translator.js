@@ -39,7 +39,7 @@ for (let i = 0; i < tds.length; i++) {
         tds[i].innerText = '--';
 }
 
-creationTimes = document.getElementsByClassName("creation_time");
+creationTimes = document.getElementsByClassName("date-time");
 
 for (let i = 0; i < creationTimes.length; i++) {
     creationTimes[i].innerText = creationTimes[i].innerText.replace(/0/g, '۰');

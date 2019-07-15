@@ -1,10 +1,12 @@
 from datetime import datetime
 
 from django.shortcuts import get_object_or_404
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from habitats.models import Habitat, GeographicDivision, RoomType
 from places.models import DistanceHabitatToPlace
+from reservation.models import Reservation, ReservationComment, ReservationCommentPhoto, ReservationCommentVideo
 from reservation.forms import HabitatSearchForm
 
 
@@ -68,8 +70,53 @@ class ReservationHabitatView(ListView):
         except Exception:
             context['division_name'] = ''
 
-        context['habitat'] = get_object_or_404(Habitat, pk=self.kwargs.get('habitat_pk', None))
+        habitat = get_object_or_404(Habitat, pk=self.kwargs.get('habitat_pk', None))
+        context['habitat'] = habitat
         context['distances'] = DistanceHabitatToPlace.objects.filter(
             habitat_id=self.kwargs.get('habitat_pk', None)).order_by('distance')
+        context['reservations'] = Reservation.objects.filter(room__habitat=habitat,
+                                                             member__user=self.request.user).order_by('-to_date')
+        context['comments'] = ReservationComment.objects.filter(reservation__room__habitat=habitat).order_by(
+            '-created_at')
 
         return context
+
+
+class ReservationCommentView(LoginRequiredMixin, TemplateView):
+    template_name = 'reservation/reservation_comment_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        reservation = get_object_or_404(Reservation, pk=self.kwargs.get('reservation_pk', None))
+        if self.request.user and reservation.member.user == self.request.user:
+            if ReservationComment.objects.filter(reservation=reservation).exists():
+                context['message'] = 'شما قبلا برای این رزرو نظر ثبت کرده‌اید'
+            else:
+                context['reservation'] = reservation
+        else:
+            context['message'] = 'شما تنها می‌توانید برای رزروهای خود نظر ثبت کنید'
+
+        return context
+
+    def post(self, request, **kwargs):
+        context = self.get_context_data(**kwargs)
+
+        rating = request.POST.get('rating', None)
+        if rating == '':
+            rating = None
+        review = request.POST.get('review', None)
+
+        if not rating and not review:
+            context['errors'] = ['ثبت حداقل یکی از موارد امتیاز یا متن نظر الزامیست']
+        else:
+            reservation = Reservation.objects.get(pk=self.kwargs.get('reservation_pk', None))
+            reservation_comment = ReservationComment.objects.create(reservation=reservation, rating=rating,
+                                                                    review=review)
+            if self.request.FILES:
+                for image in self.request.FILES.getlist('image'):
+                    ReservationCommentPhoto.objects.create(reservation_comment=reservation_comment, photo=image)
+                for video in self.request.FILES.getlist('video'):
+                    ReservationCommentVideo.objects.create(reservation_comment=reservation_comment, video=video)
+        context['message'] = 'نظر شما برای این رزرو با موفقیت ثبت شد'
+
+        return self.render_to_response(context)

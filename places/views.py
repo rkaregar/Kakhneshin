@@ -151,7 +151,6 @@ class PlaceTinyDetailView(DetailView):
             rating = None
         review = request.POST.get('review', None)
 
-        print('hi {}, {}'.format(rating, review))
         if not rating and not review:
             context['errors'] = ['ثبت حداقل یکی از موارد امتیاز یا متن نظر الزامیست']
         else:
