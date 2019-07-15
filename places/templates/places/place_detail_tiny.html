@@ -34,8 +34,9 @@
     </head>
 
     {% if prev_form %}
-        <a href="{% url 'places:place_search' %}?name={{ prev_form.name }}&division={{ prev_form.division }}"
-           class="btn btn-info mt-auto mb-1">بازگشت به صفحهٔ جستجو</a>
+        <button onclick="window.location='{% url 'places:place_search' %}'+window.location.search;"
+                class="btn btn-info">بازگشت به صفحهٔ جستجو
+        </button>
     {% else %}
         <a href="{% url 'places:all' %}"
            class="btn btn-info mt-auto mb-1">بازگشت به لیست مکان‌های دیدنی</a>

@@ -145,6 +145,10 @@
                 <a class="nav-link" id="comments-tab" data-toggle="tab" href="#comments" role="tab"
                    aria-controls="comments" aria-selected="false">نظرات</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" id="reservations-tab" data-toggle="tab" href="#reservations" role="tab"
+                   aria-controls="reservations" aria-selected="false">رزروهای انجام شده</a>
+            </li>
         </ul>
     </div>
 
@@ -406,6 +410,65 @@
                         </div>
                         </div>
                     </div>
+                </div>
+                <div class="row tab-pane fade show" id="reservations">
+
+                    <div class="container" align="right" id="features">
+                    <br>
+                        <h3>رزروهای قبلی از این اقامتگاه</h3>
+
+                        {% for reservation_group in reservations|group_by:4 %}
+                            <div class="row" align="center">
+                                {% for reservation in reservation_group %}
+                                    <div class="col-lg-3 mb-3">
+                                        <div class="card h-100">
+                                            {% if reservation.room.photo %}
+                                                <img class="card-img-top" src="/media/{{ reservation.room.photo }}"
+                                                     alt="">
+                                            {% else %}
+                                                <img class="card-img-top" src="/static/images/no_room1.png" alt="">
+                                            {% endif %}
+
+                                            <h5 class="card-header">اتاق {{ reservation.room }}</h5>
+
+                                            <table class="table">
+                                                <tbody>
+                                                <tr>
+                                                    <td>کاربر:</td>
+                                                    <td>{{ reservation.member.name }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>از تاریخ:</td>
+                                                    <td class="date-time">{{ reservation.from_date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>تا تاریخ:</td>
+                                                    <td class="date-time">{{ reservation.to_date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>فعال شده:</td>
+                                                    <td>
+                                                        {% if reservation.is_active %}
+                                                            <span class="fas fa-check-circle"
+                                                                  style="color: green"></span>
+                                                        {% else %}
+                                                            <span class="fas fa-times-circle" style="color: red"></span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% empty %}
+                            <h4>تا کنون رزروی از این اقامتگاه انجام نشده است.</h4>
+                        {% endfor %}
+
+
+                    </div>
+
                 </div>
             </div>
 

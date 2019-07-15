@@ -48,8 +48,9 @@
         </style>
     </head>
 
-    <a href="{% url 'reservation:search' %}?persons={{ form.persons.value }}&from_date={{ form.from_date.value }}&to_date={{ form.to_date.value }}&division={{ form.division.value }}"
-       class="btn btn-info mt-auto mb-1">بازگشت به صفحهٔ جستجو</a>
+    <button onclick="window.location='{% url 'reservation:search' %}'+window.location.search;"
+            class="btn btn-info">بازگشت به صفحهٔ جستجو
+    </button>
     <br><br>
     <div class="container" align="right" id="features">
         <div class="row" id="properties">
@@ -543,7 +544,7 @@
         <div class="row tab-pane fade show" id="reservations">
 
             <div class="container" align="right" id="features">
-                <h3>رزروهای قبلی از این اقامتگاه</h3>
+                <h3>رزروهای قبلی شما از این اقامتگاه</h3>
 
                 {% for reservation_group in reservations|group_by:4 %}
                     <div class="row" align="center">
@@ -583,11 +584,11 @@
                                     <br><br>
                                     <div class="card-footer">
                                         {% if reservation.comment or not reservation.is_active %}
-                                            <a href="{% url 'reservation:create_reservation_comment' reservation_pk=reservation.id %}"
-                                               class="btn btn-primary disabled">ثبت نظر</a>
+                                            <a href="#" class="btn btn-primary disabled">ثبت نظر</a>
                                         {% else %}
-                                            <a href="{% url 'reservation:create_reservation_comment' reservation_pk=reservation.id %}"
-                                               class="btn btn-primary">ثبت نظر</a>
+                                            <button onclick="window.location='{% url 'reservation:create_reservation_comment' reservation_pk=reservation.id %}'+window.location.search;"
+                                                    class="btn btn-primary">ثبت نظر
+                                            </button>
                                         {% endif %}
 
                                     </div>
@@ -597,7 +598,7 @@
                         {% endfor %}
                     </div>
                 {% empty %}
-                    <h4>شما تا کنون از این هتل رزروی انجام نداده‌اید.</h4>
+                    <h4>شما تا کنون از این اقامتگاه رزروی انجام نداده‌اید.</h4>
                 {% endfor %}
 
 

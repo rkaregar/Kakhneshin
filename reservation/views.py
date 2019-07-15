@@ -88,11 +88,11 @@ class ReservationCommentView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         reservation = get_object_or_404(Reservation, pk=self.kwargs.get('reservation_pk', None))
+        context['reservation'] = reservation
+
         if self.request.user and reservation.member.user == self.request.user:
             if ReservationComment.objects.filter(reservation=reservation).exists():
                 context['message'] = 'شما قبلا برای این رزرو نظر ثبت کرده‌اید'
-            else:
-                context['reservation'] = reservation
         else:
             context['message'] = 'شما تنها می‌توانید برای رزروهای خود نظر ثبت کنید'
 
@@ -117,6 +117,7 @@ class ReservationCommentView(LoginRequiredMixin, TemplateView):
                     ReservationCommentPhoto.objects.create(reservation_comment=reservation_comment, photo=image)
                 for video in self.request.FILES.getlist('video'):
                     ReservationCommentVideo.objects.create(reservation_comment=reservation_comment, video=video)
-        context['message'] = 'نظر شما برای این رزرو با موفقیت ثبت شد'
+
+            context['message'] = 'نظر شما برای این رزرو با موفقیت ثبت شد'
 
         return self.render_to_response(context)

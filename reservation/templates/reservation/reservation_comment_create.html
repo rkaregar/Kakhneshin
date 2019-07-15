@@ -2,14 +2,10 @@
 {% load static %}
 
 {% block content %}
-    {#    {% if prev_form %}#}
-    {#        <a href="{% url 'places:place_search' %}?name={{ prev_form.name }}&division={{ prev_form.division }}"#}
-    {#           class="btn btn-info mt-auto mb-1">بازگشت به صفحهٔ جستجو</a>#}
-    {#    {% else %}#}
-    {#        <a href="{% url 'places:all' %}"#}
-    {#           class="btn btn-info mt-auto mb-1">بازگشت به لیست مکان‌های دیدنی</a>#}
-    {#    {% endif %}#}
-    {#    <br><br>#}
+    <button onclick="window.location='{% url 'reservation:habitat' habitat_pk=reservation.room.habitat_id %}'+window.location.search;"
+            class="btn btn-info">بازگشت به صفحهٔ جزئیات اقامتگاه
+    </button>
+    <br><br>
 
     {% if message %}
         <div class="container" align="center" id="features">
@@ -34,7 +30,8 @@
                 {% endif %}
 
                 <div class="card">
-                    <h4 class="card-header">ثبت نظر</h4>
+                    <h4 class="card-header">ثبت نظر برای رزرو اتاق
+                    {{ reservation.room }}</h4>
                     <br>
                     <form method="post" enctype="multipart/form-data" action="">
                         <div class="form-row" style="padding-right: 30px;margin-bottom: 20px">
