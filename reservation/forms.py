@@ -34,6 +34,7 @@ class ReservationForm(ModelForm):
     def __init__(self, member, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.cost = None
+        self.amount_required = 0
         self.member = member
 
     def clean(self):
@@ -47,6 +48,7 @@ class ReservationForm(ModelForm):
             self.cost = required_money
             balance = Transaction.get_balance_from_user(self.member.user)
             if balance < required_money:
+                self.amount_required = required_money - balance
                 raise ValidationError('باید حداقل {} در حساب خود داشته باشد. لطفا حساب خود را شارژ کنید.'.format(
                     required_money
                 ))

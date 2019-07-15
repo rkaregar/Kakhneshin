@@ -17,7 +17,7 @@ class ChargeView(LoginRequiredMixin, FormView):
     def form_valid(self, form):
         transaction = Transaction.objects.create(to_user=self.request.user, verified=False,
                                                  amount=form.cleaned_data['amount'])
-        return redirect('accounts:callback', token=transaction.token)
+        return redirect('accounts:portal', token=transaction.token)
 
 
 class CallbackView(TemplateView):
@@ -25,12 +25,20 @@ class CallbackView(TemplateView):
 
     def get_context_data(self, token):
         transaction = get_object_or_404(Transaction, token=token)
-        transaction.verified = True
+        transaction.verified = self.request.GET['status'] == 'OK'
         transaction.save()
-        return {'success': True, 'error': None}
+        return {'success': True} if transaction.verified else {
+            'success': transaction.verified,
+            'error': self.request.GET['error']
+        }
 
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+
+
+class PortalView(TemplateView):
+    template_name = 'accounts/portal.html'
+
+    def get_context_data(self, token):
+        return {'token': token}
 
 
 class WithdrawalsView(LoginRequiredMixin, CreateView):
