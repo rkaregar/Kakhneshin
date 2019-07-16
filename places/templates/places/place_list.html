@@ -5,7 +5,12 @@
 {% block content %}
     {% load group_by %}
     <div class="container-fluid" align="center">
-        <h1>مکان دیدنی‌های شما</h1>
+        {% if user.is_superuser %}
+            <h1>مکان‌های دیدنی سامانه</h1>
+        {% else %}
+            <h1>مکان‌های دیدنی شما</h1>
+        {% endif %}
+    
         {% for place_group in object_list|add_str:'add'|group_by:3 %}
             <div class="row">
                 {% for place in place_group %}
@@ -26,7 +31,9 @@
                         <div class="col-md-4 mb-3">
                             <div class="card h-100 mx-1">
                                 <a href="{% url 'places:place_detail' place_pk=place.pk %}"><img
-                                        class="card-img-top" src="{% if place.photo %}{{ place.photo.url }}{% else %}{% static 'images/no_hotel.jpg' %}{% endif %}"
+                                        class="card-img-top" src="
+
+                                        {% if place.photo %}{{ place.photo.url }}{% else %}{% static 'images/no_place.jpg' %}{% endif %}"
                                         alt="کاخ"></a>
                                 <div class="card-body d-flex flex-column">
                                     <h5 class="card-title">{{ place.name }}</h5>

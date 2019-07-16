@@ -1,9 +1,42 @@
 {% extends "master.html" %}
 {% load static %}
 
+{% load group_by %}
+
 {% block content %}
+    <head>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+              integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
+              crossorigin="anonymous">
+        <style>
+            .fa-angry.checked {
+                color: red;
+            }
+
+            .fa-frown.checked {
+                color: #ff9505;
+            }
+
+            .fa-meh.checked {
+                color: #ffdf00;
+            }
+
+            .fa-smile.checked {
+                color: #98fc34;
+            }
+
+            .fa-laugh-beam.checked {
+                color: #1da509;
+            }
+
+            .not-checked {
+                color: grey;
+            }
+        </style>
+    </head>
+
     <a href="{% url 'habitats:all' %}"
-                   class="btn btn-info mt-auto mb-1">بازگشت به لیست اقامتگاه‌ها</a>
+       class="btn btn-info mt-auto mb-1">بازگشت به لیست اقامتگاه‌ها</a>
     <br><br>
     <div class="container" align="right" id="features">
         <div class="row" id="properties">
@@ -37,7 +70,12 @@
                 <br>
                 <a href="{% url 'habitats:room_type_create' habitat_pk=habitat.id %}"
                    class="btn btn-primary mt-auto mb-1">اضافه کردن اتاق جدید</a>
-
+                <br>
+                <a href="{% url 'habitats:habitat_distances' habitat_pk=habitat.id %}"
+                   class="btn btn-primary mt-auto mb-1">فاصله از مکان‌های گردشگری</a>
+                <br>
+                <a href="{% url 'habitats:habitat_stats' habitat_pk=habitat.id %}"
+                   class="btn btn-primary mt-auto mb-1">آمارهای این اقامتگاه</a>
             </div>
 
             <div class="col-lg-1">
@@ -64,7 +102,8 @@
                                     <div class="carousel-item carousel-item-habitat-detail-tiny active"
                                          style="background-image: url({{ img.image.url }})">
                                 {% else %}
-                                    <div class="carousel-item carousel-item-habitat-detail-tiny" style="background-image: url({{ img.image.url }})">
+                                    <div class="carousel-item carousel-item-habitat-detail-tiny"
+                                         style="background-image: url({{ img.image.url }})">
                                 {% endif %}
                             </div>
                             {% endfor %}
@@ -96,47 +135,342 @@
         <hr>
     </div>
 
-    <div class="container" align="right" id="features">
-        <h2>اتاق‌ها</h2>
+    <div class="container" align="right">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="rooms-tab" data-toggle="tab" href="#rooms" role="tab"
+                   aria-controls="rooms" aria-selected="true">اتاق‌ها</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="comments-tab" data-toggle="tab" href="#comments" role="tab"
+                   aria-controls="comments" aria-selected="false">نظرات</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="reservations-tab" data-toggle="tab" href="#reservations" role="tab"
+                   aria-controls="reservations" aria-selected="false">رزروهای انجام شده</a>
+            </li>
+        </ul>
+    </div>
 
-        {% for room_type in room_types %}
-            {% if forloop.counter0|divisibleby:4 %}
-                <div class="row" align="center">
-            {% endif %}
+    <div class="tab-content" id="tab-content">
+        <div class="tab-pane fade show active" id="rooms">
 
-        <div class="col-lg-3 mb-3">
-            <div class="card h-100">
-                <a href="{% url 'habitats:room_type_detail' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}">
-                    {% if room_type.photo %}
-                        <img class="card-img-top" src="/media/{{ room_type.photo }}" alt="">
-                    {% else %}
-                        <img class="card-img-top" src="/static/images/no_room1.png" alt="">
-                    {% endif %}
-                </a>
+            <div class="container" align="right">
+                <br>
+                <h2>اتاق‌ها</h2>
 
-                <h4 class="card-header">{{ room_type.type_name }}</h4>
+                {% for room_type_group in room_types|group_by:4 %}
+                    <div class="row" align="center">
+                        {% for room_type in room_type_group %}
+                            <div class="col-lg-3 mb-3">
+                                <div class="card h-100">
+                                    <a href="{% url 'habitats:room_type_detail' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}">
+                                        {% if room_type.photo %}
+                                            <img class="card-img-top" src="/media/{{ room_type.photo }}" alt="">
+                                        {% else %}
+                                            <img class="card-img-top" src="/static/images/no_room1.png" alt="">
+                                        {% endif %}
+                                    </a>
 
-                <div class="card-footer">
-                    <a href="{% url 'habitats:room_type_detail' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}"
-                       class="btn btn-primary">مشاهده‌ی اتاق</a>
-                </div>
-                <div class="card-footer">
-                    <a href="{% url 'habitats:room_out_of_service' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}"
-                       class="btn btn-warning">بازه‌های خارج از سرویس</a>
-                </div>
+                                    <h4 class="card-header">{{ room_type.type_name }}</h4>
+
+                                    <div class="card-footer">
+                                        <a href="{% url 'habitats:room_type_detail' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}"
+                                           class="btn btn-primary">مشاهده‌ی اتاق</a>
+                                    </div>
+                                    <div class="card-footer">
+                                        <a href="{% url 'habitats:room_out_of_service' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}"
+                                           class="btn btn-warning">بازه‌های خارج از سرویس</a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                {% empty %}
+                    <h4>متاسفانه اتاقی برای این اقامتگاه ثبت نشده است.</h4>
+                {% endfor %}
 
             </div>
         </div>
 
-        {% if forloop.counter0|add:1|divisibleby:4 or forloop.counter == ss|length %}
+        <div class="row tab-pane fade show" id="comments">
+            <div class="container" align="right">
+                <div id="list_of_comments" class="col-12">
+
+                    <div class="container" align="right" id="features">
+                        <br>
+                        <h2>نظرات ثبت شده</h2>
+                        {% for comment in comments %}
+                            <div class="row" align="center">
+                            <div class="col-lg-12 mb-12">
+                            <div class="card h-100">
+                                <h5 class="card-header date-time">نظر
+                                    {{ comment.reservation.member.name }}
+                                    ، ثبت شده در
+                                    {{ comment.created_at }}</h5>
+
+                                <div class="row">
+                                    <div class="col-4">
+                                        <table class="table">
+                                            <tbody>
+                                            <tr>
+                                                <td>اقامت در اتاق:</td>
+                                                <td>{{ comment.reservation.room }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>تاریخ آغاز اقامت:</td>
+                                                <td class="date-time">{{ comment.reservation.from_date }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>تاریخ پایان اقامت:</td>
+                                                <td class="date-time">{{ comment.reservation.to_date }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>امتیاز:</td>
+                                                <td>
+                                                    {% if comment.rating %}
+                                                        {% if comment.rating == 1 %}
+                                                            <span class="fas fa-angry checked"></span>
+                                                            <span class="fas fa-angry not-checked"></span>
+                                                            <span class="fas fa-angry not-checked"></span>
+                                                            <span class="fas fa-angry not-checked"></span>
+                                                            <span class="fas fa-angry not-checked"></span>
+                                                        {% elif comment.rating == 2 %}
+                                                            <span class="fas fa-frown checked"></span>
+                                                            <span class="fas fa-frown checked"></span>
+                                                            <span class="fas fa-frown not-checked"></span>
+                                                            <span class="fas fa-frown not-checked"></span>
+                                                            <span class="fas fa-frown not-checked"></span>
+                                                        {% elif comment.rating == 3 %}
+                                                            <span class="fas fa-meh checked"></span>
+                                                            <span class="fas fa-meh checked"></span>
+                                                            <span class="fas fa-meh checked"></span>
+                                                            <span class="fas fa-meh not-checked"></span>
+                                                            <span class="fas fa-meh not-checked"></span>
+                                                        {% elif comment.rating == 4 %}
+                                                            <span class="fas fa-smile checked"></span>
+                                                            <span class="fas fa-smile checked"></span>
+                                                            <span class="fas fa-smile checked"></span>
+                                                            <span class="fas fa-smile checked"></span>
+                                                            <span class="fas fa-smile not-checked"></span>
+                                                        {% else %}
+                                                            <span class="fas fa-laugh-beam checked"></span>
+                                                            <span class="fas fa-laugh-beam checked"></span>
+                                                            <span class="fas fa-laugh-beam checked"></span>
+                                                            <span class="fas fa-laugh-beam checked"></span>
+                                                            <span class="fas fa-laugh-beam checked"></span>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        امتیازی برای این نظر داده نشده
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>متن نظر:</td>
+                                                <td>
+                                                    {% if comment.review %}
+                                                        {{ comment.review }}
+                                                    {% else %}
+                                                        متنی برای این نظر ثبت نشده
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+                                    <div class="col-4">
+                                        <h6>تصاویر ثبت شده برای این نظر:</h6>
+                                        {% if comment.photos.all.exists %}
+                                            <div id="carousel_photo_{{ comment.id }}" class="carousel slide"
+                                                 data-ride="carousel">
+                                            <ol class="carousel-indicators">
+                                                {% for photo in comment.photos.all %}
+                                                    {% if forloop.counter == 1 %}
+                                                        <li data-target="#carousel_photo_{{ comment.id }}"
+                                                            data-slide-to={{ forloop.counter0 }} class="active"></li>
+                                                    {% else %}
+                                                        <li data-target="#carousel_photo_{{ comment.id }}"
+                                                            data-slide-to={{ forloop.counter0 }}></li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ol>
+
+                                            <div class="carousel-inner" role="listbox">
+                                                {% for photo in comment.photos.all %}
+                                                    {% if forloop.counter0 == 0 %}
+                                                        <div class="carousel-item carousel-item-place-comment-photo active"
+                                                             style="background-image: url({{ photo.photo.url }})">
+                                                    {% else %}
+                                                        <div class="carousel-item carousel-item-place-comment-photo"
+                                                             style="background-image: url({{ photo.photo.url }})">
+                                                    {% endif %}
+                                                </div>
+                                                {% endfor %}
+
+                                                </div>
+
+                                                <a class="carousel-control-prev" href="#carousel_photo_{{ comment.id }}"
+                                                   role="button"
+                                                   data-slide="prev">
+                                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                    <span class="sr-only">Previous</span>
+                                                </a>
+                                                <a class="carousel-control-next" href="#carousel_photo_{{ comment.id }}"
+                                                   role="button"
+                                                   data-slide="next">
+                                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                    <span class="sr-only">Next</span>
+                                                </a>
+                                            </div>
+                                            <br>
+                                        {% else %}
+                                            تصویری برای این نظر ثبت نشده است.
+                                        {% endif %}
+
+                                        </div>
+
+
+                                        <div class="col-4">
+                                            <h6>ویدیوهای ثبت شده برای این نظر:</h6>
+                                            {% if comment.videos.all.exists %}
+                                                <div id="carousel_video_{{ comment.id }}" class="carousel slide"
+                                                     data-ride="carousel">
+                                                <ol class="carousel-indicators">
+                                                    {% for video in comment.videos.all %}
+                                                        {% if forloop.counter == 1 %}
+                                                            <li data-target="#carousel_video_{{ comment.id }}"
+                                                                data-slide-to={{ forloop.counter0 }} class="active"></li>
+                                                        {% else %}
+                                                            <li data-target="#carousel_video_{{ comment.id }}"
+                                                                data-slide-to={{ forloop.counter0 }}></li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </ol>
+
+
+                                                <div class="carousel-inner" role="listbox">
+                                                    {% for video in comment.videos.all %}
+                                                        {% if forloop.counter0 == 0 %}
+                                                            <div class="carousel-item carousel-item-place-comment-photo active">
+                                                            <video width="320" height="320" controls>
+                                                                <source src="{{ video.video.url }}"
+                                                                        type="video/mp4">
+                                                            </video>
+                                                        {% else %}
+                                                            <div class="carousel-item carousel-item-place-comment-photo">
+                                                            <video width="320" height="320" controls>
+                                                                <source src="{{ video.video.url }}"
+                                                                        type="video/mp4">
+                                                            </video>
+                                                        {% endif %}
+                                                    </div>
+                                                    {% endfor %}
+
+                                                    </div>
+
+                                                    <a class="carousel-control-prev"
+                                                       href="#carousel_video_{{ comment.id }}"
+                                                       role="button"
+                                                       data-slide="prev">
+                                                        <span class="carousel-control-prev-icon"
+                                                              aria-hidden="true"></span>
+                                                        <span class="sr-only">Previous</span>
+                                                    </a>
+                                                    <a class="carousel-control-next"
+                                                       href="#carousel_video_{{ comment.id }}"
+                                                       role="button"
+                                                       data-slide="next">
+                                                        <span class="carousel-control-next-icon"
+                                                              aria-hidden="true"></span>
+                                                        <span class="sr-only">Next</span>
+                                                    </a>
+                                                </div>
+                                                <br>
+                                            {% else %}
+                                                ویدیویی برای این نظر ثبت نشده است.
+                                            {% endif %}
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <br>
+                        {% empty %}
+                            <h4>هنوز نظری برای این مکان دیدنی ثبت نشده است.</h4>
+                        {% endfor %}
+
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row tab-pane fade show" id="reservations">
+
+                    <div class="container" align="right" id="features">
+                    <br>
+                        <h3>رزروهای قبلی از این اقامتگاه</h3>
+
+                        {% for reservation_group in reservations|group_by:4 %}
+                            <div class="row" align="center">
+                                {% for reservation in reservation_group %}
+                                    <div class="col-lg-3 mb-3">
+                                        <div class="card h-100">
+                                            {% if reservation.room.photo %}
+                                                <img class="card-img-top" src="/media/{{ reservation.room.photo }}"
+                                                     alt="">
+                                            {% else %}
+                                                <img class="card-img-top" src="/static/images/no_room1.png" alt="">
+                                            {% endif %}
+
+                                            <h5 class="card-header">اتاق {{ reservation.room }}</h5>
+
+                                            <table class="table">
+                                                <tbody>
+                                                <tr>
+                                                    <td>کاربر:</td>
+                                                    <td>{{ reservation.member.name }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>از تاریخ:</td>
+                                                    <td class="date-time">{{ reservation.from_date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>تا تاریخ:</td>
+                                                    <td class="date-time">{{ reservation.to_date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>فعال شده:</td>
+                                                    <td>
+                                                        {% if reservation.is_active %}
+                                                            <span class="fas fa-check-circle"
+                                                                  style="color: green"></span>
+                                                        {% else %}
+                                                            <span class="fas fa-times-circle" style="color: red"></span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% empty %}
+                            <h4>تا کنون رزروی از این اقامتگاه انجام نشده است.</h4>
+                        {% endfor %}
+
+
+                    </div>
+
+                </div>
             </div>
-        {% endif %}
 
-        {% empty %}
-            <h4>متاسفانه اتاقی برای این اقامتگاه ثبت نشده است.</h4>
-        {% endfor %}
-
-    </div>
-
-    <script src="/static/Translator.js"></script>
+            <script src="/static/Translator.js"></script>
 {% endblock %}

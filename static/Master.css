@@ -26,6 +26,11 @@ body {
     height: 55vh;
 }
 
+.carousel-item-place-comment-photo {
+    min-height: 1px;
+    height: 40vh;
+}
+
 @font-face {
     font-family: 'myFont';
     src: url('/static/fonts/IRANSans.ttf');
@@ -35,16 +40,11 @@ body {
     font-family: 'myFont';
 }
 
-input.loadinggif
-{
-       background:
-     url('/static/spinner.gif')
-     no-repeat
-     left center;
+input.loadinggif {
+    background: url('/static/spinner.gif') no-repeat left center;
     background-size: 30px;
 }
 
-#homepage-form label
-{
+#homepage-form label {
     margin-right: 10px;
 }

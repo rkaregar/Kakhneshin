@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_head %}
-      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -23,13 +23,11 @@
         </style>
     </head>
 
-    <a href="{% url 'habitats:room_type_detail' habitat_pk=room_type.habitat_id room_type_pk=room_type.id %}"
-       class="btn btn-info mt-auto mb-1">بازگشت به صفحهٔ اتاق</a>
-    <a href="{% url 'habitats:habitat_detail' habitat_pk=room_type.habitat_id %}"
+    <a href="{% url 'habitats:habitat_detail' habitat_pk=habitat.id %}"
        class="btn btn-info mt-auto mb-1">بازگشت به صفحهٔ اقامتگاه</a>
 
     <div class="container" align="right" id="features">
-        <h2>بازه‌های خارج از سرویس بودن اتاق {{ room_type }}</h2>
+        <h2>مکان‌های گردشگری نزدیک به اقامتگاه {{ habitat }}</h2>
         <br>
         <div class="card">
 
@@ -47,51 +45,34 @@
                 </div>
             {% endif %}
 
-            <h5 class="card-header">جزئیات خارج از سرویس بودن اعمالی را مشخص کنید</h5>
+            <h5 class="card-header">مکان گردشگری مورد نظر را انتخاب نمایید</h5>
             <br>
             <form method="POST">
                 {% csrf_token %}
                 <div class="form-group row">
-                    <label for="daterange" class="col-sm-3 col-form-label text-md-right">بازهٔ از دسترس خارج
-                        بودن</label>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control" name="daterange" id="daterange" value=""
-                               style="width: 200px" required/>
-                        <script>
-                            $(function () {
-                                $('input[name="daterange"]').daterangepicker({
-                                    opens: 'left'
-                                }, function (start, end, label) {
-                                    console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-                                });
-                            });
-                        </script>
+                    <label for="place" class="col-auto col-form-label text-md-right">مکان گردشگری</label>
+                    <div class="col-md-2">
+                        <select class="form-control" name="place_id" id="place">
+                            {% for place in places %}
+                                <option value="{{ place.id }}">{{ place }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
 
-                    <label for="num_of_rooms" class="col-sm-3 col-form-label text-md-right">تعداد اتاق‌های تحت تاثیر
-                        قرار گرفته</label>
-                    <div class="col-md-3">
-                        <input type="number" class="form-control" name="num_of_rooms" id="num_of_rooms" value="1"
-                               min="1" required
+                    <label for="distance" class="col-auto col-form-label text-md-right">فاصله (کیلومتر)</label>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" name="distance" id="distance" value="1"
+                               min="0.1" step="0.1" required
                                style="width: 75px"/>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label for="details" class="col-sm-3 col-form-label text-md-right">توضیحات</label>
-                    <div class="col-md-3">
-                        <textarea class="form-control" name="details" id="details"></textarea>
-                    </div>
 
-                    <div class="form-group row mb-0">
-                        <div class="col-md-8 offset-md-4">
-                            <button type="submit" class="btn btn-primary" id="submit_button"
-                                    name="submit_button">
-                                اضافه کردن بازه
-                            </button>
-                        </div>
+                    <div class="col-md-3" align="left">
+                        <button type="submit" class="btn btn-primary" id="submit_button"
+                                name="submit_button">
+                            اضافه کردن مکان گردشگری
+                        </button>
                     </div>
                 </div>
-
 
             </form>
         </div>
@@ -100,40 +81,39 @@
     <br><br>
 
     <div class="container" align="right" id="features">
-        <h3>بازه‌های خارج از سرویس ثبت شده</h3>
+        <h3>مکان‌های گردشگری نزدیک</h3>
 
-        {% for out_of_service in out_of_services %}
+        {% for distance in distances %}
             {% if forloop.counter0|divisibleby:4 %}
                 <div class="row" align="center">
             {% endif %}
 
         <div class="col-lg-3 mb-3">
             <div class="card h-100">
+
+                {% if distance.place.photo %}
+                    <a href="#"><img class="card-img-top" src="/media/{{ distance.place.photo }}" alt=""></a>
+                {% else %}
+                    <a href="#"><img class="card-img-top" src="/static/images/no_place.jpg" alt=""></a>
+                {% endif %}
+                <h4 class="card-header">{{ distance.place.name }}</h4>
                 <table class="table">
                     <tbody>
                     <tr>
-                        <td>از تاریخ:</td>
-                        <td>{{ out_of_service.inclusive_since }}</td>
+                        <td>نشانی:</td>
+                        <td>{{ distance.place.address }}</td>
                     </tr>
                     <tr>
-                        <td>تا تاریخ:</td>
-                        <td>{{ out_of_service.exclusive_until }}</td>
+                        <td>فاصله (کیلومتر):</td>
+                        <td>{{ distance.distance }}</td>
                     </tr>
-                    <tr>
-                        <td>تعداد اتاق‌ها:</td>
-                        <td>{{ out_of_service.number_of_affected_rooms }}</td>
-                    </tr>
-                    <tr class="desc">
-                        <td>توضیحات:</td>
-                        <td>{{ out_of_service.details }}</td>
-                    </tr>
-
                     </tbody>
                 </table>
+
                 <br><br>
                 <div class="card-footer">
-                    <button id="btn-delete{{ out_of_service.id }}" type="button" name="delete"
-                            class="btn btn-danger btn-delete" data-id={{ out_of_service.id }} data-toggle="modal"
+                    <button id="btn-delete{{ distance.id }}" type="button" name="delete"
+                            class="btn btn-danger btn-delete" data-id={{ distance.id }} data-toggle="modal"
                             data-target="#myModal" style="margin-top: 5px"
                     >حذف
                     </button>
@@ -146,17 +126,17 @@
 
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title" dir="rtl">حذف بازهٔ خارج از سرویس بودن</h4>
+                        <h4 class="modal-title" dir="rtl">حذف مکان گردشگری نزدیک</h4>
                     </div>
                     <div class="modal-body">
-                        <p>آیا با حذف این بازه موافقید؟</p>
+                        <p>آیا با حذف این مکان گردشگری موافقید؟</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">خیر</button>
                         <form method="post">
                             {% csrf_token %}
                             <input type="hidden" name="delete" value="true">
-                            <input type="hidden" name="out_of_service_id" id="modal_id">
+                            <input type="hidden" name="distance_id" id="modal_id">
                             <button type="submit" class="btn btn-success"
                                     style="margin-right: 5px;">بله
                             </button>
@@ -172,7 +152,7 @@
         {% endif %}
 
         {% empty %}
-            <h4>هنوز هیچ بازهٔ خارج از سرویسی برای این اتاق ثبت نشده است.</h4>
+            <h4>هنوز هیچ مکان گردشگری نزدیکی برای این اقامتگاه ثبت نشده است.</h4>
         {% endfor %}
 
         <script>

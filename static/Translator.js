@@ -39,59 +39,52 @@ for (let i = 0; i < tds.length; i++) {
         tds[i].innerText = '--';
 }
 
+creationTimes = document.getElementsByClassName("date-time");
+
+for (let i = 0; i < creationTimes.length; i++) {
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/0/g, '۰');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/1/g, '۱');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/2/g, '۲');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/3/g, '۳');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/4/g, '۴');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/5/g, '۵');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/6/g, '۶');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/7/g, '۷');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/8/g, '۸');
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(/9/g, '۹');
+
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("January", "ژانویه");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("February", "فوریه");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("March", "مارس");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("April", "آوریل");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("May", "می");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("June", "ژوئن");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("July", "جولای");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("August", "اوت");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("September", "سپتامبر");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("October", "اکتبر");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("November", "نوامبر");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("December", "دسامبر");
+
+    creationTimes[i].innerText = creationTimes[i].innerText.replace(",", "،");
+
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("a.m.", "صبح");
+    creationTimes[i].innerText = creationTimes[i].innerText.replace("p.m.", "عصر");
+
+}
 
 badges = document.getElementsByTagName("span");
 for (let i = 0; i < badges.length; i++) {
-    if (badges[i].innerText.includes('has_breakfast'))
-        badges[i].innerText = 'صبحانه';
-    else if (badges[i].innerText.includes('has_telephone'))
-        badges[i].innerText = 'تلفن';
-    else if (badges[i].innerText.includes('has_wifi'))
-        badges[i].innerText = 'وای‌فای';
-    else if (badges[i].innerText.includes('has_minibar'))
-        badges[i].innerText = 'مینی‌بار';
-    else if (badges[i].innerText.includes('has_foreign_wc'))
-        badges[i].innerText = 'توالت فرنگی';
-    else if (badges[i].innerText.includes('has_bath_tub'))
-        badges[i].innerText = 'وان حمام';
-    else if (badges[i].innerText.includes('has_shower'))
-        badges[i].innerText = 'دوش';
-    else if (badges[i].innerText.includes('has_wc'))
-        badges[i].innerText = 'توالت';
+    badges[i].innerText = badges[i].innerText.replace(/has_breakfast/g, 'صبحانه');
+    badges[i].innerText = badges[i].innerText.replace(/has_telephone/g, 'تلفن');
+    badges[i].innerText = badges[i].innerText.replace(/has_wifi/g, 'وای‌فای');
+    badges[i].innerText = badges[i].innerText.replace(/has_minibar/g, 'مینی‌بار');
+    badges[i].innerText = badges[i].innerText.replace(/has_foreign_wc/g, 'توالت فرنگی');
+    badges[i].innerText = badges[i].innerText.replace(/has_bath_tub/g, 'وان حمام');
+    badges[i].innerText = badges[i].innerText.replace(/has_wc/g, 'توالت');
+    badges[i].innerText = badges[i].innerText.replace(/has_shower/g, 'دوش');
 }
 
-creationTime = document.getElementById("creation_time");
-if (creationTime) {
-    creationTime.innerText = creationTime.innerText.replace(/0/g, '۰');
-    creationTime.innerText = creationTime.innerText.replace(/1/g, '۱');
-    creationTime.innerText = creationTime.innerText.replace(/2/g, '۲');
-    creationTime.innerText = creationTime.innerText.replace(/3/g, '۳');
-    creationTime.innerText = creationTime.innerText.replace(/4/g, '۴');
-    creationTime.innerText = creationTime.innerText.replace(/5/g, '۵');
-    creationTime.innerText = creationTime.innerText.replace(/6/g, '۶');
-    creationTime.innerText = creationTime.innerText.replace(/7/g, '۷');
-    creationTime.innerText = creationTime.innerText.replace(/8/g, '۸');
-    creationTime.innerText = creationTime.innerText.replace(/9/g, '۹');
-
-    creationTime.innerText = creationTime.innerText.replace("January", "جنیوئری");
-    creationTime.innerText = creationTime.innerText.replace("February", "فبریه");
-    creationTime.innerText = creationTime.innerText.replace("March", "مارچ");
-    creationTime.innerText = creationTime.innerText.replace("April", "آپریل");
-    creationTime.innerText = creationTime.innerText.replace("May", "می");
-    creationTime.innerText = creationTime.innerText.replace("June", "جون");
-    creationTime.innerText = creationTime.innerText.replace("July", "جولای");
-    creationTime.innerText = creationTime.innerText.replace("August", "اسگت");
-    creationTime.innerText = creationTime.innerText.replace("September", "سپتامبر");
-    creationTime.innerText = creationTime.innerText.replace("October", "اکتبر");
-    creationTime.innerText = creationTime.innerText.replace("November", "نوامبر");
-    creationTime.innerText = creationTime.innerText.replace("December", "دسامبر");
-
-    creationTime.innerText = creationTime.innerText.replace(",", "،");
-
-    creationTime.innerText = creationTime.innerText.replace("a.m.", "صبح");
-    creationTime.innerText = creationTime.innerText.replace("p.m.", "عصر");
-    // creationTime.innerText = 'به به';
-}
 lis = document.getElementsByTagName('li');
 for (let i = 0; i < lis.length; i++) {
     if (lis[i].innerText.includes('Email: This field is req'))

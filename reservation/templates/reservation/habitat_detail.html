@@ -1,8 +1,56 @@
 {% extends "master.html" %}
 
+{% load static %}
+
+{% load autocomplete %}
+
+{% load group_by %}
+
 {% block content %}
-    <a href="{% url 'reservation:search' %}?persons={{ form.persons }}&from_date={{ form.from_date }}&to_date={{ form.to_date }}&division={{ form.division }}"
-       class="btn btn-info mt-auto mb-1">بازگشت به صفحهٔ جستجو</a>
+    <head>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+              integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
+              crossorigin="anonymous">
+        <style>
+            .row {
+                padding-top: 20px;
+            }
+
+            .card-footer {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+            }
+
+            .fa-angry.checked {
+                color: red;
+            }
+
+            .fa-frown.checked {
+                color: #ff9505;
+            }
+
+            .fa-meh.checked {
+                color: #ffdf00;
+            }
+
+            .fa-smile.checked {
+                color: #98fc34;
+            }
+
+            .fa-laugh-beam.checked {
+                color: #1da509;
+            }
+
+            .not-checked {
+                color: grey;
+            }
+        </style>
+    </head>
+
+    <button onclick="window.location='{% url 'reservation:search' %}'+window.location.search;"
+            class="btn btn-info">بازگشت به صفحهٔ جستجو
+    </button>
     <br><br>
     <div class="container" align="right" id="features">
         <div class="row" id="properties">
@@ -34,19 +82,48 @@
 
                 <p>{{ description }}</p>
 
+                <br>
+                <h5>مکان‌های گردشگری نزدیک اقامتگاه</h5>
+
+                {% for distance in distances %}
+                    {% if forloop.counter0|divisibleby:2 %}
+                        <div class="row">
+                    {% endif %}
+
+                <div class="col-lg-6">
+                    <table class="table table-sm">
+                        <tbody>
+                        <tr>
+                            <td>
+                                <a href="{% url 'places:place_detail' place_pk=distance.place_id %}">{{ distance.place.name }}</a>
+                            </td>
+                            <td>{{ distance.distance }} کیلومتر</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if not forloop.counter0|divisibleby:2 or forloop.last %}
+                    </div>
+                {% endif %}
+
+                {% empty %}
+                    <h6>هنوز مکان گردشگری نزدیکی برای این اقامتگاه ثبت نشده است.</h6>
+
+                {% endfor %}
+
             </div>
 
             <div class="col-lg-1">
             </div>
 
             <div class="col-lg-6">
-
-
                 <div id="carousel" class="carousel slide" data-ride="carousel">
                     <ol class="carousel-indicators">
                         {% for img in images %}
                             {% if forloop.counter == 1 %}
-                                <li data-target="#carousel" data-slide-to={{ forloop.counter0 }} class="active"></li>
+                                <li data-target="#carousel"
+                                    data-slide-to={{ forloop.counter0 }} class="active"></li>
                             {% else %}
                                 <li data-target="#carousel" data-slide-to={{ forloop.counter0 }}></li>
                             {% endif %}
@@ -93,53 +170,143 @@
         <hr>
     </div>
 
-    <div class="container" align="right" id="features">
-        <h2>اتاق‌ها</h2>
+    <div class="container" align="right">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="rooms-tab" data-toggle="tab" href="#rooms" role="tab"
+                   aria-controls="rooms" aria-selected="true">اتاق‌ها</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="comments-tab" data-toggle="tab" href="#comments" role="tab"
+                   aria-controls="comments" aria-selected="false">نظرات</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="reservations-tab" data-toggle="tab" href="#reservations" role="tab"
+                   aria-controls="reservations" aria-selected="false">رزروهای قبلی شما</a>
+            </li>
+        </ul>
+    </div>
 
-        {% for type in room_types %}
-            {% if forloop.counter0|divisibleby:4 %}
-                <div class="row" align="center">
-            {% endif %}
-
-        <div class="col-lg-3 mb-3">
-            <div class="card h-100">
-                {% if type.photo %}
-                    {#          {{ type.photo }}#}
-                    {#          <a href="#"><img class="card-img-top" src="{{ type.photo.url }}" alt=""></a>#}
-                    <a href="#"><img class="card-img-top" src="/media/{{ type.photo }}" alt=""></a>
-                {% else %}
-                    <a href="#"><img class="card-img-top" src="/static/images/no_room1.png" alt=""></a>
-                {% endif %}
-                <h4 class="card-header">{{ type.type_name }}</h4>
-                <table class="table">
-                    <tbody>
-                    <tr>
-                        <td>ظرفیت</td>
-                        <td>{{ type.capacity_in_person }}</td>
-                    </tr>
-                    <tr>
-                        <td>قیمت یک شب:</td>
-                        <td>{{ type.cost_per_night }}</td>
-                    </tr>
-                    <tr>
-                    </tr>
-
-                    <tr>
-                        <td>امکانات:</td>
-                        <td>
-                            {% for feature, state in type.items %}
-                                {% if 'has_' in feature %}
-                                    {% if state %}
-                                        <span class="badge badge-success">{{ feature }}</span>
-                                    {% else %}
-                                        <span class="badge badge-danger">{{ feature }}</span>
-                                    {% endif %}
-                                {% endif %}
+    <div class="tab-content" id="tab-content">
+    <div class="tab-pane fade show active" id="rooms">
+        <div class="row">
+            <div id="sidebar-wrapper" class="col-3" style="padding-right: 90px;">
+                <br><br>
+                <form method="GET" enctype="multipart/form-data">
+                    <div class="form-group row">
+                        <label for="id_from_date" class="col-form-label">آغاز سفر</label>
+                        <div class="col-sm-9">
+                            <input type="text"
+                                   class="form-control {% if form.from_date.errors %}is-invalid{% endif %}"
+                                   id="id_from_date"
+                                   name="from_date" autocomplete="off" required value="{{ form.from_date.value }}">
+                        </div>
+                        <div style="text-align: right;color: brown">
+                            {% for error in form.from_date.errors %}
+                                {{ error }}
                             {% endfor %}
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="id_to_date" class="col-form-label">پایان سفر</label>
+                        <div class="col-sm-9">
+                            <input type="text"
+                                   class="form-control {% if form.to_date.errors %}is-invalid{% endif %}"
+                                   id="id_to_date"
+                                   name="to_date" autocomplete="off" required value="{{ form.to_date.value }}">
+                        </div>
+                        <div style="text-align: right;color: brown">
+                            {% for error in form.to_Date.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="id_persons" class="col-form-label">تعداد مسافران</label>
+                        <div class="col-sm-5">
+                            <input type="number"
+                                   class="form-control {% if form.persons.errors %}is-invalid{% endif %}"
+                                   id="id_persons"
+                                   name="persons" value="{{ form.persons.value }}">
+                        </div>
+                        <div style="text-align: right;color: brown">
+                            {% for error in form.persons.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-10" hidden>
+                            {% divisions_autocomplete_input default_value=form.division.value default_value_name=division_name errors=form.division.errors %}
+                        </div>
+                        <div style="text-align: right;color: brown">
+                            {% for error in form.division.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-0">
+                        <div class="col-md-8 offset-md-4">
+                            <button type="submit" class="btn btn-outline-primary" id="search">
+                                جستجو
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div id="list_of_ads" class="col-8">
+                <div class="container" align="right" id="features">
+                    <h2>اتاق‌ها</h2>
+
+                    {% for type in room_types %}
+                        {% if forloop.counter0|divisibleby:3 %}
+                            <div class="row" align="center">
+                        {% endif %}
+
+                    <div class="col-lg-4 mb-4">
+                        <div class="card h-100">
+                            {% if type.photo %}
+                                <a href="#"><img class="card-img-top" src="/media/{{ type.photo }}" alt=""></a>
+                            {% else %}
+                                <a href="#"><img class="card-img-top" src="/static/images/no_room1.png" alt=""></a>
+                            {% endif %}
+                            <h4 class="card-header">{{ type.type_name }}</h4>
+                            <table class="table">
+                                <tbody>
+                                <tr>
+                                    <td>ظرفیت</td>
+                                    <td>{{ type.capacity_in_person }}</td>
+                                </tr>
+                                <tr>
+                                    <td>قیمت یک شب:</td>
+                                    <td>{{ type.cost_per_night }}</td>
+                                </tr>
+                                <tr>
+                                    <td>امکانات:</td>
+                                    <td>
+                                        {% for feature, state in type.items %}
+                                            {% if 'has_' in feature %}
+                                                {% if state %}
+                                                    <span class="badge badge-success">✔ {{ feature }}</span>
+                                                {% else %}
+                                                    <span class="badge badge-danger">✘ {{ feature }}</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>سایر توضیحات:</td>
+                                    <td>{{ type.details }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
 
         <div class="card-footer">
           <form action="{% url 'reservation:reserve' %}" method="post">
@@ -151,24 +318,304 @@
           </form>
         </div>
 
-                <table class="table">
-                    <tr>
-                        <td>سایر توضیحات:</td>
-                        <td>{{ type.details }}</td>
-                    </tr>
-                </table>
+                        </div>
+                    </div>
 
+                    {% if forloop.counter0|add:1|divisibleby:3 or forloop.last %}
+                        </div>
+                    {% endif %}
+
+                    {% empty %}
+                        <h4>متاسفانه اتاقی برای این اقامتگاه با فیلترهای داده شده یافت نشد.</h4>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row tab-pane fade show" id="comments">
+    <div class="container" align="right">
+        <div id="list_of_comments" class="col-12">
+
+            <div class="container" align="right" id="features">
+                <h2>نظرات ثبت شده</h2>
+                {% for comment in comments %}
+                    <div class="row" align="center">
+                    <div class="col-lg-12 mb-12">
+                    <div class="card h-100">
+                        <h5 class="card-header date-time">نظر
+                            {{ comment.reservation.member.name }}
+                            ، ثبت شده در
+                            {{ comment.created_at }}</h5>
+
+                        <div class="row">
+                            <div class="col-4">
+                                <table class="table">
+                                    <tbody>
+                                    <tr>
+                                        <td>اقامت در اتاق:</td>
+                                        <td>{{ comment.reservation.room }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>تاریخ آغاز اقامت:</td>
+                                        <td class="date-time">{{ comment.reservation.from_date }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>تاریخ پایان اقامت:</td>
+                                        <td class="date-time">{{ comment.reservation.to_date }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>امتیاز:</td>
+                                        <td>
+                                            {% if comment.rating %}
+                                                {% if comment.rating == 1 %}
+                                                    <span class="fas fa-angry checked"></span>
+                                                    <span class="fas fa-angry not-checked"></span>
+                                                    <span class="fas fa-angry not-checked"></span>
+                                                    <span class="fas fa-angry not-checked"></span>
+                                                    <span class="fas fa-angry not-checked"></span>
+                                                {% elif comment.rating == 2 %}
+                                                    <span class="fas fa-frown checked"></span>
+                                                    <span class="fas fa-frown checked"></span>
+                                                    <span class="fas fa-frown not-checked"></span>
+                                                    <span class="fas fa-frown not-checked"></span>
+                                                    <span class="fas fa-frown not-checked"></span>
+                                                {% elif comment.rating == 3 %}
+                                                    <span class="fas fa-meh checked"></span>
+                                                    <span class="fas fa-meh checked"></span>
+                                                    <span class="fas fa-meh checked"></span>
+                                                    <span class="fas fa-meh not-checked"></span>
+                                                    <span class="fas fa-meh not-checked"></span>
+                                                {% elif comment.rating == 4 %}
+                                                    <span class="fas fa-smile checked"></span>
+                                                    <span class="fas fa-smile checked"></span>
+                                                    <span class="fas fa-smile checked"></span>
+                                                    <span class="fas fa-smile checked"></span>
+                                                    <span class="fas fa-smile not-checked"></span>
+                                                {% else %}
+                                                    <span class="fas fa-laugh-beam checked"></span>
+                                                    <span class="fas fa-laugh-beam checked"></span>
+                                                    <span class="fas fa-laugh-beam checked"></span>
+                                                    <span class="fas fa-laugh-beam checked"></span>
+                                                    <span class="fas fa-laugh-beam checked"></span>
+                                                {% endif %}
+                                            {% else %}
+                                                امتیازی برای این نظر داده نشده
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>متن نظر:</td>
+                                        <td>
+                                            {% if comment.review %}
+                                                {{ comment.review }}
+                                            {% else %}
+                                                متنی برای این نظر ثبت نشده
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                            <div class="col-4">
+                                <h6>تصاویر ثبت شده برای این نظر:</h6>
+                                {% if comment.photos.all.exists %}
+                                    <div id="carousel_photo_{{ comment.id }}" class="carousel slide"
+                                         data-ride="carousel">
+                                    <ol class="carousel-indicators">
+                                        {% for photo in comment.photos.all %}
+                                            {% if forloop.counter == 1 %}
+                                                <li data-target="#carousel_photo_{{ comment.id }}"
+                                                    data-slide-to={{ forloop.counter0 }} class="active"></li>
+                                            {% else %}
+                                                <li data-target="#carousel_photo_{{ comment.id }}"
+                                                    data-slide-to={{ forloop.counter0 }}></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ol>
+
+                                    <div class="carousel-inner" role="listbox">
+                                        {% for photo in comment.photos.all %}
+                                            {% if forloop.counter0 == 0 %}
+                                                <div class="carousel-item carousel-item-place-comment-photo active"
+                                                     style="background-image: url({{ photo.photo.url }})">
+                                            {% else %}
+                                                <div class="carousel-item carousel-item-place-comment-photo"
+                                                     style="background-image: url({{ photo.photo.url }})">
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+
+                                        </div>
+
+                                        <a class="carousel-control-prev" href="#carousel_photo_{{ comment.id }}"
+                                           role="button"
+                                           data-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="sr-only">Previous</span>
+                                        </a>
+                                        <a class="carousel-control-next" href="#carousel_photo_{{ comment.id }}"
+                                           role="button"
+                                           data-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="sr-only">Next</span>
+                                        </a>
+                                    </div>
+                                    <br>
+                                {% else %}
+                                    تصویری برای این نظر ثبت نشده است.
+                                {% endif %}
+
+                                </div>
+
+
+                                <div class="col-4">
+                                    <h6>ویدیوهای ثبت شده برای این نظر:</h6>
+                                    {% if comment.videos.all.exists %}
+                                        <div id="carousel_video_{{ comment.id }}" class="carousel slide"
+                                             data-ride="carousel">
+                                        <ol class="carousel-indicators">
+                                            {% for video in comment.videos.all %}
+                                                {% if forloop.counter == 1 %}
+                                                    <li data-target="#carousel_video_{{ comment.id }}"
+                                                        data-slide-to={{ forloop.counter0 }} class="active"></li>
+                                                {% else %}
+                                                    <li data-target="#carousel_video_{{ comment.id }}"
+                                                        data-slide-to={{ forloop.counter0 }}></li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ol>
+
+
+                                        <div class="carousel-inner" role="listbox">
+                                            {% for video in comment.videos.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <div class="carousel-item carousel-item-place-comment-photo active">
+                                                    <video width="320" height="320" controls>
+                                                        <source src="{{ video.video.url }}"
+                                                                type="video/mp4">
+                                                    </video>
+                                                {% else %}
+                                                    <div class="carousel-item carousel-item-place-comment-photo">
+                                                    <video width="320" height="320" controls>
+                                                        <source src="{{ video.video.url }}"
+                                                                type="video/mp4">
+                                                    </video>
+                                                {% endif %}
+                                            </div>
+                                            {% endfor %}
+
+                                            </div>
+
+                                            <a class="carousel-control-prev" href="#carousel_video_{{ comment.id }}"
+                                               role="button"
+                                               data-slide="prev">
+                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                <span class="sr-only">Previous</span>
+                                            </a>
+                                            <a class="carousel-control-next" href="#carousel_video_{{ comment.id }}"
+                                               role="button"
+                                               data-slide="next">
+                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                <span class="sr-only">Next</span>
+                                            </a>
+                                        </div>
+                                        <br>
+                                    {% else %}
+                                        ویدیویی برای این نظر ثبت نشده است.
+                                    {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <br>
+                {% empty %}
+                    <h4>هنوز نظری برای این مکان دیدنی ثبت نشده است.</h4>
+                {% endfor %}
+
+                </div>
+                </div>
             </div>
         </div>
 
-        {% if forloop.counter0|add:1|divisibleby:4 or forloop.counter == ss|length %}
-            </div>
-        {% endif %}
+        <div class="row tab-pane fade show" id="reservations">
 
-        {% empty %}
-            <h4>متاسفانه اتاقی برای این اقامتگاه ثبت نشده است.</h4>
-        {% endfor %}
+            <div class="container" align="right" id="features">
+                <h3>رزروهای قبلی شما از این اقامتگاه</h3>
+
+                {% for reservation_group in reservations|group_by:4 %}
+                    <div class="row" align="center">
+                        {% for reservation in reservation_group %}
+                            <div class="col-lg-3 mb-3">
+                                <div class="card h-100">
+                                    {% if reservation.room.photo %}
+                                        <img class="card-img-top" src="/media/{{ reservation.room.photo }}" alt="">
+                                    {% else %}
+                                        <img class="card-img-top" src="/static/images/no_room1.png" alt="">
+                                    {% endif %}
+
+                                    <h5 class="card-header">اتاق {{ reservation.room }}</h5>
+
+                                    <table class="table">
+                                        <tbody>
+                                        <tr>
+                                            <td>از تاریخ:</td>
+                                            <td class="date-time">{{ reservation.from_date }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>تا تاریخ:</td>
+                                            <td class="date-time">{{ reservation.to_date }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>فعال شده:</td>
+                                            <td>
+                                                {% if reservation.is_active %}
+                                                    <span class="fas fa-check-circle" style="color: green"></span>
+                                                {% else %}
+                                                    <span class="fas fa-times-circle" style="color: red"></span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <br><br>
+                                    <div class="card-footer">
+                                        {% if reservation.comment or not reservation.is_active %}
+                                            <a href="#" class="btn btn-primary disabled">ثبت نظر</a>
+                                        {% else %}
+                                            <button onclick="window.location='{% url 'reservation:create_reservation_comment' reservation_pk=reservation.id %}'+window.location.search;"
+                                                    class="btn btn-primary">ثبت نظر
+                                            </button>
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% empty %}
+                    <h4>شما تا کنون از این اقامتگاه رزروی انجام نداده‌اید.</h4>
+                {% endfor %}
+
+
+            </div>
+
+        </div>
 
     </div>
+
     <script src="/static/Translator.js"></script>
+{% endblock %}
+
+{% block extra_script %}
+    <script src="{% static 'datepickers.js' %}"></script>
 {% endblock %}
