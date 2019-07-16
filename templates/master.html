@@ -32,12 +32,7 @@
 
 </head>
 <body dir="rtl">
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <!-- navbar place holder -->
-    <div class="container">
-        <a class="navbar-brand" href="{% url 'habitats:home' %}">کاخ‌نشین</a>
-    </div>
-</nav>
+
 <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container">
         <a class="navbar-brand" href="{% url 'habitats:home' %}">کاخ‌نشین</a>
@@ -124,6 +119,9 @@
                                     برداشت‌ها</a>
                             {% endif %}
                         </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'reservation:list' %}" id="bookings">لیست رزروها</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'users:logout' %}" id="logout">خروج</a>
