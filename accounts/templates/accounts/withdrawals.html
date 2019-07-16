@@ -20,6 +20,11 @@
                                             {{ field.label_tag }}
                                         </div>
                                         <div class="col-md-6">
+                                            {% if field.errors %}
+                                                <div class="alert alert-danger">
+                                                    <strong>{{ field.errors|striptags }}</strong>
+                                                </div>
+                                            {% endif %}
                                             {{ field }}
                                         </div>
                                     </div>
@@ -38,21 +43,23 @@
             </div>
         </div>
         <div class="col-md-8" align="center">
-            {% if form.errors %}
-                <!-- Error messaging -->
-                <div id="form_errors" style="background: #ffcccc;">
-                    <div class="inner">
-                        <p>خطاهای زیر پیش آمده:</p>
-                        {{ form.non_field_errors }}
-                        <ul>
-                            {% for field in form %}
-                                {% if field.errors %}
-                                    <li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            {% endif %}
+
+        {% if form.errors %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" id="form_errors" align="center"
+                 style="margin-top: 20px">
+                <ul>
+                    <strong>خطاهای زیر پیش آمده:</strong>
+                    {{ form.non_field_errors }}
+                    {% for field in form %}
+                        {% if field.errors %}
+                            <li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                    {% endfor %}
+                </ul>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endif %}
         </div>
 </div>
     <script src="/static/Translator.js"></script>

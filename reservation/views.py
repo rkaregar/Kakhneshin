@@ -1,9 +1,11 @@
 import re
-from datetime import datetime
+from datetime import datetime, date
 
+from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import View, TemplateView, ListView, UpdateView, CreateView
+from django.views.generic import View, TemplateView, ListView, UpdateView, CreateView, DetailView
 from reservation.forms import ReservationForm
 from reservation.models import Reservation
 
@@ -80,6 +82,20 @@ class ReservationListView(ListView):
         return Reservation.objects.filter(member=self.request.user.member)
 
 
+class ReservationCancelView(View):
+
+    @staticmethod
+    def post(request, reservation_id):
+        reservation = get_object_or_404(Reservation, id=reservation_id)
+        if reservation.member.user.id != request.user.id:
+            return HttpResponse(status=404)
+        if reservation.cancel():
+            messages.add_message(request, level=messages.INFO, message='رزرو با موفقیت لغو شد.')
+        else:
+            messages.add_message(request, level=messages.ERROR, message='لغو رزرو امکان پذیر نیست.')
+        return redirect(reverse_lazy('reservation:list'))
+
+
 class ReservationCreateView(CreateView):
 
     form_class = ReservationForm
@@ -93,3 +109,9 @@ class ReservationCreateView(CreateView):
 
     def form_invalid(self, form):
         return render(self.request, self.template_name, {'form': form})
+
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.INFO, 'رزرو با موفقیت انجام شد.')
+        return super().form_valid(form)
+
+

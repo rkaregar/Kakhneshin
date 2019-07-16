@@ -1,13 +1,30 @@
 {% extends "master.html" %}
 
 {% block content %}
-    <div>
-        رزرو با موفقیت انجام شد.
+    <div class="container">
+      <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <th>شناسه</th>
+            <th>توضیحات</th>
+            <th>وضعیت</th>
+            <th>لغو</th>
+            </thead>
         {% for reservation in object_list %}
-            <div class="row">
-                {{ reservation }}
-            </div>
+            <tr>
+                <td>{{ reservation.id }}</td>
+                <td>{{ reservation }}</td>
+                <td>{% if reservation.is_active %}فعال{% else %}لغو‌شده{% endif %}</td>
+                <td>
+                    {% if reservation.can_cancel %}
+                    <form action="{% url 'reservation:cancel' reservation.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">لغو</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
         {% endfor %}
+        </table>
     </div>
 {% endblock content %}
 
