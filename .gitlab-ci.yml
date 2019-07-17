@@ -23,6 +23,7 @@ deploy:
   image: joyzoursky/python-chromedriver:3.7-selenium
   stage: deploy
   script:
+  - python manage.py import_geographic_divisions iran_divisions.json
   - apt-get update -qy
   - apt-get install -y ruby-dev
   - gem install dpl

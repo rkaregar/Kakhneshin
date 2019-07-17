@@ -307,16 +307,16 @@
                                 </tr>
                                 </tbody>
                             </table>
-
-        <div class="card-footer">
-          <form action="{% url 'reservation:reserve' %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="room" value="{{ type.id }}">
-            <input type="hidden" name="from_date" value="{{ from_date }}">
-            <input type="hidden" name="to_date" value="{{ to_date }}">
-            <input type="submit" class="btn btn-primary" value="رزور اتاق">
-          </form>
-        </div>
+                            <br><br>
+                            <div class="card-footer">
+                                <form action="{% url 'reservation:reserve' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="room" value="{{ type.id }}">
+                                    <input type="hidden" name="from_date" value="{{ from_date }}">
+                                    <input type="hidden" name="to_date" value="{{ to_date }}">
+                                    <input type="submit" class="btn btn-primary" value="رزور اتاق">
+                                </form>
+                            </div>
 
                         </div>
                     </div>

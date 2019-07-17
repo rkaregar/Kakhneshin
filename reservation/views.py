@@ -88,15 +88,9 @@ class ReservationHabitatView(ListView):
         context['comments'] = ReservationComment.objects.filter(reservation__room__habitat=habitat).order_by(
             '-created_at')
 
-        context['form'] = {}
-        context['form']['persons'] = self.request.GET.get('persons', None)
-        context['form']['from_date'] = self.request.GET.get('from_date', None)
-        context['form']['to_date'] = self.request.GET.get('to_date', None)
-        context['form']['division'] = self.request.GET.get('division', None)
-
         roomtypes = context['habitat'].roomtype_set.all()
         if 'persons' in self.request.GET:
-            roomtypes = roomtypes.filter(capacity_in_person=2)
+            roomtypes = roomtypes.filter(capacity_in_person=self.request.GET['persons'])
         if 'from_date' and 'to_date' in self.request.GET:
             from_date = datetime.strptime(self.request.GET['from_date'], '%Y-%m-%d')
             to_date = datetime.strptime(self.request.GET['to_date'], '%Y-%m-%d')
@@ -107,7 +101,6 @@ class ReservationHabitatView(ListView):
             context['from_date'] = from_date.strftime('%m/%d/%Y')
             context['to_date'] = to_date.strftime('%m/%d/%Y')
         context['room_types'] = roomtypes.values()
-
 
         return context
 
@@ -153,9 +146,7 @@ class ReservationCommentView(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-
 class ReservationListView(ListView):
-
     template_name = 'reservation/list.html'
 
     def get_queryset(self):
@@ -177,7 +168,6 @@ class ReservationCancelView(View):
 
 
 class ReservationCreateView(CreateView):
-
     form_class = ReservationForm
     template_name = 'reservation/error.html'
     success_url = reverse_lazy('reservation:list')
@@ -193,5 +183,3 @@ class ReservationCreateView(CreateView):
     def form_valid(self, form):
         messages.add_message(self.request, messages.INFO, 'رزرو با موفقیت انجام شد.')
         return super().form_valid(form)
-
-
