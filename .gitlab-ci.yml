@@ -23,13 +23,6 @@ deploy:
   image: joyzoursky/python-chromedriver:3.7-selenium
   stage: deploy
   script:
-  - sudo apt-get update -yq > /dev/null
-  - sudo apt-get install -yq virtualenv libpq-dev python3-dev build-essential > /dev/null
-  - virtualenv -p /usr/bin/python3 venv > /dev/null
-  - source venv/bin/activate
-  - pip install -r requirements.txt
-  - python manage.py import_geographic_divisions iran_divisions.json
-
   - apt-get update -qy
   - apt-get install -y ruby-dev
   - gem install dpl
