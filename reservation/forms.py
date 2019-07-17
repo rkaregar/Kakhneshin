@@ -68,7 +68,7 @@ class ReservationForm(ModelForm):
                 from_user=self.member.user, to_user=None, amount=self.cost, verified=True
             )
             self.instance.fee_transaction = Transaction.objects.create(
-                from_user=self.member.user, to_user=self.instance.room.habitat.owner.user,
+                from_user=None, to_user=self.instance.room.habitat.owner.user,
                 amount=self.cost * (1 - settings.RESERVATION_FEE), verified=False
             )
         return super().save(commit)
