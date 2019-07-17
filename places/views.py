@@ -19,7 +19,7 @@ class PlaceCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
     def form_valid(self, form):
         if self.request.user.member:
-            form.instance.owner = self.request.user.member
+            form.instance.creator = self.request.user.member
         return super(PlaceCreateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):
@@ -45,7 +45,7 @@ class PlaceUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return self.place
 
     def user_passed_test(self, request):
-        return request.user.is_superuser or self.place.creator == self.request.user.member
+        return request.user.is_superuser or self.place.creator.user == self.request.user
         # return request.user.is_superuser
 
     def get_context_data(self, **kwargs):
@@ -79,7 +79,7 @@ class PlaceDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
         return self.place
 
     def user_passed_test(self, request):
-        return request.user.is_superuser or self.place.creator == self.request.user.member
+        return request.user.is_superuser or self.place.creator.user == self.request.user
         # return request.user.is_superuser
 
     def dispatch(self, request, *args, **kwargs):
@@ -98,7 +98,7 @@ class PlaceListView(ListView):
         qs = super(PlaceListView, self).get_queryset()
 
         if not self.request.user.is_superuser:
-            qs = qs.filter(creator=self.request.user.member)
+            qs = qs.filter(creator__user=self.request.user)
 
         return qs
 
@@ -131,7 +131,7 @@ class PlaceTinyDetailView(DetailView):
         return context
 
     def user_passed_test(self, request):
-        return request.user.is_authenticated
+        return True
         # return request.user.is_superuser
 
     def dispatch(self, request, *args, **kwargs):
