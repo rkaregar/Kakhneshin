@@ -83,8 +83,11 @@ class ReservationHabitatView(ListView):
         context['habitat'] = habitat
         context['distances'] = DistanceHabitatToPlace.objects.filter(
             habitat_id=self.kwargs.get('habitat_pk', None)).order_by('distance')
-        context['reservations'] = Reservation.objects.filter(room__habitat=habitat,
-                                                             member__user=self.request.user).order_by('-to_date')
+
+        if self.request.user.is_authenticated:
+            context['reservations'] = Reservation.objects.filter(room__habitat=habitat,
+                                                                 member__user=self.request.user).order_by('-to_date')
+
         context['comments'] = ReservationComment.objects.filter(reservation__room__habitat=habitat).order_by(
             '-created_at')
 
@@ -103,6 +106,20 @@ class ReservationHabitatView(ListView):
         context['room_types'] = roomtypes.values()
 
         return context
+
+    def post(self, request, **kwargs):
+        self.object_list = self.get_queryset()
+        context = self.get_context_data(**kwargs)
+
+        comment_id = request.POST.get('comment_id', None)
+        comment = ReservationComment.objects.get(pk=comment_id)
+        if self.request.user == comment.reservation.member.user:
+            comment.delete()
+            context['messages'] = ['نظر شما با موفقیت حذف شد.', ]
+        else:
+            context['errors'] = ['شما تنها مجاز به حذف نظرات ثبت شده توسط خود هستید.', ]
+
+        return self.render_to_response(context)
 
 
 class ReservationCommentView(LoginRequiredMixin, TemplateView):

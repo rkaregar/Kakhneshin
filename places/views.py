@@ -146,22 +146,32 @@ class PlaceTinyDetailView(DetailView):
         self.object = self.get_object()
         context = self.get_context_data(**kwargs)
 
-        rating = request.POST.get('rating', None)
-        if rating == '':
-            rating = None
-        review = request.POST.get('review', None)
-
-        if not rating and not review:
-            context['errors'] = ['ثبت حداقل یکی از موارد امتیاز یا متن نظر الزامیست']
+        if request.POST.get('delete', None):
+            comment_id = request.POST.get('comment_id', None)
+            comment = PlaceComment.objects.get(pk=comment_id)
+            if self.request.user == comment.writer.user:
+                comment.delete()
+                context['messages'] = ['نظر شما با موفقیت حذف شد.', ]
+            else:
+                context['errors'] = ['شما تنها مجاز به حذف نظرات ثبت شده توسط خود هستید.', ]
         else:
-            place_comment = PlaceComment.objects.create(place_id=self.kwargs.get('place_pk', None),
-                                                        writer=self.request.user.member, rating=rating, review=review)
+            rating = request.POST.get('rating', None)
+            if rating == '':
+                rating = None
+            review = request.POST.get('review', None)
 
-            if self.request.FILES:
-                for image in self.request.FILES.getlist('image'):
-                    PlaceCommentPhoto.objects.create(place_comment=place_comment, photo=image)
-                for video in self.request.FILES.getlist('video'):
-                    PlaceCommentVideo.objects.create(place_comment=place_comment, video=video)
+            if not rating and not review:
+                context['errors'] = ['ثبت حداقل یکی از موارد امتیاز یا متن نظر الزامیست']
+            else:
+                place_comment = PlaceComment.objects.create(place_id=self.kwargs.get('place_pk', None),
+                                                            writer=self.request.user.member, rating=rating,
+                                                            review=review)
+
+                if self.request.FILES:
+                    for image in self.request.FILES.getlist('image'):
+                        PlaceCommentPhoto.objects.create(place_comment=place_comment, photo=image)
+                    for video in self.request.FILES.getlist('video'):
+                        PlaceCommentVideo.objects.create(place_comment=place_comment, video=video)
 
         return self.render_to_response(context)
 

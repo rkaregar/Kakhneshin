@@ -42,7 +42,7 @@
                     <label for="id_persons" class="col-form-label">تعداد مسافران</label>
                     <div class="col-sm-5">
                         <input type="number" class="form-control {% if form.persons.errors %}is-invalid{% endif %}"
-                               id="id_persons"
+                               id="id_persons" min="1"
                                name="persons" value="{{ form.persons.value }}">
                     </div>
                     <div style="text-align: right;color: brown">
