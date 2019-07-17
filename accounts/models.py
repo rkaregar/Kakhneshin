@@ -6,7 +6,7 @@ from django.db.models import Sum
 
 
 class Transaction(models.Model):
-    created = models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')
+    created = models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد', editable=True)
     modified = models.DateTimeField(auto_now=True, verbose_name='زمان تغییر')
     amount = models.PositiveIntegerField(verbose_name='مبلغ')
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True,

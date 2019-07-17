@@ -2,7 +2,7 @@ from django.urls import path
 
 from habitats.views.geographic_divisions_views import GeographicDivisionsSearchView
 from habitats.views.habitat_views import HabitatTinyDetailView, HomeView, HabitatListView, \
-    HabitatCreateView, HabitatDeleteView, HabitatUpdateView, DistanceToPlacesView, HabitatStatsView
+    HabitatCreateView, HabitatDeleteView, HabitatUpdateView, DistanceToPlacesView, HabitatStatsView, HabitatAllStatsView
 from habitats.views.room_views import RoomTypeCreateView, RoomTypeDeleteView, RoomTypeUpdateView, RoomTypeDetailView, \
     RoomOutOfServiceView
 
@@ -10,6 +10,7 @@ urlpatterns = [
     path('home/', HomeView.as_view(), name='home'),
     path('', HabitatListView.as_view(), name='all'),
     path('create/', HabitatCreateView.as_view(), name='habitat_create'),
+    path('stats/', HabitatAllStatsView.as_view(), name='habitat_all_stats'),
     path('<int:habitat_pk>/stats/', HabitatStatsView.as_view(), name='habitat_stats'),
     path('<int:habitat_pk>/delete/', HabitatDeleteView.as_view(), name='delete'),
     path('<int:habitat_pk>/update/', HabitatUpdateView.as_view(), name='habitat_update'),
