@@ -44,6 +44,11 @@ class TestReservation(SeleniumTestCase):
         button = self.selenium_client.web_driver.find_elements_by_tag_name('input')[-1]
         button.location_once_scrolled_into_view
         button.click()
+        sleep(1)
+        button = self.selenium_client.web_driver.find_elements_by_tag_name('a')[-1]
+        button.location_once_scrolled_into_view
+        button.click()
+        sleep(1)
         self.assertEqual(Transaction.get_balance_from_user(self.user), 10000000 - self.cost_per_day * 2)
 
     def get_cancel_buttons(self):
@@ -57,9 +62,9 @@ class TestReservation(SeleniumTestCase):
         today = date.today()
         for date_pair in (
                 (today - timedelta(days=1), today),
-                (today + timedelta(days=4), today + timedelta(days=6)),
-                (today + timedelta(days=9), today + timedelta(days=11)),
-                (today + timedelta(days=14), today + timedelta(days=16)),
+                (today + timedelta(days=5), today + timedelta(days=7)),
+                (today + timedelta(days=10), today + timedelta(days=12)),
+                (today + timedelta(days=15), today + timedelta(days=17)),
         ):
             self.selenium_client.get('/reservation/{}/?from_date={}&to_date={}'.format(
                 self.habitat.id,
@@ -68,6 +73,11 @@ class TestReservation(SeleniumTestCase):
             button = self.selenium_client.web_driver.find_elements_by_tag_name('input')[-1]
             button.location_once_scrolled_into_view
             button.click()
+            sleep(1)
+            button = self.selenium_client.web_driver.find_elements_by_tag_name('a')[-1]
+            button.location_once_scrolled_into_view
+            button.click()
+            sleep(1)
         self.assertEqual(Transaction.get_balance_from_user(self.user), 10000000 - self.cost_per_day * 6)
 
         # do a little stupid thing to travel in the time
@@ -88,6 +98,7 @@ class TestReservation(SeleniumTestCase):
         self.assertEqual(len(cancel_buttons), 1)
 
         cancel_buttons[0].click()
+        sleep(1)
 
         cancel_buttons = self.get_cancel_buttons()
         self.assertEqual(len(cancel_buttons), 0)
@@ -109,6 +120,11 @@ class TestReservation(SeleniumTestCase):
         button = self.selenium_client.web_driver.find_elements_by_tag_name('input')[-1]
         button.location_once_scrolled_into_view
         button.click()
+        sleep(1)
+        button = self.selenium_client.web_driver.find_elements_by_tag_name('a')[-1]
+        button.location_once_scrolled_into_view
+        button.click()
+        sleep(1)
         self.assertIn('امروز', self.selenium_client.web_driver.page_source)
 
         self.selenium_client.get('/reservation/{}/?from_date={}&to_date={}'.format(
@@ -119,4 +135,9 @@ class TestReservation(SeleniumTestCase):
         button = self.selenium_client.web_driver.find_elements_by_tag_name('input')[-1]
         button.location_once_scrolled_into_view
         button.click()
+        sleep(1)
+        button = self.selenium_client.web_driver.find_elements_by_tag_name('a')[-1]
+        button.location_once_scrolled_into_view
+        button.click()
+        sleep(1)
         self.assertIn('شارژ', self.selenium_client.web_driver.page_source)
