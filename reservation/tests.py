@@ -33,14 +33,13 @@ class TestReservation(SeleniumTestCase):
 
         self.selenium_client.login('ali', 'hello')
 
-
     @override_settings(DEBUG=True)
     def test_reserve_success(self):
         Transaction.objects.create(from_user=None, to_user=self.user, amount=10000000, verified=True)
         self.selenium_client.get('/reservation/{}/?from_date={}&to_date={}'.format(
             self.habitat.id,
             date.today() + timedelta(days=50),
-            date.today() + timedelta(days=51),
+            date.today() + timedelta(days=52),
         ))
         button = self.selenium_client.web_driver.find_elements_by_tag_name('input')[-1]
         button.location_once_scrolled_into_view
@@ -58,9 +57,9 @@ class TestReservation(SeleniumTestCase):
         today = date.today()
         for date_pair in (
                 (today - timedelta(days=1), today),
-                (today + timedelta(days=5), today + timedelta(days=6)),
-                (today + timedelta(days=10), today + timedelta(days=11)),
-                (today + timedelta(days=15), today + timedelta(days=16)),
+                (today + timedelta(days=4), today + timedelta(days=6)),
+                (today + timedelta(days=9), today + timedelta(days=11)),
+                (today + timedelta(days=14), today + timedelta(days=16)),
         ):
             self.selenium_client.get('/reservation/{}/?from_date={}&to_date={}'.format(
                 self.habitat.id,
@@ -79,7 +78,6 @@ class TestReservation(SeleniumTestCase):
 
         self.selenium_client.get('/reservation/list')
 
-
         cancel_buttons = self.get_cancel_buttons()
         self.assertEqual(len(cancel_buttons), 2)
 
@@ -94,7 +92,6 @@ class TestReservation(SeleniumTestCase):
         cancel_buttons = self.get_cancel_buttons()
         self.assertEqual(len(cancel_buttons), 0)
 
-
         punishment = self.cost_per_day * 2 * settings.CANCELLATION_FEE * 5
         self.assertEqual(
             Transaction.get_balance_from_user(self.user),
@@ -106,13 +103,9 @@ class TestReservation(SeleniumTestCase):
             self.cost_per_day * 2 * (1 - settings.RESERVATION_FEE) + punishment
         )
 
-
-
-
-
     @override_settings(DEBUG=True)
     def test_reserve_failure(self):
-        self.selenium_client.get('/reservation/{}/?from_date=2019-07-07&to_date=2019-07-07'.format(self.habitat.id))
+        self.selenium_client.get('/reservation/{}/?from_date=2019-07-07&to_date=2019-07-08'.format(self.habitat.id))
         button = self.selenium_client.web_driver.find_elements_by_tag_name('input')[-1]
         button.location_once_scrolled_into_view
         button.click()
@@ -121,11 +114,9 @@ class TestReservation(SeleniumTestCase):
         self.selenium_client.get('/reservation/{}/?from_date={}&to_date={}'.format(
             self.habitat.id,
             date.today() + timedelta(days=50),
-            date.today() + timedelta(days=51),
+            date.today() + timedelta(days=52),
         ))
         button = self.selenium_client.web_driver.find_elements_by_tag_name('input')[-1]
         button.location_once_scrolled_into_view
         button.click()
         self.assertIn('شارژ', self.selenium_client.web_driver.page_source)
-
-
