@@ -84,6 +84,7 @@ class TestReservation(SeleniumTestCase):
         self.assertEqual(len(cancel_buttons), 2)
 
         cancel_buttons[0].click()
+        sleep(1)
 
         cancel_buttons = self.get_cancel_buttons()
         self.assertEqual(len(cancel_buttons), 1)
@@ -93,10 +94,19 @@ class TestReservation(SeleniumTestCase):
         cancel_buttons = self.get_cancel_buttons()
         self.assertEqual(len(cancel_buttons), 0)
 
+
+        punishment = self.cost_per_day * 2 * settings.CANCELLATION_FEE * 5
         self.assertEqual(
             Transaction.get_balance_from_user(self.user),
-            10000000 - self.cost_per_day * 2 - self.cost_per_day * 2 * settings.CANCELLATION_FEE
+            10000000 - self.cost_per_day * 2 - punishment
         )
+
+        self.assertEqual(
+            Transaction.get_balance_from_user(self.habitat_owner_user),
+            self.cost_per_day * 2 * (1 - settings.RESERVATION_FEE) + punishment
+        )
+
+
 
 
 
