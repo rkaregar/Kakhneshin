@@ -1,6 +1,7 @@
 from datetime import datetime
 import re
 from datetime import datetime, date
+from urllib.parse import urlencode
 
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, TemplateView
@@ -163,14 +164,14 @@ class ReservationCommentView(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class ReservationListView(ListView):
+class ReservationListView(LoginRequiredMixin, ListView):
     template_name = 'reservation/list.html'
 
     def get_queryset(self):
         return Reservation.objects.filter(member=self.request.user.member)
 
 
-class ReservationCancelView(View):
+class ReservationCancelView(LoginRequiredMixin, View):
 
     @staticmethod
     def post(request, reservation_id):
@@ -184,10 +185,13 @@ class ReservationCancelView(View):
         return redirect(reverse_lazy('reservation:list'))
 
 
-class ReservationCreateView(CreateView):
+class ReservationCreateView(LoginRequiredMixin, CreateView):
     form_class = ReservationForm
     template_name = 'reservation/error.html'
     success_url = reverse_lazy('reservation:list')
+
+    def get(self, request, habitat_pk):
+        return redirect(reverse_lazy('reservation:habitat', args=(habitat_pk,)) + '?' + urlencode(request.GET))
 
     def get_form_kwargs(self):
         super_kwargs = super().get_form_kwargs()

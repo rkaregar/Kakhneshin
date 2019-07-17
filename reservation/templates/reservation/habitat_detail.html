@@ -320,7 +320,8 @@
                                     <input type="hidden" name="from_date" value="{{ from_date }}">
                                     <input type="hidden" name="to_date" value="{{ to_date }}">
 
-                                    <input type="button" name="btn" value="رزرو اتاق" id="submitBtn_{{ type.id }}"
+                                    <input type="{% if request.user.is_authenticated %}button{% else %}submit{% endif %}"
+                                           name="btn" value="رزرو اتاق" id="submitBtn_{{ type.id }}"
                                            data-toggle="modal"
                                            data-target="#confirm-submit-{{ type.id }}" class="btn btn-primary"/>
                                 </form>
