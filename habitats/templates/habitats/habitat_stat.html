@@ -16,22 +16,7 @@
     {{ income_graph|safe }}
     <p>انواع اتاق‌های شما</p>
     {{ rooms_graph|safe }}
-    <p>انواع اتاق‌های شما در گذر زمان</p>
-    <label for="daterange" class="col-sm-3 col-form-label text-md-right">بازهٔ از دسترس خارج
-                        بودن</label>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control" name="daterange" id="daterange" value=""
-                               style="width: 200px" required/>
-                        <script>
-                            $(function () {
-                                $('input[name="daterange"]').daterangepicker({
-                                    opens: 'left'
-                                }, function (start, end, label) {
-                                    console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-                                });
-                            });
-                        </script>
-                    </div>
+    <p>انواع اتاق‌های شما در گذر زمان</p
     {{ rooms_time_graph|safe }}
 
 

@@ -13,7 +13,7 @@ from accounts.models import Transaction
 from habitats.forms import HabitatStatForm
 from habitats.models import Habitat, RoomType
 from places.models import Place, DistanceHabitatToPlace
-from reservation.models import Reservation, ReservationComment
+from reservation.models import Reservation, ReservationComment, Reservation
 
 import plotly as py
 import plotly.graph_objs as go
@@ -212,7 +212,9 @@ class HabitatStatsView(LoginRequiredMixin, TemplateView):
             reserved_room_types[room_type.type_name] = num_of_reserved_today
             ready_room_types[
                 room_type.type_name] = room_type.number_of_rooms_of_this_kind - num_of_reserved_today - num_of_disabled_today
-            room_types[room_type.type_name] = room_type.get_reserve_ready_out_count_list(timezone.now(), timezone.now()+timezone.timedelta(days=30))
+            room_types[room_type.type_name] = room_type.get_reserve_ready_out_count_list(timezone.now(),
+                                                                                         timezone.now() + timezone.timedelta(
+                                                                                             days=30))
 
         ready_rooms_trace = go.Bar(x=list(ready_room_types.keys()), y=list(ready_room_types.values()),
                                    name='آماده برای رزرو شدن')
@@ -228,17 +230,17 @@ class HabitatStatsView(LoginRequiredMixin, TemplateView):
         rooms_fig = go.Figure(data=rooms_data, layout=stack_bar_layout)
         rooms_div = py.offline.plot(rooms_fig, auto_open=False, output_type='div')
         context['rooms_graph'] = rooms_div
-        dates = [timezone.now()+timezone.timedelta(i) for i in range(30)]
+        dates = [timezone.now() + timezone.timedelta(i) for i in range(30)]
         rooms_time_data = []
         for type_name, reserved_ready_out_list in room_types.items():
-            reserveds, readys, outs = [],[],[]
+            reserveds, readys, outs = [], [], []
             for res, rea, out in reserved_ready_out_list:
                 reserveds.append(res)
                 readys.append(rea)
                 outs.append(out)
-            trace_res = go.Scatter(x=dates, y=reserveds, name=type_name+' '+' رزرو شده')
-            trace_rea = go.Scatter(x=dates, y=readys, name=type_name+' '+'آماده‌')
-            trace_out = go.Scatter(x=dates, y=outs, name=type_name+' '+'خارج از سرویس')
+            trace_res = go.Scatter(x=dates, y=reserveds, name=type_name + ' ' + ' رزرو شده')
+            trace_rea = go.Scatter(x=dates, y=readys, name=type_name + ' ' + 'آماده‌')
+            trace_out = go.Scatter(x=dates, y=outs, name=type_name + ' ' + 'خارج از سرویس')
             rooms_time_data += [trace_res, trace_rea, trace_out]
         layout = dict(
             title='Time Series with Rangeslider',
@@ -267,13 +269,6 @@ class HabitatStatsView(LoginRequiredMixin, TemplateView):
         fig = go.Figure(data=rooms_time_data, layout=layout)
         rooms_time_graph = py.offline.plot(fig, auto_open=False, output_type='div')
         context['rooms_time_graph'] = rooms_time_graph
-
-
-
-
-
-
-
 
         return context
 
@@ -332,3 +327,88 @@ class DistanceToPlacesView(LoginRequiredMixin, TemplateView):
                 context['errors'] = ['شما مجاز به اضافه کردن حداکثر {} مکان گردشگری هستید'.format(self.MAX_DISTANCES)]
 
         return self.render_to_response(context)
+
+
+class HabitatAllStatsView(LoginRequiredMixin, TemplateView):
+    template_name = 'habitats/habitat_all_stats.html'
+
+    @staticmethod
+    def to_unix_time(dt):
+        epoch = timezone.datetime.utcfromtimestamp(0)
+        return (dt - epoch).total_seconds() * 1000
+
+    def get_context_data(self, **kwargs):
+        context = super(HabitatAllStatsView, self).get_context_data(**kwargs)
+        owner = self.request.user
+        self.form = HabitatStatForm(self.request.GET)
+        from_date, to_date = timezone.datetime(
+            year=2019, month=1,
+            day=1), timezone.now()  # TODO set this to something reasonable when nothing is specified
+        if self.form.is_valid():
+            from_date = self.form.cleaned_data['from_date']
+            to_date = self.form.cleaned_data['to_date']
+        inputs_money = Transaction.objects.filter(created__gte=from_date, created__lte=to_date, to_user=owner,
+                                                  verified=True).all()
+        outputs_money = Transaction.objects.filter(created__gte=from_date, created__lte=to_date, from_user=owner,
+                                                   verified=True).all()
+        income = defaultdict(int)
+        for im in inputs_money.all():
+            income[im.created.replace(hour=0, second=0, microsecond=0)] += im.amount
+        for im in outputs_money.all():
+            print(im.created)
+            income[im.created.replace(hour=0, second=0, microsecond=0)] -= im.amount
+        print(income)
+        x = list(income.keys())
+        print(x)
+        y = list(income.values())
+        trace1 = go.Scatter(x=x, y=y, marker={'color': 'red', 'symbol': 104, 'size': 10},
+                            mode="lines", name='1st Trace')
+
+        data = go.Data([trace1])
+        layout = dict(
+            title='درآمد روزانه‌ی شما از اقامتگاه‌هایتان',
+            xaxis=dict(
+                rangeselector=dict(
+                    buttons=list([
+                        dict(count=1,
+                             label='1m',
+                             step='month',
+                             stepmode='backward'),
+                        dict(count=6,
+                             label='6m',
+                             step='month',
+                             stepmode='backward'),
+                        dict(step='all')
+                    ])
+                ),
+                rangeslider=dict(
+                    visible=True
+                ),
+                type='date',
+                title='تاریخ',
+            ),
+            yaxis=dict(
+                title='درآمد'
+            )
+        )
+        figure = go.Figure(data=data, layout=layout)
+        div = py.offline.plot(figure, auto_open=False, output_type='div')
+        context['income_graph'] = div
+
+        confirmed_habitats = Habitat.objects.filter(confirm=True).count()
+        not_confirmed_habitats = Habitat.objects.count() - confirmed_habitats
+        habitats_stat_data = go.Pie(labels=['فعال', 'غیرفعال'], values=[confirmed_habitats, not_confirmed_habitats],
+                                    hoverinfo='label+value')
+        figure = go.Figure(data=[habitats_stat_data])
+        div = py.offline.plot(figure, auto_open=False, output_type='div')
+        context['confirmed_graph'] = div
+
+        reserved = Reservation.objects.filter(is_active=True).count()
+        cancelled = Reservation.objects.filter(is_active=False).count()
+        reserve_data  = go.Pie(labels=['انجام‌شده', 'لغو شده'], values=[reserved, cancelled],
+                                    hoverinfo='label+value')
+        figure = go.Figure(data=[reserve_data])
+        div = py.offline.plot(figure, auto_open=False, output_type='div')
+        context['reserve_graph'] = div
+
+        return context

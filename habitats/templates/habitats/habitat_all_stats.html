@@ -1,0 +1,33 @@
+{% extends "master.html" %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+{% endblock %}
+
+
+{% block content %}
+
+    <a href="{% url 'habitats:all' %}"
+       class="btn btn-info mt-auto mb-1">بازگشت به صفحه‌‌ی اصلی مدیریت اقامتگاه‌ها</a>
+    <br><br>
+    <div class="border border-primary rounded">
+        {{ income_graph|safe }}
+    </div>
+    <div class="container" style="margin-outside: 10px">
+        <div class="row">
+            <div class="col-6 col-md-offset-2 border border-primary rounded ">
+                {{ confirmed_graph|safe }}
+            </div>
+            <div class="col-6  col-md-offset-2 border border-primary rounded">
+                {{ reserve_graph|safe }}
+            </div>
+        </div>
+    </div>
+
+
+    <script src="/static/Translator.js"></script>
+{% endblock %}
