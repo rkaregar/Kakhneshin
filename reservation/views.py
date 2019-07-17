@@ -178,7 +178,8 @@ class ReservationCreateView(CreateView):
         return super_kwargs
 
     def form_invalid(self, form):
-        return render(self.request, self.template_name, {'form': form})
+        return render(self.request, self.template_name,
+                      {'form': form, 'habitat_pk': self.kwargs.get('habitat_pk', None)})
 
     def form_valid(self, form):
         messages.add_message(self.request, messages.INFO, 'رزرو با موفقیت انجام شد.')

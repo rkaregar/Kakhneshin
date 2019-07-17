@@ -75,7 +75,7 @@
                     </tr>
                     <tr>
                         <td>صاحب</td>
-                        <td>{{ habitat.owner }}</td>
+                        <td>{{ habitat.owner.name }}</td>
                     </tr>
                     </tbody>
                 </table>
@@ -95,7 +95,8 @@
                         <tbody>
                         <tr>
                             <td>
-                                <a href="{% url 'places:place_detail' place_pk=distance.place_id %}">{{ distance.place.name }}</a>
+                                <a href="{% url 'places:place_detail' place_pk=distance.place_id %}"
+                                   target="_blank">{{ distance.place.name }}</a>
                             </td>
                             <td>{{ distance.distance }} کیلومتر</td>
                         </tr>
@@ -272,9 +273,9 @@
                     <div class="col-lg-4 mb-4">
                         <div class="card h-100">
                             {% if type.photo %}
-                                <a href="#"><img class="card-img-top" src="/media/{{ type.photo }}" alt=""></a>
+                                <img class="card-img-top" src="/media/{{ type.photo }}" alt="">
                             {% else %}
-                                <a href="#"><img class="card-img-top" src="/static/images/no_room1.png" alt=""></a>
+                                <img class="card-img-top" src="/static/images/no_room1.png" alt="">
                             {% endif %}
                             <h4 class="card-header">{{ type.type_name }}</h4>
                             <table class="table">
@@ -309,17 +310,49 @@
                             </table>
                             <br><br>
                             <div class="card-footer">
-                                <form action="{% url 'reservation:reserve' %}" method="post">
+                                <form id="reserve_form_{{ type.id }}"
+                                      action="{% url 'reservation:reserve' habitat_pk=habitat.id %}?persons={{ form.persons.value }}&from_date={{ form.from_date.value }}&to_date={{ form.to_date.value }}&division={{ form.division.value }}"
+                                      method="post">
                                     {% csrf_token %}
                                     <input type="hidden" name="room" value="{{ type.id }}">
                                     <input type="hidden" name="from_date" value="{{ from_date }}">
                                     <input type="hidden" name="to_date" value="{{ to_date }}">
-                                    <input type="submit" class="btn btn-primary" value="رزور اتاق">
+
+                                    <input type="button" name="btn" value="رزرو اتاق" id="submitBtn_{{ type.id }}"
+                                           data-toggle="modal"
+                                           data-target="#confirm-submit-{{ type.id }}" class="btn btn-primary"/>
                                 </form>
                             </div>
 
                         </div>
                     </div>
+
+                    <div class="modal fade" id="confirm-submit-{{ type.id }}" role="dialog">
+                        <div class="modal-dialog">
+
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" dir="rtl">رزرو اتاق</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>آیا از رزرو اتاق {{ type.type_name }} از تاریخ {{ from_date }} تا
+                                        تاریخ {{ to_date }} مطمئن هستید؟</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">خیر</button>
+                                    &nbsp;
+                                    <a href="#" id="submit_reserve_{{ type.id }}"
+                                       class="btn btn-success success">بله</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <script>
+                        $('#submit_reserve_{{ type.id }}').click(function () {
+                            $('#reserve_form_{{ type.id }}').submit();
+                        });
+                    </script>
 
                     {% if forloop.counter0|add:1|divisibleby:3 or forloop.last %}
                         </div>
@@ -575,7 +608,7 @@
                                             <td class="date-time">{{ reservation.to_date }}</td>
                                         </tr>
                                         <tr>
-                                            <td>فعال شده:</td>
+                                            <td>فعال:</td>
                                             <td>
                                                 {% if reservation.is_active %}
                                                     <span class="fas fa-check-circle" style="color: green"></span>

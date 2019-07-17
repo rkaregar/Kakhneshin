@@ -36,15 +36,7 @@ class Reservation(models.Model):
 
     @property
     def cost(self):
-        return (((self.to_date - self.from_date) / timedelta(days=1)) + 1) * self.room.cost_per_night
-
-    def __str__(self):
-        return "رزرو {} از تاریخ {} تا {} با هزینه‌ی {}".format(
-            self.room,
-            self.from_date,
-            self.to_date,
-            self.cost
-        )
+        return ((self.to_date - self.from_date) / timedelta(days=1)) * self.room.cost_per_night
 
     @property
     def can_cancel(self):
@@ -67,10 +59,10 @@ class Reservation(models.Model):
         self.save()
         return True
 
-
     def __str__(self):
-        return 'رزرو از تاریخ {} تا {}، توسط {} و اتاق {}'.format(self.from_date, self.to_date, self.member.name,
-                                                                      self.room)
+        return 'رزرو اتاق {} در اقامتگاه {}، از تاریخ {} تا {} با هزینهٔ {}'.format(self.room, self.room.habitat,
+                                                                                    self.from_date, self.to_date,
+                                                                                    self.cost)
 
 
 class ReservationComment(models.Model):
