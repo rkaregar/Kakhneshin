@@ -1,8 +1,17 @@
 from datetime import datetime
+import re
+from datetime import datetime, date
 
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, render, redirect
+from django.urls import reverse_lazy
+from django.views.generic import View, TemplateView, ListView, UpdateView, CreateView, DetailView
+from reservation.forms import ReservationForm
+from reservation.models import Reservation
 
 from habitats.models import Habitat, GeographicDivision, RoomType
 from places.models import DistanceHabitatToPlace
@@ -79,6 +88,20 @@ class ReservationHabitatView(ListView):
         context['comments'] = ReservationComment.objects.filter(reservation__room__habitat=habitat).order_by(
             '-created_at')
 
+        roomtypes = context['habitat'].roomtype_set.all()
+        if 'persons' in self.request.GET:
+            roomtypes = roomtypes.filter(capacity_in_person=self.request.GET['persons'])
+        if 'from_date' and 'to_date' in self.request.GET:
+            from_date = datetime.strptime(self.request.GET['from_date'], '%Y-%m-%d')
+            to_date = datetime.strptime(self.request.GET['to_date'], '%Y-%m-%d')
+            for roomtype in roomtypes:
+                if not roomtype.has_empty_room(from_date,
+                                               to_date):
+                    roomtypes = roomtypes.exclude(pk=roomtype.pk)
+            context['from_date'] = from_date.strftime('%m/%d/%Y')
+            context['to_date'] = to_date.strftime('%m/%d/%Y')
+        context['room_types'] = roomtypes.values()
+
         return context
 
 
@@ -88,11 +111,11 @@ class ReservationCommentView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         reservation = get_object_or_404(Reservation, pk=self.kwargs.get('reservation_pk', None))
+        context['reservation'] = reservation
+
         if self.request.user and reservation.member.user == self.request.user:
             if ReservationComment.objects.filter(reservation=reservation).exists():
                 context['message'] = 'شما قبلا برای این رزرو نظر ثبت کرده‌اید'
-            else:
-                context['reservation'] = reservation
         else:
             context['message'] = 'شما تنها می‌توانید برای رزروهای خود نظر ثبت کنید'
 
@@ -117,6 +140,47 @@ class ReservationCommentView(LoginRequiredMixin, TemplateView):
                     ReservationCommentPhoto.objects.create(reservation_comment=reservation_comment, photo=image)
                 for video in self.request.FILES.getlist('video'):
                     ReservationCommentVideo.objects.create(reservation_comment=reservation_comment, video=video)
-        context['message'] = 'نظر شما برای این رزرو با موفقیت ثبت شد'
+
+            context['message'] = 'نظر شما برای این رزرو با موفقیت ثبت شد'
 
         return self.render_to_response(context)
+
+
+class ReservationListView(ListView):
+    template_name = 'reservation/list.html'
+
+    def get_queryset(self):
+        return Reservation.objects.filter(member=self.request.user.member)
+
+
+class ReservationCancelView(View):
+
+    @staticmethod
+    def post(request, reservation_id):
+        reservation = get_object_or_404(Reservation, id=reservation_id)
+        if reservation.member.user.id != request.user.id:
+            return HttpResponse(status=404)
+        if reservation.cancel():
+            messages.add_message(request, level=messages.INFO, message='رزرو با موفقیت لغو شد.')
+        else:
+            messages.add_message(request, level=messages.ERROR, message='لغو رزرو امکان پذیر نیست.')
+        return redirect(reverse_lazy('reservation:list'))
+
+
+class ReservationCreateView(CreateView):
+    form_class = ReservationForm
+    template_name = 'reservation/error.html'
+    success_url = reverse_lazy('reservation:list')
+
+    def get_form_kwargs(self):
+        super_kwargs = super().get_form_kwargs()
+        super_kwargs['member'] = self.request.user.member
+        return super_kwargs
+
+    def form_invalid(self, form):
+        return render(self.request, self.template_name,
+                      {'form': form, 'habitat_pk': self.kwargs.get('habitat_pk', None)})
+
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.INFO, 'رزرو با موفقیت انجام شد.')
+        return super().form_valid(form)

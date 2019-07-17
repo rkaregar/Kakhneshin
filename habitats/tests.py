@@ -1,4 +1,7 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
+
+from accounts.models import Transaction
 from .models import *
 from datetime import datetime
 
@@ -8,6 +11,10 @@ class RoomOutOfServiceTest(TestCase):
         habitat = Habitat.objects.create(name='test habitat')
         self.room = RoomType.objects.create(habitat=habitat, type_name='test room', capacity_in_person=4,
                                             number_of_rooms_of_this_kind=4)
+
+        self.user = User.objects.create_user('ali', None, 'hello')
+        self.member = Member.objects.create(user=self.user)
+        self.transaction = Transaction.objects.create(from_user=self.user, verified=True, amount=10000)
 
     def test_out_of_service_without_any_constraint(self):
         self.assertTrue(self.room.has_empty_rooms(datetime.strptime('2019-10-10', '%Y-%m-%d'),
@@ -44,9 +51,11 @@ class RoomOutOfServiceTest(TestCase):
 
     def test_prevent_adding_out_of_service_include_since_reservation(self):
         Reservation.objects.create(from_date=datetime.strptime('2019-10-10', '%Y-%m-%d'),
-                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room)
+                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room,
+                                   transaction=self.transaction)
         Reservation.objects.create(from_date=datetime.strptime('2019-10-10', '%Y-%m-%d'),
-                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room)
+                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room,
+                                   transaction=self.transaction)
 
         with self.assertRaises(ValidationError):
             RoomOutOfService.objects.create(room=self.room, inclusive_since=datetime.strptime('2019-10-05', '%Y-%m-%d'),
@@ -55,35 +64,45 @@ class RoomOutOfServiceTest(TestCase):
 
     def test_add_out_of_service_exclude_until_reservation(self):
         Reservation.objects.create(from_date=datetime.strptime('2019-10-10', '%Y-%m-%d'),
-                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room)
+                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room,
+                                   transaction=self.transaction)
         Reservation.objects.create(from_date=datetime.strptime('2019-10-10', '%Y-%m-%d'),
-                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room)
+                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room,
+                                   transaction=self.transaction)
 
         self.assertTrue(self.room.has_empty_rooms(datetime.strptime('2019-10-15', '%Y-%m-%d'),
                                                   datetime.strptime('2019-10-20', '%Y-%m-%d'), 3))
 
     def test_add_out_of_service_ignore_inactive_reservations(self):
         Reservation.objects.create(from_date=datetime.strptime('2019-10-10', '%Y-%m-%d'),
-                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room)
+                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room,
+                                   transaction=self.transaction)
         Reservation.objects.create(from_date=datetime.strptime('2019-10-10', '%Y-%m-%d'),
-                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room)
+                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room,
+                                   transaction=self.transaction)
         Reservation.objects.create(from_date=datetime.strptime('2019-10-10', '%Y-%m-%d'),
-                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=False, room=self.room)
+                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=False, room=self.room,
+                                   transaction=self.transaction)
         Reservation.objects.create(from_date=datetime.strptime('2019-10-10', '%Y-%m-%d'),
-                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=False, room=self.room)
+                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=False, room=self.room,
+                                   transaction=self.transaction)
 
         self.assertTrue(self.room.has_empty_rooms(datetime.strptime('2019-10-10', '%Y-%m-%d'),
                                                   datetime.strptime('2019-10-20', '%Y-%m-%d'), 2))
 
     def test_add_out_of_service_with_previous_limitations_and_reservations(self):
         Reservation.objects.create(from_date=datetime.strptime('2019-10-05', '%Y-%m-%d'),
-                                   to_date=datetime.strptime('2019-10-10', '%Y-%m-%d'), is_active=True, room=self.room)
+                                   to_date=datetime.strptime('2019-10-10', '%Y-%m-%d'), is_active=True, room=self.room,
+                                   transaction=self.transaction)
         Reservation.objects.create(from_date=datetime.strptime('2019-10-10', '%Y-%m-%d'),
-                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room)
+                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room,
+                                   transaction=self.transaction)
         Reservation.objects.create(from_date=datetime.strptime('2019-10-10', '%Y-%m-%d'),
-                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room)
+                                   to_date=datetime.strptime('2019-10-15', '%Y-%m-%d'), is_active=True, room=self.room,
+                                   transaction=self.transaction)
         Reservation.objects.create(from_date=datetime.strptime('2019-10-15', '%Y-%m-%d'),
-                                   to_date=datetime.strptime('2019-10-20', '%Y-%m-%d'), is_active=True, room=self.room)
+                                   to_date=datetime.strptime('2019-10-20', '%Y-%m-%d'), is_active=True, room=self.room,
+                                   transaction=self.transaction)
 
         RoomOutOfService.objects.create(room=self.room, inclusive_since=datetime.strptime('2019-10-05', '%Y-%m-%d'),
                                         exclusive_until=datetime.strptime('2019-10-10', '%Y-%m-%d'),

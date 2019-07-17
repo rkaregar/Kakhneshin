@@ -15,7 +15,9 @@
                             {% if success %}
                                 شارژ حساب با موفقیت انجام شد.
                             {% else %}
-                                {{ error }}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error }}</strong>
+                                </div>
                             {% endif %}
                         </div>
                     </div>

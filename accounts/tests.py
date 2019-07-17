@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from accounts.models import Transaction
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -17,19 +19,43 @@ class SetupUserAndAccountMixin:
 
 
 class DepositTest(SetupUserAndAccountMixin):
-    @skip
+
     def test_deposit(self):
         self.client.force_login(self.user)
         post_url = self.navigate_to_deposit_page()
         amount = 1452
         response = self.client.post(post_url, data={'amount': amount}, follow=True)
+        self.assertTrue('تایید پرداخت' in response.content.decode('utf8'))
+        response = self.confirm_payment()
         self.assertTrue('شارژ حساب با موفقیت انجام شد.' in response.content.decode('utf8'))
         self.assertTrue(str(amount + self.prior_balance) in response.content.decode('utf8'))
+
+    def test_deposit_error(self):
+        self.client.force_login(self.user)
+        post_url = self.navigate_to_deposit_page()
+        amount = 1452
+        response = self.client.post(post_url, data={'amount': amount}, follow=True)
+        self.assertTrue('لغو پرداخت' in response.content.decode('utf8'))
+        response = self.reject_payment()
+        self.assertTrue('پرداخت توسط کاربر لغو شد' in response.content.decode('utf8'))
+        self.assertTrue(str(self.prior_balance) in response.content.decode('utf8'))
+
 
     def navigate_to_deposit_page(self):
         response = self.client.get('/accounts/deposit/')
         self.assertEqual(response.status_code, 200)
         return '/accounts/deposit/'
+
+    def confirm_payment(self):
+        return self.client.get('/accounts/callback/{}/?status=OK'.format(
+            Transaction.objects.order_by('id').last().token
+        ))
+
+    def reject_payment(self):
+        return self.client.get('/accounts/callback/{}/?status=NOK&{}'.format(
+            Transaction.objects.order_by('id').last().token,
+            urlencode({'error': 'پرداخت توسط کاربر لغو شد'})
+        ))
 
 
 @tag('backend')
@@ -38,6 +64,7 @@ class DepositBackendTest(DepositTest, TestCase):
 
 
 @tag('ui')
+@override_settings(**settings.TEST_SETTINGS)
 class DepositSeleniumTest(DepositTest, SeleniumTestCase):
 
     def navigate_to_deposit_page(self):
@@ -47,6 +74,14 @@ class DepositSeleniumTest(DepositTest, SeleniumTestCase):
         link_path = charge_link.get_attribute('pathname')
         charge_link.click()
         return link_path
+
+    def confirm_payment(self):
+        self.selenium_client.web_driver.find_element_by_id('confirm').click()
+        return SeleniumResponse(self.selenium_client.web_driver)
+
+    def reject_payment(self):
+        self.selenium_client.web_driver.find_element_by_id('reject').click()
+        return SeleniumResponse(self.selenium_client.web_driver)
 
     def setUp(self):
         self.client = self.selenium_client
@@ -96,7 +131,7 @@ class TestWithdrawal(SetupUserAndAccountMixin):
 @tag('backend')
 class BackendWithdrawalTestCase(TestWithdrawal, TestCase):
 
-    def test_0ions(self):
+    def test_transactions(self):
         response = self.client.get('/accounts/withdrawals/')
         self.assertNotEqual(response.status_code, 200)
         self.client.force_login(self.user)

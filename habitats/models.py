@@ -76,6 +76,10 @@ class RoomType(models.Model):
     def __str__(self):
         return self.type_name
 
+    @property
+    def owner(self):
+        return self.habitat.owner
+
     def validate_unique(self, exclude=None):
         qs = RoomType.objects.filter(habitat=self.habitat)
         if qs.filter(type_name=self.type_name).exclude(id=self.id).exists():
