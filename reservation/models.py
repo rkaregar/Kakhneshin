@@ -7,6 +7,7 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from users.models import Member
+from utils.observer import non_recurse
 
 
 class Reservation(models.Model):
@@ -36,15 +37,7 @@ class Reservation(models.Model):
 
     @property
     def cost(self):
-        return (((self.to_date - self.from_date) / timedelta(days=1)) + 1) * self.room.cost_per_night
-
-    def __str__(self):
-        return "رزرو {} از تاریخ {} تا {} با هزینه‌ی {}".format(
-            self.room,
-            self.from_date,
-            self.to_date,
-            self.cost
-        )
+        return ((self.to_date - self.from_date) / timedelta(days=1)) * self.room.cost_per_night
 
     @property
     def can_cancel(self):
@@ -54,8 +47,10 @@ class Reservation(models.Model):
         if not self.can_cancel:
             return False
         cancellation_fee = 0
-        if self.from_date - timedelta(days=10) < date.today():
-            cancellation_fee = settings.CANCELLATION_FEE
+        today = date.today()
+        if self.from_date - timedelta(days=10) < today:
+            left_days = (self.from_date - today) / timedelta(days=1)
+            cancellation_fee = settings.CANCELLATION_FEE * (settings.PUNISHED_CANCELLATION_DAYS - left_days)
         self.is_active = False
         cancellation_punish_amount = cancellation_fee * self.cost
         self.return_transaction = Transaction.objects.create(
@@ -67,10 +62,23 @@ class Reservation(models.Model):
         self.save()
         return True
 
+    @staticmethod
+    @non_recurse
+    def update():
+        today = date.today()
+        Transaction.objects.filter(
+            fee_reservations__from_date__lte=today,
+            fee_reservations__is_active=True,
+            verified=False
+        ).update(verified=True)
 
     def __str__(self):
-        return 'رزرو از تاریخ {} تا {}، توسط {} و اتاق {}'.format(self.from_date, self.to_date, self.member.name,
-                                                                      self.room)
+        return 'رزرو اتاق {} در اقامتگاه {}، از تاریخ {} تا {} با هزینهٔ {}'.format(self.room, self.room.habitat,
+                                                                                    self.from_date, self.to_date,
+                                                                                    self.cost)
+
+
+Transaction.register_observer(Reservation)
 
 
 class ReservationComment(models.Model):

@@ -1,6 +1,9 @@
 from time import sleep
 
 import random
+
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+
 from accounts.models import Transaction
 from copy import copy
 from django.conf import settings
@@ -35,6 +38,8 @@ class SeleniumDjangoTestClient(object):
         self.live_server_url = live_server_url
 
     def get_absolute_url(self, path):
+        if path.startswith('https://') or path.startswith('http://'):
+            return path
         return self.live_server_url + path
 
     def get(self, path):
@@ -71,6 +76,9 @@ class SeleniumDjangoTestClient(object):
 
     def login(self, username, password, login_path='/users/login'):
         self.post(login_path, data={'username': username, 'password': password})
+
+    def login_without_navigation(self, username, password):
+        self.login(username, password, self.web_driver.current_url)
 
     def force_login(self, user):
         self.login(user.username, user.raw_password)
@@ -185,7 +193,7 @@ def create_user(username='test', password='test', **kwargs):
 
 
 @tag('abstract')
-class SeleniumTestCase(LiveServerTestCase):
+class SeleniumTestCase(StaticLiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
