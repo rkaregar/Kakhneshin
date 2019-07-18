@@ -409,9 +409,7 @@ class HabitatAllStatsView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(HabitatAllStatsView, self).get_context_data(**kwargs)
         self.form = HabitatStatForm(self.request.GET)
-        from_date, to_date = timezone.datetime(
-            year=2019, month=1,
-            day=1), timezone.now()
+        from_date, to_date = timezone.now() - timezone.timedelta(days=90), timezone.now()
         if self.form.is_valid():
             from_date = self.form.cleaned_data['from_date']
             to_date = self.form.cleaned_data['to_date']
@@ -455,8 +453,8 @@ class HabitatAllStatsView(LoginRequiredMixin, TemplateView):
         context['income_graph'] = div
 
         selected_habitats = self.get_habitats_query_set()
-        confirmed_habitats = Habitat.objects.filter(confirm=True).count()
-        not_confirmed_habitats = Habitat.objects.count() - confirmed_habitats
+        confirmed_habitats = selected_habitats.filter(confirm=True).count()
+        not_confirmed_habitats = selected_habitats.count() - confirmed_habitats
         habitats_stat_data = go.Pie(labels=['فعال', 'غیرفعال'], values=[confirmed_habitats, not_confirmed_habitats],
                                     hoverinfo='label+value')
         figure = go.Figure(data=[habitats_stat_data])
@@ -502,7 +500,7 @@ class HabitatAllManagementStatsView(HabitatAllStatsView):
         return Reservation.objects
 
     def get_habitats_query_set(self):
-        return Habitat.objects.filter()
+        return Habitat.objects
 
     def get_context_data(self, **kwargs):
         context = super(HabitatAllManagementStatsView, self).get_context_data(**kwargs)
