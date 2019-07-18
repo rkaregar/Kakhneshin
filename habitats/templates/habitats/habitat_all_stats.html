@@ -1,0 +1,75 @@
+{% extends "master.html" %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+{% endblock %}
+
+
+{% block content %}
+
+    <a href="{% url 'habitats:all' %}"
+       class="btn btn-info mt-auto mb-1">بازگشت به صفحه‌‌ی اصلی مدیریت اقامتگاه‌ها</a>
+    <br><br>
+    <div class="col-12">
+        <div class="border border-primary rounded">
+            <div class="card">
+                {{ income_graph|safe }}
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <br>
+    </div>
+    <div class="container" style="margin-outside: 10px">
+        <div class="row">
+            <div class="col-6">
+                <div class="border border-primary rounded ">
+                    <div class="card">
+                        {{ confirmed_graph|safe }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="border border-primary rounded">
+                    <div class="card">
+                        {{ reserve_graph|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </br>
+    <div class="col-12">
+        <div class="border border-primary rounded">
+            <div class="card">
+                <table class="table table-hover">
+                    <thead>
+                    <th>نام اقامتگاه</th>
+                    <th>ظرفیت‌های خالی</th>
+                    </thead>
+                    <tbody>
+                    {% for habitat in habitats %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'habitats:habitat_stats' habitat_pk=habitat.pk %}">
+                                    {{ habitat.name }}
+                                </a>
+                            </td>
+                            <td>
+                                {{ habitat.empty_rooms_count }}
+                            </td>
+                        </tr>
+                        </a>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/Translator.js"></script>
+{% endblock %}

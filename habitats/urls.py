@@ -2,7 +2,9 @@ from django.urls import path
 
 from habitats.views.geographic_divisions_views import GeographicDivisionsSearchView
 from habitats.views.habitat_views import HabitatTinyDetailView, HomeView, HabitatListView, \
-    HabitatCreateView, HabitatDeleteView, HabitatUpdateView, DistanceToPlacesView, HabitatStatsView
+    HabitatCreateView, HabitatDeleteView, HabitatUpdateView, DistanceToPlacesView, HabitatStatsView, \
+    HabitatAllStatsView, HabitatManagementStatsView, HabitatAllManagementStatsView, \
+    HabitatDivisionStatsView, HabitatTownStatsView
 from habitats.views.room_views import RoomTypeCreateView, RoomTypeDeleteView, RoomTypeUpdateView, RoomTypeDetailView, \
     RoomOutOfServiceView
 
@@ -10,7 +12,12 @@ urlpatterns = [
     path('home/', HomeView.as_view(), name='home'),
     path('', HabitatListView.as_view(), name='all'),
     path('create/', HabitatCreateView.as_view(), name='habitat_create'),
+    path('stats/', HabitatAllStatsView.as_view(), name='habitat_all_stats'),
+    path('management/stats/', HabitatAllManagementStatsView.as_view(), name='habitat_all_management_stats'),
+    path('management/stats/<int:division_pk>', HabitatDivisionStatsView.as_view(), name='habitat_division_stats'),
+    path('management/stats/town/<int:town_pk>', HabitatTownStatsView.as_view(), name='habitat_town_stats'),
     path('<int:habitat_pk>/stats/', HabitatStatsView.as_view(), name='habitat_stats'),
+    path('<int:habitat_pk>/management/stats/', HabitatManagementStatsView.as_view(), name='habitat_management_stats'),
     path('<int:habitat_pk>/delete/', HabitatDeleteView.as_view(), name='delete'),
     path('<int:habitat_pk>/update/', HabitatUpdateView.as_view(), name='habitat_update'),
     path('<int:habitat_pk>/detail/', HabitatTinyDetailView.as_view(), name='habitat_detail'),

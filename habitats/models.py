@@ -2,6 +2,7 @@ from typing import List, Iterable, Tuple
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 from django.utils.functional import cached_property
 
 from users.models import Member
@@ -29,6 +30,34 @@ class GeographicDivision(models.Model):
             division = division.region
         return name[:-2]
 
+    @cached_property
+    def get_province(self):
+        division = self
+        while division.region is not None and division.region.region is not None:
+            division = division.region
+        return division
+
+    @cached_property
+    def get_fathers(self):
+        division = self
+        fathers = []
+        while division.region is not None:
+            fathers.append(division.region)
+            division = division.region
+        return fathers
+
+    @classmethod
+    def get_all_provinces(cls):
+        provinces = []
+        for division in cls.objects.all():
+            if division.region is not None and division.region.region is None:
+                provinces.append(division)
+        return provinces
+
+    @classmethod
+    def get_childs(cls, divison_pk):
+        return cls.objects.filter(region__id=divison_pk).all()
+
 
 class Habitat(models.Model):
     name = models.CharField(max_length=200, default='', verbose_name='نام', unique=True)
@@ -37,8 +66,6 @@ class Habitat(models.Model):
     owner = models.ForeignKey(Member, on_delete=models.CASCADE, null=True, verbose_name='صاحب اقامتگاه')
     confirm = models.BooleanField(default=False)
     photo = models.ImageField(upload_to='habitats', null=True, blank=True, verbose_name='تصویر')
-
-    # TODO: add new additional fields
 
     def __str__(self):
         return self.name
@@ -52,6 +79,20 @@ class Habitat(models.Model):
 
         super(Habitat, self).save(*args, **kwargs)
 
+    def get_reserve_ready_out(self, date):
+        today = date
+        tomorrow = timezone.now()+timezone.timedelta(days=1)
+        reserved, ready, out = 0, 0, 0
+        for room_type in self.roomtype_set.all():
+            res, rea, ou = list(room_type.get_reserve_ready_out_count_list(today, tomorrow))[0]
+            reserved += res
+            ready += rea
+            out += ou
+        return reserved, ready, out
+
+    def empty_rooms_count(self):
+        return self.get_reserve_ready_out(timezone.now())[1]
+
 
 class RoomType(models.Model):
     habitat = models.ForeignKey(Habitat, null=True, on_delete=models.CASCADE, verbose_name=' نام اقامتگاه')
@@ -64,7 +105,6 @@ class RoomType(models.Model):
     has_breakfast = models.BooleanField(default=False, verbose_name='صبحانه')
     has_telephone = models.BooleanField(default=False, verbose_name='تلفون')
     has_wifi = models.BooleanField(default=False, verbose_name='اینترنت بی‌سیم')
-    # TODO: add interior picture
     has_minibar = models.BooleanField(default=False, verbose_name='مینی‌بار')
     has_foreign_wc = models.BooleanField(default=False, verbose_name='دست‌شویی‌فرنگی')
     has_bath_tub = models.BooleanField(default=False, verbose_name='وان حمام')

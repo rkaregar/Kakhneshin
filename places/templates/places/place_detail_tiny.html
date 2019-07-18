@@ -80,16 +80,6 @@
 
 
                 <div id="carousel" class="carousel slide" data-ride="carousel">
-                    <ol class="carousel-indicators">
-                        {% for img in images %}
-                            {% if forloop.counter == 1 %}
-                                <li data-target="#carousel" data-slide-to={{ forloop.counter0 }} class="active"></li>
-                            {% else %}
-                                <li data-target="#carousel" data-slide-to={{ forloop.counter0 }}></li>
-                            {% endif %}
-                        {% endfor %}
-                    </ol>
-
                     <div class="carousel-inner" role="listbox">
                         {% if images %}
                             {% for img in images %}
@@ -112,15 +102,6 @@
 
                         </div>
                     </div>
-
-                    <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
                 </div>
 
 
@@ -265,8 +246,46 @@
                                     </tr>
                                     </tbody>
                                 </table>
-                            </div>
+                                {% if user == comment.writer.user %}
+                                    <div class="col-1">
+                                        <button id="btn-delete{{ comment.id }}" type="button" name="delete"
+                                                class="btn btn-danger btn-delete"
+                                                data-id={{ comment.id }} data-toggle="modal"
+                                                data-target="#myModal" style="margin-top: 5px"
+                                        >حذف نظر
+                                        </button>
+                                    </div>
+                                    <br>
+                                {% endif %}
 
+                                <div class="modal fade" id="myModal" role="dialog">
+                                    <div class="modal-dialog">
+
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" dir="rtl">حذف نظر</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>آیا با حذف این نظر موافقید؟</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger" data-dismiss="modal">خیر
+                                                </button>
+                                                <form method="post">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="delete" value="true">
+                                                    <input type="hidden" name="comment_id" id="modal_id">
+                                                    <button type="submit" class="btn btn-success"
+                                                            style="margin-right: 5px;">بله
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
 
                             <div class="col-4">
                                 <h6>تصاویر ثبت شده برای این نظر:</h6>
@@ -389,6 +408,15 @@
                 {% empty %}
                     <h4>هنوز نظری برای این مکان دیدنی ثبت نشده است.</h4>
                 {% endfor %}
+
+                <script>
+                    $(document).ready(function () {
+                        $(".btn-delete").bind('click', function () {
+                            const id = $(this).attr('data-id');
+                            $('#modal_id').attr('value', id);
+                        })
+                    })
+                </script>
 
                 </div>
                 </div>
