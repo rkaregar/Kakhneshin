@@ -319,12 +319,17 @@ class HabitatManagementStatsView(HabitatStatsView):
                                                   fee_reservations__isnull=False,
                                                   fee_reservations__room__habitat=self.habitat, verified=True).all()
         income = defaultdict(int)
+
+        for day in [from_date + timezone.timedelta(i) for i in range((to_date - from_date).days + 1)]:
+            income[day.replace(hour=0, minute=0, second=0, microsecond=0)] = 0
+
+
         for im in inputs_money.all():
             created = im.created
-            income[created.replace(hour=0, second=0, microsecond=0)] += im.amount
+            income[created.replace(hour=0, minute=0, second=0, microsecond=0)] += im.amount
         for im in output_money.all():
             created = im.created
-            income[created.replace(hour=0, second=0, microsecond=0)] -= im.amount
+            income[created.replace(hour=0, minute=0, second=0, microsecond=0)] -= im.amount
         return income
 
     def dispatch(self, *args, **kwargs):
@@ -392,9 +397,13 @@ class HabitatAllStatsView(LoginRequiredMixin, TemplateView):
                                                    fee_reservations__room__habitat__owner=member,
                                                    verified=True).all()
         income = defaultdict(int)
+
+        for day in [from_date + timezone.timedelta(i) for i in range((to_date - from_date).days + 1)]:
+            income[day.replace(hour=0, minute=0, second=0, microsecond=0)] = 0
+
         for im in outputs_money.all():
             print(im.created)
-            income[im.created.replace(hour=0, second=0, microsecond=0)] += im.amount
+            income[im.created.replace(hour=0, minute=0, second=0, microsecond=0)] += im.amount
         return income
 
     def get_context_data(self, **kwargs):
@@ -507,11 +516,15 @@ class HabitatAllManagementStatsView(HabitatAllStatsView):
         outputs_money = Transaction.objects.filter(created__gte=from_date, created__lte=to_date,
                                                    fee_reservations__isnull=False, verified=True).all()
         income = defaultdict(int)
+
+        for day in [from_date + timezone.timedelta(i) for i in range((to_date - from_date).days + 1)]:
+            income[day.replace(hour=0, minute=0, second=0, microsecond=0)] = 0
+
         for im in inputs_money.all():
-            income[im.created.replace(hour=0, second=0, microsecond=0)] += im.amount
+            income[im.created.replace(hour=0, minute=0, second=0, microsecond=0)] += im.amount
         for im in outputs_money.all():
             print(im.created)
-            income[im.created.replace(hour=0, second=0, microsecond=0)] -= im.amount
+            income[im.created.replace(hour=0, minute=0, second=0, microsecond=0)] -= im.amount
         return income
 
 

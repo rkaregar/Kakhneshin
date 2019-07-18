@@ -24,7 +24,7 @@ class TestReservation(SeleniumTestCase):
         self.habitat_owner_user = User.objects.create_user('owner', None, 'hello')
         self.member = Member.objects.create(user=self.user)
         self.owner_member = Member.objects.create(user=self.habitat_owner_user)
-        self.habitat = Habitat.objects.create(name='hello', owner=self.owner_member)
+        self.habitat = Habitat.objects.create(name='hello', owner=self.owner_member, confirm=True)
 
         self.room = RoomType.objects.create(
             habitat=self.habitat,
