@@ -55,7 +55,6 @@ class GeographicDivision(models.Model):
         return provinces
 
     @classmethod
-
     def get_childs(cls, divison_pk):
         return cls.objects.filter(region__id=divison_pk).all()
 
@@ -67,8 +66,6 @@ class Habitat(models.Model):
     owner = models.ForeignKey(Member, on_delete=models.CASCADE, null=True, verbose_name='صاحب اقامتگاه')
     confirm = models.BooleanField(default=False)
     photo = models.ImageField(upload_to='habitats', null=True, blank=True, verbose_name='تصویر')
-
-    # TODO: add new additional fields
 
     def __str__(self):
         return self.name
@@ -108,7 +105,6 @@ class RoomType(models.Model):
     has_breakfast = models.BooleanField(default=False, verbose_name='صبحانه')
     has_telephone = models.BooleanField(default=False, verbose_name='تلفون')
     has_wifi = models.BooleanField(default=False, verbose_name='اینترنت بی‌سیم')
-    # TODO: add interior picture
     has_minibar = models.BooleanField(default=False, verbose_name='مینی‌بار')
     has_foreign_wc = models.BooleanField(default=False, verbose_name='دست‌شویی‌فرنگی')
     has_bath_tub = models.BooleanField(default=False, verbose_name='وان حمام')

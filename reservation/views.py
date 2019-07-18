@@ -23,7 +23,6 @@ from reservation.forms import HabitatSearchForm
 class ReservationSearchView(ListView):
     model = Habitat
     template_name = 'reservation/habitats-search.html'
-    # paginate_by = 10 TODO
     context_object_name = 'habitats'
 
     def get_queryset(self, **kwargs):
@@ -35,7 +34,8 @@ class ReservationSearchView(ListView):
             for roomtype in roomtypes:
                 if roomtype.habitat not in habitats and roomtype.has_empty_room(self.form.cleaned_data['from_date'],
                                                                                 self.form.cleaned_data['to_date']):
-                    habitats.append(roomtype.habitat)
+                    if roomtype.habitat.confirm:
+                        habitats.append(roomtype.habitat)
             return habitats
         return []
 

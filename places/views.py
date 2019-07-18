@@ -179,7 +179,6 @@ class PlaceTinyDetailView(DetailView):
 class PlaceSearchView(ListView):
     model = Place
     template_name = 'places/places_search.html'
-    # paginate_by = 10 TODO
     context_object_name = 'places'
 
     def get_queryset(self, **kwargs):

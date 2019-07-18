@@ -20,8 +20,8 @@ from reservation.models import Reservation, ReservationComment, Reservation
 import plotly as py
 import plotly.graph_objs as go
 
-import pandas as pd
-from datetime import datetime
+
+# from django.utils.timezone import timedelta
 
 
 class HabitatCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -127,6 +127,9 @@ class HabitatTinyDetailView(DetailView):
         context = super(HabitatTinyDetailView, self).get_context_data(**kwargs)
 
         habitat = Habitat.objects.get(pk=self.kwargs.get('habitat_pk', None))
+        if not habitat.confirm:
+            context['errors'] = [
+                'این اقامتگاه هنوز توسط مدیر سامانه تایید نشده است، به همین دلیل به کاربران نشان داده نخواهد شد.', ]
         room_types = habitat.roomtype_set.all().values()
 
         context['room_types'] = room_types
@@ -173,16 +176,20 @@ class HabitatStatsView(LoginRequiredMixin, TemplateView):
                                                   fee_reservations__isnull=False,
                                                   fee_reservations__room__habitat=self.habitat, verified=True).all()
         income = defaultdict(int)
+
+        for day in [from_date + timezone.timedelta(i) for i in range((to_date - from_date).days + 1)]:
+            income[day.replace(hour=0, minute=0, second=0, microsecond=0)] = 0
+
         for im in inputs_money.all():
             created = im.created
-            income[created.replace(hour=0, second=0, microsecond=0)] += im.amount
+            income[created.replace(hour=0, minute=0, second=0, microsecond=0)] += im.amount
         return income
 
     def get_income_graph(self, from_date, to_date):
         income = self.get_input_moneys(from_date, to_date)
         x = list(income.keys())
         y = list(income.values())
-        trace1 = go.Scatter(x=x, y=y, marker={'color': 'red', 'symbol': 104, 'size': 10},
+        trace1 = go.Scatter(x=x, y=y, marker={'color': 'red', 'symbol': 104, 'size': 100},
                             mode="lines", name='1st Trace')
 
         data = go.Data([trace1])
@@ -197,9 +204,7 @@ class HabitatStatsView(LoginRequiredMixin, TemplateView):
         context['habitat'] = self.habitat
         owner = self.request.user
         self.form = HabitatStatForm(self.request.GET)
-        from_date, to_date = timezone.datetime(
-            year=2019, month=1,
-            day=1), timezone.now()  # TODO set this to something reasonable when nothing is specified
+        from_date, to_date = timezone.now() - timezone.timedelta(days=90), timezone.now()
         if self.form.is_valid():
             from_date = self.form.cleaned_data['from_date']
             to_date = self.form.cleaned_data['to_date']
@@ -397,7 +402,7 @@ class HabitatAllStatsView(LoginRequiredMixin, TemplateView):
         self.form = HabitatStatForm(self.request.GET)
         from_date, to_date = timezone.datetime(
             year=2019, month=1,
-            day=1), timezone.now()  # TODO set this to something reasonable when nothing is specified
+            day=1), timezone.now()
         if self.form.is_valid():
             from_date = self.form.cleaned_data['from_date']
             to_date = self.form.cleaned_data['to_date']
