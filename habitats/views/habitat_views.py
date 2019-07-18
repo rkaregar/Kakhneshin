@@ -290,7 +290,7 @@ class HabitatStatsView(LoginRequiredMixin, TemplateView):
         return context
 
     def user_passed_test(self, request):
-        if self.habitat.owner == self.request.user.member:
+        if self.request.user.is_superuser or self.habitat.owner == self.request.user.member:
             return True
         return False
 
@@ -308,7 +308,6 @@ class HabitatStatsView(LoginRequiredMixin, TemplateView):
 
 
 class HabitatManagementStatsView(HabitatStatsView):
-
     def get_input_moneys(self, from_date, to_date) -> Dict:
         owner = self.request.user
         inputs_money = Transaction.objects.filter(created__gte=from_date, created__lte=to_date, to_user=None,
@@ -322,7 +321,6 @@ class HabitatManagementStatsView(HabitatStatsView):
 
         for day in [from_date + timezone.timedelta(i) for i in range((to_date - from_date).days + 1)]:
             income[day.replace(hour=0, minute=0, second=0, microsecond=0)] = 0
-
 
         for im in inputs_money.all():
             created = im.created
