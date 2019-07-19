@@ -82,6 +82,13 @@
                                  style="padding-left: 18px">
                                 <a class="dropdown-item" href="{% url 'habitats:all' %}">مشاهدهٔ اقامتگاه‌ها</a>
                                 <a class="dropdown-item" href="{% url 'habitats:habitat_create' %}">ساخت اقامتگاه</a>
+                                <a class="dropdown-item" href="{% url 'habitats:habitat_all_stats' %}">گزارش آماری
+                                    اقامتگاه‌ها</a>
+                                {% if user.is_superuser %}
+                                    <a class="dropdown-item" href="{% url 'habitats:habitat_all_management_stats' %}">گزارش آماری
+                                    اقامتگاه‌ها(مخصوص مدیریت)
+                                    </a>
+                                {% endif %}
                             </div>
                         </li>
                     {% endif %}

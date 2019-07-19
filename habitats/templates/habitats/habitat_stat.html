@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_head %}
-      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -13,11 +13,32 @@
        class="btn btn-info mt-auto mb-1">بازگشت به صفحه‌‌ی اصلی مدیریت اقامتگاه</a>
     <br><br>
 
-    {{ income_graph|safe }}
-    <p>انواع اتاق‌های شما</p>
-    {{ rooms_graph|safe }}
-    <p>انواع اتاق‌های شما در گذر زمان</p
-    {{ rooms_time_graph|safe }}
+
+    <div class="container">
+        <div class="col-12">
+            <div class="border border-primary rounded">
+                <div class="card">
+                    {{ rooms_graph|safe }}
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="col-12">
+            <div class="border border-primary rounded">
+                <div class="card">
+                    {{ rooms_time_graph|safe }}
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="col-12">
+            <div class="border border-primary rounded ">
+                <div class="card">
+                    {{ income_graph|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 

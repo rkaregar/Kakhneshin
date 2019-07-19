@@ -48,3 +48,48 @@ input.loadinggif {
 #homepage-form label {
     margin-right: 10px;
 }
+
+.gtitle {
+    font-family: 'myFont' !important;
+}
+
+.legendtext {
+    font-family: 'myFont' !important;
+}
+
+.hovertext text {
+    font-family: 'myFont' !important;
+}
+
+.g-xtitle text {
+    font-family: 'myFont' !important;
+}
+
+.g-ytitle text {
+    font-family: 'myFont' !important;
+}
+
+.xtick text {
+    font-family: 'myFont' !important;
+}
+
+.ytick text {
+    font-family: 'myFont' !important;
+}
+
+.selector-text {
+    font-family: 'myFont' !important;
+}
+
+.table td {
+    text-align: center;
+}
+
+.table th {
+    text-align: center;
+}
+
+
+
+
+
