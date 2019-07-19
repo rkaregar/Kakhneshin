@@ -32,7 +32,7 @@ class HabitatCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = 'اقامتگاه %s با موفقیت ثبت شد!'
 
     def form_valid(self, form):
-        form.instance.creator = self.request.user.member
+        form.instance.owner = self.request.user.member
         return super(HabitatCreateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):

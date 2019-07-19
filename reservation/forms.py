@@ -50,6 +50,8 @@ class ReservationForm(ModelForm):
             if to_date <= from_date:
                 raise ValidationError('بازه زمانی رزرو صحیح نیست.')
             if room_type:
+                if not room_type.has_empty_room(from_date, to_date):
+                    raise ValidationError('اتاق در این زمان خالی نیست.')
                 days = (to_date - from_date) / timedelta(days=1)
                 required_money = room_type.cost_per_night * days
                 self.cost = required_money

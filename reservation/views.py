@@ -1,6 +1,7 @@
 from datetime import datetime
 import re
 from datetime import datetime, date
+from urllib.parse import urlencode
 
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, TemplateView
@@ -83,8 +84,11 @@ class ReservationHabitatView(ListView):
         context['habitat'] = habitat
         context['distances'] = DistanceHabitatToPlace.objects.filter(
             habitat_id=self.kwargs.get('habitat_pk', None)).order_by('distance')
-        context['reservations'] = Reservation.objects.filter(room__habitat=habitat,
-                                                             member__user=self.request.user).order_by('-to_date')
+
+        if self.request.user.is_authenticated:
+            context['reservations'] = Reservation.objects.filter(room__habitat=habitat,
+                                                                 member__user=self.request.user).order_by('-to_date')
+
         context['comments'] = ReservationComment.objects.filter(reservation__room__habitat=habitat).order_by(
             '-created_at')
 
@@ -103,6 +107,20 @@ class ReservationHabitatView(ListView):
         context['room_types'] = roomtypes.values()
 
         return context
+
+    def post(self, request, **kwargs):
+        self.object_list = self.get_queryset()
+        context = self.get_context_data(**kwargs)
+
+        comment_id = request.POST.get('comment_id', None)
+        comment = ReservationComment.objects.get(pk=comment_id)
+        if self.request.user == comment.reservation.member.user:
+            comment.delete()
+            context['messages'] = ['نظر شما با موفقیت حذف شد.', ]
+        else:
+            context['errors'] = ['شما تنها مجاز به حذف نظرات ثبت شده توسط خود هستید.', ]
+
+        return self.render_to_response(context)
 
 
 class ReservationCommentView(LoginRequiredMixin, TemplateView):
@@ -146,14 +164,14 @@ class ReservationCommentView(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class ReservationListView(ListView):
+class ReservationListView(LoginRequiredMixin, ListView):
     template_name = 'reservation/list.html'
 
     def get_queryset(self):
         return Reservation.objects.filter(member=self.request.user.member)
 
 
-class ReservationCancelView(View):
+class ReservationCancelView(LoginRequiredMixin, View):
 
     @staticmethod
     def post(request, reservation_id):
@@ -167,10 +185,13 @@ class ReservationCancelView(View):
         return redirect(reverse_lazy('reservation:list'))
 
 
-class ReservationCreateView(CreateView):
+class ReservationCreateView(LoginRequiredMixin, CreateView):
     form_class = ReservationForm
     template_name = 'reservation/error.html'
     success_url = reverse_lazy('reservation:list')
+
+    def get(self, request, habitat_pk):
+        return redirect(reverse_lazy('reservation:habitat', args=(habitat_pk,)) + '?' + urlencode(request.GET))
 
     def get_form_kwargs(self):
         super_kwargs = super().get_form_kwargs()

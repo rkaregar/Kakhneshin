@@ -19,7 +19,7 @@ class PlaceCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
     def form_valid(self, form):
         if self.request.user.member:
-            form.instance.owner = self.request.user.member
+            form.instance.creator = self.request.user.member
         return super(PlaceCreateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):
@@ -45,7 +45,7 @@ class PlaceUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return self.place
 
     def user_passed_test(self, request):
-        return request.user.is_superuser or self.place.creator == self.request.user.member
+        return request.user.is_superuser or self.place.creator.user == self.request.user
         # return request.user.is_superuser
 
     def get_context_data(self, **kwargs):
@@ -79,7 +79,7 @@ class PlaceDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
         return self.place
 
     def user_passed_test(self, request):
-        return request.user.is_superuser or self.place.creator == self.request.user.member
+        return request.user.is_superuser or self.place.creator.user == self.request.user
         # return request.user.is_superuser
 
     def dispatch(self, request, *args, **kwargs):
@@ -98,7 +98,7 @@ class PlaceListView(ListView):
         qs = super(PlaceListView, self).get_queryset()
 
         if not self.request.user.is_superuser:
-            qs = qs.filter(creator=self.request.user.member)
+            qs = qs.filter(creator__user=self.request.user)
 
         return qs
 
@@ -131,7 +131,7 @@ class PlaceTinyDetailView(DetailView):
         return context
 
     def user_passed_test(self, request):
-        return request.user.is_authenticated
+        return True
         # return request.user.is_superuser
 
     def dispatch(self, request, *args, **kwargs):
@@ -146,22 +146,32 @@ class PlaceTinyDetailView(DetailView):
         self.object = self.get_object()
         context = self.get_context_data(**kwargs)
 
-        rating = request.POST.get('rating', None)
-        if rating == '':
-            rating = None
-        review = request.POST.get('review', None)
-
-        if not rating and not review:
-            context['errors'] = ['ثبت حداقل یکی از موارد امتیاز یا متن نظر الزامیست']
+        if request.POST.get('delete', None):
+            comment_id = request.POST.get('comment_id', None)
+            comment = PlaceComment.objects.get(pk=comment_id)
+            if self.request.user == comment.writer.user:
+                comment.delete()
+                context['messages'] = ['نظر شما با موفقیت حذف شد.', ]
+            else:
+                context['errors'] = ['شما تنها مجاز به حذف نظرات ثبت شده توسط خود هستید.', ]
         else:
-            place_comment = PlaceComment.objects.create(place_id=self.kwargs.get('place_pk', None),
-                                                        writer=self.request.user.member, rating=rating, review=review)
+            rating = request.POST.get('rating', None)
+            if rating == '':
+                rating = None
+            review = request.POST.get('review', None)
 
-            if self.request.FILES:
-                for image in self.request.FILES.getlist('image'):
-                    PlaceCommentPhoto.objects.create(place_comment=place_comment, photo=image)
-                for video in self.request.FILES.getlist('video'):
-                    PlaceCommentVideo.objects.create(place_comment=place_comment, video=video)
+            if not rating and not review:
+                context['errors'] = ['ثبت حداقل یکی از موارد امتیاز یا متن نظر الزامیست']
+            else:
+                place_comment = PlaceComment.objects.create(place_id=self.kwargs.get('place_pk', None),
+                                                            writer=self.request.user.member, rating=rating,
+                                                            review=review)
+
+                if self.request.FILES:
+                    for image in self.request.FILES.getlist('image'):
+                        PlaceCommentPhoto.objects.create(place_comment=place_comment, photo=image)
+                    for video in self.request.FILES.getlist('video'):
+                        PlaceCommentVideo.objects.create(place_comment=place_comment, video=video)
 
         return self.render_to_response(context)
 

@@ -120,17 +120,6 @@
 
             <div class="col-lg-6">
                 <div id="carousel" class="carousel slide" data-ride="carousel">
-                    <ol class="carousel-indicators">
-                        {% for img in images %}
-                            {% if forloop.counter == 1 %}
-                                <li data-target="#carousel"
-                                    data-slide-to={{ forloop.counter0 }} class="active"></li>
-                            {% else %}
-                                <li data-target="#carousel" data-slide-to={{ forloop.counter0 }}></li>
-                            {% endif %}
-                        {% endfor %}
-                    </ol>
-
                     <div class="carousel-inner" role="listbox">
                         {% if images %}
                             {% for img in images %}
@@ -153,15 +142,6 @@
 
                         </div>
                     </div>
-
-                    <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
                 </div>
 
 
@@ -181,10 +161,12 @@
                 <a class="nav-link" id="comments-tab" data-toggle="tab" href="#comments" role="tab"
                    aria-controls="comments" aria-selected="false">نظرات</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" id="reservations-tab" data-toggle="tab" href="#reservations" role="tab"
-                   aria-controls="reservations" aria-selected="false">رزروهای قبلی شما</a>
-            </li>
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" id="reservations-tab" data-toggle="tab" href="#reservations" role="tab"
+                       aria-controls="reservations" aria-selected="false">رزروهای قبلی شما</a>
+                </li>
+            {% endif %}
         </ul>
     </div>
 
@@ -227,7 +209,7 @@
                     <div class="form-group row">
                         <label for="id_persons" class="col-form-label">تعداد مسافران</label>
                         <div class="col-sm-5">
-                            <input type="number"
+                            <input type="number" min="1"
                                    class="form-control {% if form.persons.errors %}is-invalid{% endif %}"
                                    id="id_persons"
                                    name="persons" value="{{ form.persons.value }}">
@@ -318,7 +300,8 @@
                                     <input type="hidden" name="from_date" value="{{ from_date }}">
                                     <input type="hidden" name="to_date" value="{{ to_date }}">
 
-                                    <input type="button" name="btn" value="رزرو اتاق" id="submitBtn_{{ type.id }}"
+                                    <input type="{% if request.user.is_authenticated %}button{% else %}submit{% endif %}"
+                                           name="btn" value="رزرو اتاق" id="submitBtn_{{ type.id }}"
                                            data-toggle="modal"
                                            data-target="#confirm-submit-{{ type.id }}" class="btn btn-primary"/>
                                 </form>
@@ -450,8 +433,44 @@
                                     </tr>
                                     </tbody>
                                 </table>
-                            </div>
+                                {% if user == comment.reservation.member.user %}
+                                    <div class="col-1">
+                                        <button id="btn-delete{{ comment.id }}" type="button" name="delete"
+                                                class="btn btn-danger btn-delete"
+                                                data-id={{ comment.id }} data-toggle="modal"
+                                                data-target="#myModal" style="margin-top: 5px"
+                                        >حذف نظر
+                                        </button>
+                                    </div>
+                                    <br>
+                                {% endif %}
+                                <div class="modal fade" id="myModal" role="dialog">
+                                    <div class="modal-dialog">
 
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" dir="rtl">حذف نظر</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>آیا با حذف این نظر موافقید؟</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger" data-dismiss="modal">خیر
+                                                </button>
+                                                <form method="post">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="delete" value="true">
+                                                    <input type="hidden" name="comment_id" id="modal_id">
+                                                    <button type="submit" class="btn btn-success"
+                                                            style="margin-right: 5px;">بله
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="col-4">
                                 <h6>تصاویر ثبت شده برای این نظر:</h6>
@@ -571,78 +590,89 @@
                     </div>
                     <br>
                 {% empty %}
-                    <h4>هنوز نظری برای این مکان دیدنی ثبت نشده است.</h4>
+                    <h4>هنوز نظری برای این اقامتگاه ثبت نشده است.</h4>
                 {% endfor %}
+
+                <script>
+                    $(document).ready(function () {
+                        $(".btn-delete").bind('click', function () {
+                            const id = $(this).attr('data-id');
+                            $('#modal_id').attr('value', id);
+                        })
+                    })
+                </script>
 
                 </div>
                 </div>
             </div>
         </div>
 
-        <div class="row tab-pane fade show" id="reservations">
+        {% if user.is_authenticated %}
+            <div class="row tab-pane fade show" id="reservations">
 
-            <div class="container" align="right" id="features">
-                <h3>رزروهای قبلی شما از این اقامتگاه</h3>
+                <div class="container" align="right" id="features">
+                    <h3>رزروهای قبلی شما از این اقامتگاه</h3>
 
-                {% for reservation_group in reservations|group_by:4 %}
-                    <div class="row" align="center">
-                        {% for reservation in reservation_group %}
-                            <div class="col-lg-3 mb-3">
-                                <div class="card h-100">
-                                    {% if reservation.room.photo %}
-                                        <img class="card-img-top" src="/media/{{ reservation.room.photo }}" alt="">
-                                    {% else %}
-                                        <img class="card-img-top" src="/static/images/no_room1.png" alt="">
-                                    {% endif %}
-
-                                    <h5 class="card-header">اتاق {{ reservation.room }}</h5>
-
-                                    <table class="table">
-                                        <tbody>
-                                        <tr>
-                                            <td>از تاریخ:</td>
-                                            <td class="date-time">{{ reservation.from_date }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>تا تاریخ:</td>
-                                            <td class="date-time">{{ reservation.to_date }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>فعال:</td>
-                                            <td>
-                                                {% if reservation.is_active %}
-                                                    <span class="fas fa-check-circle" style="color: green"></span>
-                                                {% else %}
-                                                    <span class="fas fa-times-circle" style="color: red"></span>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                    <br><br>
-                                    <div class="card-footer">
-                                        {% if reservation.comment or not reservation.is_active %}
-                                            <a href="#" class="btn btn-primary disabled">ثبت نظر</a>
+                    {% for reservation_group in reservations|group_by:4 %}
+                        <div class="row" align="center">
+                            {% for reservation in reservation_group %}
+                                <div class="col-lg-3 mb-3">
+                                    <div class="card h-100">
+                                        {% if reservation.room.photo %}
+                                            <img class="card-img-top" src="/media/{{ reservation.room.photo }}" alt="">
                                         {% else %}
-                                            <button onclick="window.location='{% url 'reservation:create_reservation_comment' reservation_pk=reservation.id %}'+window.location.search;"
-                                                    class="btn btn-primary">ثبت نظر
-                                            </button>
+                                            <img class="card-img-top" src="/static/images/no_room1.png" alt="">
                                         {% endif %}
 
+                                        <h5 class="card-header">اتاق {{ reservation.room }}</h5>
+
+                                        <table class="table">
+                                            <tbody>
+                                            <tr>
+                                                <td>از تاریخ:</td>
+                                                <td class="date-time">{{ reservation.from_date }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>تا تاریخ:</td>
+                                                <td class="date-time">{{ reservation.to_date }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>فعال:</td>
+                                                <td>
+                                                    {% if reservation.is_active %}
+                                                        <span class="fas fa-check-circle" style="color: green"></span>
+                                                    {% else %}
+                                                        <span class="fas fa-times-circle" style="color: red"></span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <br><br>
+                                        <div class="card-footer">
+                                            {% if reservation.comment or not reservation.is_active %}
+                                                <a href="#" class="btn btn-primary disabled">ثبت نظر</a>
+                                            {% else %}
+                                                <button onclick="window.location='{% url 'reservation:create_reservation_comment' reservation_pk=reservation.id %}'+window.location.search;"
+                                                        class="btn btn-primary">ثبت نظر
+                                                </button>
+                                            {% endif %}
+
+                                        </div>
+
                                     </div>
-
                                 </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% empty %}
-                    <h4>شما تا کنون از این اقامتگاه رزروی انجام نداده‌اید.</h4>
-                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% empty %}
+                        <h4>شما تا کنون از این اقامتگاه رزروی انجام نداده‌اید.</h4>
+                    {% endfor %}
 
+
+                </div>
 
             </div>
-
-        </div>
+        {% endif %}
 
     </div>
 

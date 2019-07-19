@@ -6,7 +6,7 @@ from django.conf import settings
 from accounts.models import Transaction
 from django.contrib.auth.models import User
 from django.test import override_settings, tag
-from habitats.models import Habitat, RoomType
+from habitats.models import Habitat, RoomType, GeographicDivision
 from reservation.models import Reservation
 from users.models import Member
 from utils.test import SeleniumTestCase
@@ -25,13 +25,43 @@ class TestReservation(SeleniumTestCase):
         self.member = Member.objects.create(user=self.user)
         self.owner_member = Member.objects.create(user=self.habitat_owner_user)
         self.habitat = Habitat.objects.create(name='hello', owner=self.owner_member)
+
         self.room = RoomType.objects.create(
             habitat=self.habitat,
             number_of_rooms_of_this_kind=2,
             cost_per_night=self.cost_per_day,
+            capacity_in_person=1,
         )
 
         self.selenium_client.login('ali', 'hello')
+
+    @override_settings(DEBUG=True)
+    def test_login_redirect(self):
+
+        self.selenium_client.logout()
+
+        Transaction.objects.create(from_user=None, to_user=self.user, amount=10000000, verified=True)
+        self.selenium_client.get('/reservation/{}/?persons=1&from_date={}&to_date={}'.format(
+            self.habitat.id,
+            date.today() + timedelta(days=50),
+            date.today() + timedelta(days=52),
+        ))
+        button = self.selenium_client.web_driver.find_elements_by_tag_name('input')[-1]
+        button.location_once_scrolled_into_view
+        button.click()
+        sleep(1)
+
+        self.selenium_client.login_without_navigation('ali', 'hello')
+        button = self.selenium_client.web_driver.find_elements_by_tag_name('input')[-1]
+        button.location_once_scrolled_into_view
+        button.click()
+        sleep(1)
+
+        button = self.selenium_client.web_driver.find_element_by_link_text('بله')
+        button.location_once_scrolled_into_view
+        button.click()
+        sleep(1)
+        self.assertEqual(Transaction.get_balance_from_user(self.user), 10000000 - self.cost_per_day * 2)
 
     @override_settings(DEBUG=True)
     def test_reserve_success(self):
@@ -45,7 +75,7 @@ class TestReservation(SeleniumTestCase):
         button.location_once_scrolled_into_view
         button.click()
         sleep(1)
-        button = self.selenium_client.web_driver.find_elements_by_tag_name('a')[-1]
+        button = self.selenium_client.web_driver.find_element_by_link_text('بله')
         button.location_once_scrolled_into_view
         button.click()
         sleep(1)
@@ -74,7 +104,7 @@ class TestReservation(SeleniumTestCase):
             button.location_once_scrolled_into_view
             button.click()
             sleep(1)
-            button = self.selenium_client.web_driver.find_elements_by_tag_name('a')[-1]
+            button = self.selenium_client.web_driver.find_element_by_link_text('بله')
             button.location_once_scrolled_into_view
             button.click()
             sleep(1)
@@ -121,7 +151,7 @@ class TestReservation(SeleniumTestCase):
         button.location_once_scrolled_into_view
         button.click()
         sleep(1)
-        button = self.selenium_client.web_driver.find_elements_by_tag_name('a')[-1]
+        button = self.selenium_client.web_driver.find_element_by_link_text('بله')
         button.location_once_scrolled_into_view
         button.click()
         sleep(1)
@@ -136,7 +166,7 @@ class TestReservation(SeleniumTestCase):
         button.location_once_scrolled_into_view
         button.click()
         sleep(1)
-        button = self.selenium_client.web_driver.find_elements_by_tag_name('a')[-1]
+        button = self.selenium_client.web_driver.find_element_by_link_text('بله')
         button.location_once_scrolled_into_view
         button.click()
         sleep(1)
